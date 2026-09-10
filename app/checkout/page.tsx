@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   QrCode,
   CreditCard,
-  Barcode,
   Truck,
   ArrowLeft,
   Copy,
@@ -34,7 +33,7 @@ function CheckoutContent() {
   const pixAmount = (amount * 0.95).toFixed(2).replace('.', ',')
   const installmentAmount = (amount / 12).toFixed(2).replace('.', ',')
 
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card' | 'boleto'>('pix')
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix')
   const [copied, setCopied] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
@@ -243,22 +242,22 @@ function CheckoutContent() {
             <span>Forma de Pagamento</span>
           </h2>
 
-          <div className="grid grid-cols-3 gap-2.5 mb-4">
+          <div className="grid grid-cols-2 gap-3 mb-4">
             {/* PIX */}
             <button
               type="button"
               onClick={() => setPaymentMethod('pix')}
               className={cn(
-                'p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5',
+                'p-3.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5',
                 paymentMethod === 'pix'
-                  ? 'border-[#00B84A] bg-[#EBF8F0] shadow-sm'
+                  ? 'border-[#00B84A] bg-[#EBF8F0] shadow-sm ring-1 ring-[#00B84A]'
                   : 'border-neutral-200 hover:border-neutral-300 bg-white'
               )}
             >
               <QrCode className="w-5 h-5 text-[#00B84A]" />
               <span className="text-xs font-black text-neutral-900">PIX</span>
               <span className="text-[10px] font-bold text-[#00B84A] bg-white px-1.5 py-0.5 rounded-full shadow-xs">
-                5% OFF
+                Aprovação Imediata
               </span>
             </button>
 
@@ -267,31 +266,15 @@ function CheckoutContent() {
               type="button"
               onClick={() => setPaymentMethod('card')}
               className={cn(
-                'p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5',
+                'p-3.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5',
                 paymentMethod === 'card'
-                  ? 'border-[#00B84A] bg-[#EBF8F0] shadow-sm'
+                  ? 'border-[#00B84A] bg-[#EBF8F0] shadow-sm ring-1 ring-[#00B84A]'
                   : 'border-neutral-200 hover:border-neutral-300 bg-white'
               )}
             >
               <CreditCard className="w-5 h-5 text-neutral-800" />
-              <span className="text-xs font-black text-neutral-900">Cartão</span>
+              <span className="text-xs font-black text-neutral-900">Cartão de Crédito</span>
               <span className="text-[10px] font-bold text-neutral-500">Até 12x</span>
-            </button>
-
-            {/* Boleto */}
-            <button
-              type="button"
-              onClick={() => setPaymentMethod('boleto')}
-              className={cn(
-                'p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5',
-                paymentMethod === 'boleto'
-                  ? 'border-[#00B84A] bg-[#EBF8F0] shadow-sm'
-                  : 'border-neutral-200 hover:border-neutral-300 bg-white'
-              )}
-            >
-              <Barcode className="w-5 h-5 text-neutral-800" />
-              <span className="text-xs font-black text-neutral-900">Boleto</span>
-              <span className="text-[10px] font-bold text-neutral-500">À vista</span>
             </button>
           </div>
 
@@ -353,17 +336,6 @@ function CheckoutContent() {
                   <option value="12">12x de R$ {installmentAmount} sem juros</option>
                 </select>
               </div>
-            </div>
-          )}
-
-          {paymentMethod === 'boleto' && (
-            <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 text-xs">
-              <p className="text-neutral-600 mb-2">
-                O boleto bancário pode levar de 1 a 2 dias úteis para compensar após o pagamento.
-              </p>
-              <p className="font-bold text-neutral-900">
-                Total à vista: R$ {amount},00 com Frete Grátis
-              </p>
             </div>
           )}
         </div>

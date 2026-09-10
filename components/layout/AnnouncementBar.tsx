@@ -44,7 +44,7 @@ export default function AnnouncementBar() {
       <div className="wrap">
         <span className="an-live" aria-hidden="true"></span>
         <span className="an-msg" id="an-msg">
-          Seu <b>-51%</b> e o <b>frete grátis</b> terminam em
+          🔥 <b>OFERTA EXCLUSIVA:</b> <b>51% OFF</b> + <b>FRETE GRÁTIS</b> ENCERRAM EM
         </span>
         <time className="an-clock" id="clock-top">{timeLeft}</time>
       </div>

@@ -71,19 +71,19 @@ export default function LaunchOffer() {
               <span><b>12 meses</b> de garantia de fábrica + 7 dias para testar</span>
             </li>
             <li>
-              <span>Pagamento <b>100% seguro</b> via Mercado Pago e Pix</span>
+              <span>Pagamento <b>100% seguro</b> e protegido via Pix ou Cartão</span>
             </li>
           </ul>
 
           <p className="oferta-timer" id="of-timer">
-            Seu <b>-{discountPercent}%</b> e o frete grátis terminam em{' '}
+            O desconto de <b>{discountPercent}% OFF</b> e o frete grátis encerram em{' '}
             <time id="of-clock">{timeLeft}</time>
           </p>
 
           <a className="btn btn-buy oferta-cta" href="#producto">
             COMPRAR AGORA · {formatMoney(cheapestKit.price)} &rarr;
           </a>
-          <p className="oferta-mp">Pix, Cartão de Crédito em até 12x ou Boleto Bancário</p>
+          <p className="oferta-mp">Pix com aprovação imediata ou Cartão de Crédito em até 12x</p>
         </div>
       </div>
     </section>

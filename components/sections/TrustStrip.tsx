@@ -27,7 +27,7 @@ export default function TrustStrip() {
             </svg>
             <div>
               <b>Pagamento seguro</b>
-              <small>Pix, Cartão em até 12x ou Boleto</small>
+              <small>Pix ou Cartão em até 12x</small>
             </div>
           </li>
 

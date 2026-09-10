@@ -77,7 +77,7 @@ export default function Modals() {
             <h3>Compartilhamento seguro</h3>
             <p>
               Não vendemos nem repassamos seus dados sob nenhuma hipótese. Os dados estritamente operacionais são compartilhados
-              apenas com os Correios/transportadoras e com o gateway de pagamento criptografado (Mercado Pago).
+              apenas com os Correios/transportadoras e com processadores de pagamento com criptografia SSL de ponta a ponta.
             </p>
           </div>
         </div>

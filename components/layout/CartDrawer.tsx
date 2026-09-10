@@ -110,7 +110,7 @@ export default function CartDrawer() {
               </button>
 
               <p style={{ fontSize: '12px', color: 'var(--ink-3)', textAlign: 'center', marginTop: '10px' }}>
-                Pagamento seguro com Mercado Pago &middot; Até {CONFIG.installments}x no cartão ou Pix
+                Pagamento 100% seguro &middot; Até {CONFIG.installments}x no cartão ou Pix
               </p>
             </>
           )}

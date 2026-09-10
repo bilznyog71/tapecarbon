@@ -1408,10 +1408,10 @@ p { color: var(--ink-2); }
   font-weight: 700;
   color: var(--ink-3);
 }
-.co-steps li { display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; }
+.co-steps li { display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; transition: all 0.2s ease; }
 .co-steps i {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -1420,10 +1420,14 @@ p { color: var(--ink-2); }
   font-weight: 800;
   background: var(--line);
   color: var(--ink-2);
+  flex: none;
 }
 .co-steps li.on { background: var(--gold-soft); color: var(--gold); }
 .co-steps li.on i { background: var(--gold); color: #1B1400; }
+.co-steps li.done { color: var(--green-dark); }
 .co-steps li.done i { background: var(--green); color: #04240F; }
+.co-steps .step-label-full { display: inline; }
+.co-steps .step-label-short { display: none; }
 
 .co-seals {
   display: flex;
@@ -1489,9 +1493,177 @@ p { color: var(--ink-2); }
   margin: 12px 0;
 }
 .co-err a { color: var(--gold); text-decoration: underline; }
-.co-back { font-size: 13.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 16px; background: none; border: 0; cursor: pointer; padding: 0; }
-.co-back:hover { color: var(--gold); }
-.co-note { font-size: 13.5px; margin-bottom: 16px; color: var(--ink-2); }
+.co-step-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.co-step-badge span {
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+.co-step-badge h2 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.co-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-l);
+  padding: 22px;
+}
+.co-section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.co-section-title svg {
+  stroke: var(--gold);
+}
+
+.co-pay-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.co-pay-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 15px 16px;
+  border-radius: var(--r);
+  border: 1.5px solid var(--line-strong);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left;
+  position: relative;
+  width: 100%;
+}
+.co-pay-opt:hover {
+  border-color: var(--ink-3);
+  background: var(--bg-soft);
+}
+.co-pay-opt.on {
+  border-color: var(--gold);
+  background: rgba(232, 177, 12, 0.07);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+.co-pay-opt-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+.co-pay-opt-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.co-pay-opt-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.co-pay-opt-desc {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.co-pay-box {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: var(--r-l);
+  border: 1px solid var(--line-strong);
+}
+
+.co-next-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  margin-top: 20px;
+  padding-block: 15px;
+}
+
+.co-mobile-summary-bar {
+  display: none;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--line);
+  padding: 13px 16px;
+}
+.co-summary-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 13.5px;
+}
+.summary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold);
+  font-weight: 700;
+}
+.summary-arrow {
+  font-size: 10px;
+  color: var(--ink-3);
+}
+.summary-total {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.co-side-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.co-side-hd h2 {
+  font-size: 15px;
+  margin: 0;
+}
+.co-side-hd .badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-2);
+}
 
 .co-side {
   border: 1px solid var(--line);
@@ -1617,9 +1789,13 @@ p { color: var(--ink-2); }
   .revs { grid-template-columns: repeat(2, 1fr); }
   .strip ul { grid-template-columns: repeat(2, 1fr); }
   .ftr-grid { grid-template-columns: 1fr 1fr; }
-  .co-grid { grid-template-columns: 1fr; gap: 26px; }
-  .co-side { position: static; order: -1; }
-  .co-steps { display: none; }
+  .co-grid { grid-template-columns: 1fr; gap: 20px; }
+  .co-mobile-summary-bar { display: block; }
+  .co-side { display: none; position: static; }
+  .co-side.mobile-expanded { display: block; margin-bottom: 20px; }
+  .co-steps { display: flex; gap: 5px; font-size: 12px; margin-inline: auto; }
+  .co-steps li { padding: 4px 9px; gap: 6px; }
+  .co-steps i { width: 19px; height: 19px; font-size: 10px; }
 }
 
 @media (max-width: 660px) {
@@ -1642,7 +1818,15 @@ p { color: var(--ink-2); }
   .vs td, .vs th { padding: 11px 10px; font-size: 13.5px; }
   .vs td:nth-child(2), .vs td:nth-child(3) { width: 18%; }
   .co-row { grid-template-columns: 1fr; gap: 0; }
-  .co-body { padding: 22px 0 96px; }
+  .co-body { padding: 18px 0 96px; }
+  .co-steps { gap: 3px; font-size: 11px; }
+  .co-steps li { padding: 3px 6px; gap: 4px; }
+  .co-steps i { width: 17px; height: 17px; font-size: 9.5px; }
+  .co-steps .step-label-full { display: none; }
+  .co-steps .step-label-short { display: inline; }
+  .co-pay-grid { grid-template-columns: 1fr; gap: 9px; }
+  .co-section-card { padding: 16px 14px; }
+  .co-pay-box { padding: 18px 14px; }
   .fld input, .fld select { font-size: 16px; }
   .co-seals { gap: 6px 16px; padding: 9px 14px; }
   .co-seals li { font-size: 11.5px; }

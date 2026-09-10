@@ -25,8 +25,8 @@ export default function Footer() {
               <span>Mastercard</span>
               <span>Elo</span>
               <span>Hipercard</span>
-              <span>Mercado Pago</span>
-              <span>Boleto</span>
+              <span>Amex</span>
+              <span>SSL Blindado</span>
             </div>
           </div>
 
