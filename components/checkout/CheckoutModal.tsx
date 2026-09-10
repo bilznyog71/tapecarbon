@@ -709,8 +709,11 @@ export default function CheckoutModal() {
                           {pixQrImage ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={pixQrImage} alt="QR Code Pix" width="190" height="190" style={{ display: 'block', borderRadius: '4px' }} />
+                          ) : pixCode ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pixCode)}`} alt="QR Code Pix" width="190" height="190" style={{ display: 'block', borderRadius: '4px' }} />
                           ) : (
-                            /* QR Code Pix Render */
+                            /* QR Code Placeholder */
                             <svg width="180" height="180" viewBox="0 0 100 100" fill="#000">
                               <rect width="30" height="30" fill="#000" />
                               <rect x="5" y="5" width="20" height="20" fill="#fff" />
