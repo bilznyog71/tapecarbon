@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@/hooks/useStore';
-import { CONFIG, formatMoney, formatInstallment } from '@/data/config';
+import { CONFIG, formatMoney } from '@/data/config';
 
 export default function CheckoutModal() {
   const { cart, isCheckoutOpen, closeCheckout, clearCart } = useStore();
@@ -30,6 +30,10 @@ export default function CheckoutModal() {
   const [estado, setEstado] = useState('SP');
   const [referencia, setReferencia] = useState('');
   const [formError, setFormError] = useState('');
+  const [isSearchingCep, setIsSearchingCep] = useState(false);
+  const [cepFeedback, setCepFeedback] = useState('');
+
+  const numeroInputRef = useRef<HTMLInputElement>(null);
 
   // Timer
   const [clock, setClock] = useState('00:15:00');
@@ -53,13 +57,15 @@ export default function CheckoutModal() {
   const totalOld = cart.reduce((sum, item) => sum + item.priceOld, 0);
   const discount = totalOld - total;
 
-  // Busca automática de CEP via ViaCEP
+  // Busca instantânea de CEP via ViaCEP
   const handleCepChange = async (val: string) => {
     const raw = val.replace(/\D/g, '').slice(0, 8);
     const masked = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw;
     setCep(masked);
 
     if (raw.length === 8) {
+      setIsSearchingCep(true);
+      setCepFeedback('Buscando endereço…');
       try {
         const res = await fetch(`https://viacep.com.br/ws/${raw}/json/`);
         const data = await res.json();
@@ -68,10 +74,20 @@ export default function CheckoutModal() {
           setBairro(data.bairro || '');
           setCidade(data.localidade || '');
           setEstado(data.uf || 'SP');
+          setCepFeedback(`✓ Endereço localizado: ${data.localidade} - ${data.uf}`);
+          setTimeout(() => {
+            numeroInputRef.current?.focus();
+          }, 100);
+        } else {
+          setCepFeedback('CEP não encontrado. Digite o endereço manualmente.');
         }
       } catch {
-        // ignore
+        setCepFeedback('');
+      } finally {
+        setIsSearchingCep(false);
       }
+    } else {
+      setCepFeedback('');
     }
   };
 
@@ -102,7 +118,7 @@ export default function CheckoutModal() {
   const handleContinueToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nome.trim() || !sobrenome.trim() || !email.trim() || !telefone.trim() || !cpf.trim() || !cep.trim() || !rua.trim() || !numero.trim() || !cidade.trim()) {
-      setFormError('Por favor, preencha todos os campos obrigatórios em destaque.');
+      setFormError('Por favor, preencha todos os campos obrigatórios marcados com *.');
       return;
     }
     setFormError('');
@@ -112,12 +128,12 @@ export default function CheckoutModal() {
   const handleCompleteOrder = () => {
     setIsSubmitting(true);
     setTimeout(() => {
-      const generated = `TC-${Math.floor(100000 + Math.random() * 900000)}`;
+      const generated = `AC-${Math.floor(100000 + Math.random() * 900000)}`;
       setOrderId(generated);
       setIsSubmitting(false);
       setStep('result');
       clearCart();
-    }, 1500);
+    }, 1200);
   };
 
   if (!isCheckoutOpen) return null;
@@ -128,7 +144,7 @@ export default function CheckoutModal() {
         <div className="wrap">
           <span className="logo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/img/logo.png" alt="TapeCarbon" width="115" height="40" />
+            <img src="/assets/img/logo.png" alt="AlfaCarbon" width="115" height="40" />
           </span>
 
           <ol className="co-steps">
@@ -185,10 +201,10 @@ export default function CheckoutModal() {
           {/* Coluna Principal */}
           <div className="co-main">
 
-            {/* Passo 1: Formulário */}
+            {/* Passo 1: Formulário e Endereço */}
             {step === 'form' && (
               <form className="co-form" onSubmit={handleContinueToPayment} noValidate>
-                <h2>Seus dados</h2>
+                <h2>1. Seus dados de contato</h2>
                 <div className="co-row">
                   <p className="fld">
                     <label htmlFor="f-nome">Nome *</label>
@@ -239,7 +255,7 @@ export default function CheckoutModal() {
                 </div>
 
                 <p className="fld">
-                  <label htmlFor="f-cpf">CPF (obrigatório para emissão de Nota Fiscal) *</label>
+                  <label htmlFor="f-cpf">CPF (exigido para emissão de Nota Fiscal) *</label>
                   <input
                     id="f-cpf"
                     value={cpf}
@@ -250,7 +266,7 @@ export default function CheckoutModal() {
                   <small>Exigido pela Receita Federal para emissão de Nota Fiscal Eletrônica.</small>
                 </p>
 
-                <h2 style={{ marginTop: '28px' }}>Endereço de entrega</h2>
+                <h2 style={{ marginTop: '28px' }}>2. Endereço de entrega</h2>
                 <div className="co-row">
                   <p className="fld">
                     <label htmlFor="f-cep">CEP *</label>
@@ -259,9 +275,18 @@ export default function CheckoutModal() {
                       value={cep}
                       onChange={e => handleCepChange(e.target.value)}
                       placeholder="00000-000"
+                      maxLength={9}
                       required
                     />
-                    <small>Busca automática de endereço</small>
+                    {isSearchingCep ? (
+                      <small style={{ color: 'var(--gold)' }}>Buscando CEP...</small>
+                    ) : cepFeedback ? (
+                      <small style={{ color: cepFeedback.startsWith('✓') ? 'var(--green-dark)' : 'var(--red)', fontWeight: 600 }}>
+                        {cepFeedback}
+                      </small>
+                    ) : (
+                      <small>Digite o CEP para buscar o endereço automaticamente.</small>
+                    )}
                   </p>
                   <p className="fld">
                     <label htmlFor="f-cidade">Cidade *</label>
@@ -293,6 +318,7 @@ export default function CheckoutModal() {
                     <label htmlFor="f-numero">Número *</label>
                     <input
                       id="f-numero"
+                      ref={numeroInputRef}
                       value={numero}
                       onChange={e => setNumero(e.target.value)}
                       placeholder="Ex: 123"
@@ -363,9 +389,9 @@ export default function CheckoutModal() {
                   &larr; Voltar e editar dados
                 </button>
 
-                <h2>Escolha a forma de pagamento</h2>
+                <h2>Forma de pagamento</h2>
                 <p className="co-note">
-                  Ambiente seguro e criptografado. Seus dados financeiros não ficam salvos neste site.
+                  Ambiente seguro e criptografado. Seus dados financeiros trafegam direto para a processadora.
                 </p>
 
                 <div className="chips" style={{ marginBottom: '22px' }}>
@@ -375,7 +401,7 @@ export default function CheckoutModal() {
                     onClick={() => setPayMethod('pix')}
                   >
                     <i style={{ background: '#00B84A' }}></i>
-                    Pix (Aprovação Imediata)
+                    Pix (Aprovação Instantânea)
                   </button>
                   <button
                     type="button"
@@ -398,12 +424,12 @@ export default function CheckoutModal() {
                 {payMethod === 'pix' && (
                   <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: 'var(--r)', border: '1px solid var(--line-strong)', textAlign: 'center' }}>
                     <h3 style={{ color: 'var(--green-dark)', marginBottom: '8px' }}>Pague com Pix e garanta envio prioritário</h3>
-                    <p style={{ fontSize: '14px', marginBottom: '18px' }}>
-                      A confirmação do Pix ocorre em segundos. Escaneie o QR Code ou use a chave Copia e Cola:
+                    <p style={{ fontSize: '14px', marginBottom: '18px', color: 'var(--ink-2)' }}>
+                      A confirmação do Pix ocorre em poucos segundos. Escaneie o QR Code ou use a chave Copia e Cola:
                     </p>
 
                     <div style={{ background: '#fff', padding: '16px', display: 'inline-block', borderRadius: '10px', marginBottom: '16px' }}>
-                      {/* Simulação de QR Code Pix SVG */}
+                      {/* QR Code Pix */}
                       <svg width="180" height="180" viewBox="0 0 100 100" fill="#000">
                         <rect width="30" height="30" fill="#000" />
                         <rect x="5" y="5" width="20" height="20" fill="#fff" />
@@ -425,23 +451,23 @@ export default function CheckoutModal() {
                       </svg>
                     </div>
 
-                    <div style={{ maxWidth: '420px', margin: '0 auto' }}>
+                    <div style={{ maxWidth: '440px', margin: '0 auto' }}>
                       <input
                         readOnly
-                        value="00020126580014br.gov.bcb.pix0136tc-br-pix-checkout-payment-tapecarbon5204000053039865405247.005802BR"
+                        value="00020126580014br.gov.bcb.pix0136alfacarbon-shop-pix-checkout-pagamento5204000053039865405247.005802BR5920ALFACARBON AUTOMOTIVO6009SAO PAULO62070503***6304ABCD"
                         style={{ width: '100%', padding: '10px', fontSize: '12px', textAlign: 'center', background: 'var(--bg-soft)', border: '1px solid var(--line)', color: 'var(--ink-2)', borderRadius: '6px', marginBottom: '10px' }}
                       />
                       <button
                         type="button"
                         className="btn btn-line btn-lg"
-                        style={{ fontSize: '14px', padding: '10px' }}
+                        style={{ fontSize: '14px', padding: '12px' }}
                         onClick={() => {
-                          navigator.clipboard?.writeText('00020126580014br.gov.bcb.pix0136tc-br-pix-checkout-payment-tapecarbon5204000053039865405247.005802BR');
+                          navigator.clipboard?.writeText('00020126580014br.gov.bcb.pix0136alfacarbon-shop-pix-checkout-pagamento5204000053039865405247.005802BR5920ALFACARBON AUTOMOTIVO6009SAO PAULO62070503***6304ABCD');
                           setPixCopied(true);
                           setTimeout(() => setPixCopied(false), 3000);
                         }}
                       >
-                        {pixCopied ? '✓ Chave Pix Copiada!' : 'Copiar Código Pix (Copia e Cola)'}
+                        {pixCopied ? '✓ Código Pix Copiado com Sucesso!' : 'Copiar Código Pix (Copia e Cola)'}
                       </button>
                     </div>
                   </div>
@@ -482,10 +508,9 @@ export default function CheckoutModal() {
 
                 {payMethod === 'boleto' && (
                   <div style={{ background: 'var(--bg-card)', padding: '24px', borderRadius: 'var(--r)', border: '1px solid var(--line-strong)', textAlign: 'center' }}>
-                    <h3>Boleto Bancário</h3>
-                    <p style={{ fontSize: '14px', marginTop: '8px' }}>
-                      O boleto será gerado para pagamento em qualquer agência bancária ou pelo aplicativo do seu banco.
-                      Prazo de compensação: 1 a 2 dias úteis.
+                    <h3 style={{ marginBottom: '8px' }}>Boleto Bancário</h3>
+                    <p style={{ fontSize: '14px', color: 'var(--ink-2)' }}>
+                      O boleto será gerado com vencimento em 3 dias úteis. Você pode pagar em qualquer banco, casa lotérica ou aplicativo bancário.
                     </p>
                   </div>
                 )}
@@ -501,14 +526,13 @@ export default function CheckoutModal() {
               </div>
             )}
 
-            {/* Passo 3: Resultado */}
+            {/* Passo 3: Concluído */}
             {step === 'result' && (
               <div className="co-result">
                 <div className="ico ok">✓</div>
                 <h2>Pedido Confirmado com Sucesso!</h2>
                 <p>
-                  Obrigado, <b>{nome}</b>! Seu pedido foi registrado em nosso sistema e já está sendo preparado
-                  pelo nosso centro de calibragem de moldes 3D.
+                  Obrigado, <b>{nome}</b>! Seu pedido foi registrado em nossa loja oficial <b>alfacarbon.shop</b> e já foi encaminhado para a calibragem do molde 3D.
                 </p>
 
                 <span className="ref">
@@ -516,21 +540,21 @@ export default function CheckoutModal() {
                 </span>
 
                 <div style={{ background: 'var(--bg-card)', padding: '18px', borderRadius: 'var(--r)', border: '1px solid var(--line)', textAlign: 'left', marginBottom: '20px' }}>
-                  <p style={{ fontSize: '13.5px', marginBottom: '6px' }}>
+                  <p style={{ fontSize: '13.5px', marginBottom: '6px', color: 'var(--ink)' }}>
                     📍 <b>Endereço de entrega:</b> {rua}, {numero} {complemento ? `- ${complemento}` : ''}, {bairro}, {cidade} - {estado}, CEP {cep}
                   </p>
-                  <p style={{ fontSize: '13.5px', marginBottom: '6px' }}>
-                    📦 <b>Envio:</b> Correios / Transportadora com rastreamento ponta a ponta.
+                  <p style={{ fontSize: '13.5px', marginBottom: '6px', color: 'var(--ink)' }}>
+                    📦 <b>Envio:</b> Correios / Transportadora com código de rastreamento.
                   </p>
-                  <p style={{ fontSize: '13.5px', margin: 0 }}>
-                    📧 Enviamos a confirmação e a Nota Fiscal para <b>{email}</b>.
+                  <p style={{ fontSize: '13.5px', margin: 0, color: 'var(--ink-2)' }}>
+                    📧 Confirmação e Nota Fiscal enviadas para <b>{email}</b>.
                   </p>
                 </div>
 
                 <p>
                   <a
                     className="btn btn-buy"
-                    href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(`Olá, acabei de realizar o pedido #${orderId} no site e gostaria de acompanhar o envio.`)}`}
+                    href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(`Olá, realizei o pedido #${orderId} no site alfacarbon.shop e gostaria de acompanhar o envio.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

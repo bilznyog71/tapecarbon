@@ -15,13 +15,13 @@ export interface ColorOption {
 }
 
 export const CONFIG = {
-  brand: 'TapeCarbon',
-  legalName: 'TapeCarbon Brasil Comércio Automotivo Ltda',
+  brand: 'AlfaCarbon',
+  legalName: 'AlfaCarbon Brasil Comércio Automotivo Ltda',
   country: 'Brasil',
-  domain: 'tapecarbon.com.br',
+  domain: 'alfacarbon.shop',
 
   /* ---- Contato ---- */
-  email: 'contato@tapecarbon.com.br',
+  email: 'contato@alfacarbon.shop',
   whatsapp: '5511999998888',
   whatsappLabel: '(11) 99999-8888',
   hours: 'Segunda a sexta, das 9h às 18h',

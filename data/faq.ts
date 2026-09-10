@@ -10,7 +10,7 @@ export const FAQ_DATA: FAQItem[] = [
   },
   {
     question: 'Como é feita a instalação?',
-    answer: 'Super simples e sem complicações. Basta retirar os tapetes antigos, posicionar as peças TapeCarbon sobre o piso e encaixar os ilhoses nos pinos e travas de fixação originais de fábrica do seu carro. Não utiliza cola, parafusos, velcros nem ferramentas. A instalação leva menos de 2 minutos.'
+    answer: 'Super simples e sem complicações. Basta retirar os tapetes antigos, posicionar as peças AlfaCarbon sobre o piso e encaixar os ilhoses nos pinos e travas de fixação originais de fábrica do seu carro. Não utiliza cola, parafusos, velcros nem ferramentas. A instalação leva menos de 2 minutos.'
   },
   {
     question: 'É realmente 100% impermeável?',

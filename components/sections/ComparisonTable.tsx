@@ -18,14 +18,14 @@ export default function ComparisonTable() {
       <div className="wrap narrow">
         <div className="sec-head mid">
           <span className="kicker">A diferença</span>
-          <h2>TapeCarbon contra um tapete comum</h2>
+          <h2>AlfaCarbon contra um tapete comum</h2>
         </div>
 
         <table className="vs">
           <thead>
             <tr>
               <th>Característica</th>
-              <th>TapeCarbon</th>
+              <th>AlfaCarbon</th>
               <th>Tapete Comum</th>
             </tr>
           </thead>

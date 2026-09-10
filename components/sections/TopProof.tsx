@@ -31,7 +31,7 @@ export default function TopProof() {
                 <img
                   className="rev-foto"
                   src={`/assets/img/${r.photo}`}
-                  alt={`Tapete TapeCarbon instalado no ${r.vehicle}`}
+                  alt={`Tapete AlfaCarbon instalado no ${r.vehicle}`}
                   loading="lazy"
                 />
                 <div className="rev-hd">

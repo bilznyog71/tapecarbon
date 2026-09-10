@@ -13,9 +13,9 @@ export default function Header() {
   return (
     <header className="hdr" id="hdr">
       <div className="wrap">
-        <a className="logo" href="#top" aria-label="TapeCarbon — início">
+        <a className="logo" href="#top" aria-label="AlfaCarbon — início">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/img/logo.png" alt="TapeCarbon" width="121" height="42" />
+          <img src="/assets/img/logo.png" alt="AlfaCarbon" width="121" height="42" />
         </a>
 
         <nav className="mainnav" aria-label="Principal">

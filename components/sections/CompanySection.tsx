@@ -11,7 +11,7 @@ export default function CompanySection() {
             <span className="kicker">A empresa</span>
             <h2>Atendemos a todo o Brasil</h2>
             <p>
-              A TapeCarbon desenvolve e comercializa tapetes automotivos bandeja 3D de alta precisão.
+              A AlfaCarbon desenvolve e comercializa tapetes automotivos bandeja 3D de alta precisão.
               Trabalhamos com molde exclusivo para cada modelo e ano, controle de qualidade peça por peça
               e atendimento humanizado por WhatsApp antes, durante e após a sua compra.
             </p>
@@ -49,7 +49,7 @@ export default function CompanySection() {
               width="1000"
               height="670"
               loading="lazy"
-              alt="Instalações e centro de distribuição da TapeCarbon"
+              alt="Instalações e centro de distribuição da AlfaCarbon"
             />
           </div>
         </div>

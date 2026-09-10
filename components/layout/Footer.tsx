@@ -12,9 +12,9 @@ export default function Footer() {
       <div className="wrap">
         <div className="ftr-grid">
           <div>
-            <a className="logo" href="#top" style={{ marginBottom: '14px' }} aria-label="TapeCarbon início">
+            <a className="logo" href="#top" style={{ marginBottom: '14px' }} aria-label="AlfaCarbon início">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/img/logo.png" alt="TapeCarbon" width="133" height="46" />
+              <img src="/assets/img/logo.png" alt="AlfaCarbon" width="133" height="46" />
             </a>
             <p style={{ maxWidth: '36ch' }}>
               Tapetes automotivos bandeja 3D sob medida para o assoalho do seu carro. Envio para todo o Brasil.
@@ -63,7 +63,7 @@ export default function Footer() {
             <ul>
               <li>
                 <a
-                  href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá, tenho uma dúvida sobre a TapeCarbon.')}`}
+                  href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá, tenho uma dúvida sobre a AlfaCarbon.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

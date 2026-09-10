@@ -57,7 +57,7 @@ function CheckoutContent() {
 
   const handleCopyPix = () => {
     navigator.clipboard.writeText(
-      '00020126580014br.gov.bcb.pix0136tapecarbon-pagamentos-pix-chave-aleatoria5204000053039865802BR5925TAPECARBON AUTOMOTIVO LTDA6009SAO PAULO62070503***6304ABCD'
+      '00020126580014br.gov.bcb.pix0136alfacarbon-shop-pix-chave-aleatoria5204000053039865802BR5920ALFACARBON AUTOMOTIVO6009SAO PAULO62070503***6304ABCD'
     )
     setCopied(true)
     setTimeout(() => setCopied(false), 3000)
@@ -402,7 +402,7 @@ function CheckoutContent() {
           </div>
           <div className="min-w-0 flex-1 text-xs">
             <span className="text-[10px] font-black text-[#00B84A] uppercase block">
-              TAPECARBON 3D ORIGINAL
+              ALFACARBON 3D ORIGINAL
             </span>
             <h4 className="font-extrabold text-sm text-neutral-900 truncate">
               {marca} {modelo} ({ano})
