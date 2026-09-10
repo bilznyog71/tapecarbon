@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '@/hooks/useStore';
 import { CONFIG, formatMoney } from '@/data/config';
 
@@ -10,9 +10,17 @@ export default function CheckoutModal() {
   const [step, setStep] = useState<'form' | 'pay' | 'result'>('form');
   const [payMethod, setPayMethod] = useState<'pix' | 'card'>('pix');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [pixCopied, setPixCopied] = useState(false);
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
+
+  // Blackcat Gateway State
+  const [pixCode, setPixCode] = useState('');
+  const [pixQrImage, setPixQrImage] = useState('');
+  const [transactionId, setTransactionId] = useState('');
+  const [payError, setPayError] = useState('');
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Form Fields
   const [nome, setNome] = useState('');
@@ -143,6 +151,67 @@ export default function CheckoutModal() {
     setCardCvv(val.replace(/\D/g, '').slice(0, 4));
   };
 
+  // Gerar PIX via Blackcat
+  const generatePix = useCallback(async () => {
+    setIsGeneratingPix(true);
+    setPayError('');
+    try {
+      const res = await fetch('/api/blackcat/create-sale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cart,
+          customer: { nome, sobrenome, email, telefone, cpf },
+          address: { cep, rua, numero, complemento, bairro, cidade, estado },
+          paymentMethod: 'pix',
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        const txnId = data.data.transactionId;
+        const pData = data.data.paymentData;
+        setTransactionId(txnId);
+        setOrderId(txnId);
+        if (pData?.copyPaste) {
+          setPixCode(pData.copyPaste);
+        } else if (pData?.qrCode) {
+          setPixCode(pData.qrCode);
+        }
+        if (pData?.qrCodeBase64) {
+          setPixQrImage(pData.qrCodeBase64);
+        }
+
+        // Inicia polling para detectar pagamento automático
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = setInterval(async () => {
+          try {
+            const statusRes = await fetch(`/api/blackcat/status/${txnId}`);
+            const statusData = await statusRes.json();
+            if (statusData.success && statusData.data?.status === 'PAID') {
+              if (pollingRef.current) clearInterval(pollingRef.current);
+              setOrderId(txnId);
+              setStep('result');
+              clearCart();
+              mainTopRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }
+          } catch {}
+        }, 3500);
+      } else {
+        setPayError(data.error || data.message || 'Não foi possível gerar a cobrança Pix na Blackcat.');
+      }
+    } catch {
+      setPayError('Erro de conexão com o servidor de pagamento. Tente novamente.');
+    } finally {
+      setIsGeneratingPix(false);
+    }
+  }, [cart, nome, sobrenome, email, telefone, cpf, cep, rua, numero, complemento, bairro, cidade, estado, clearCart]);
+
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, []);
+
   const handleContinueToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nome.trim() || !sobrenome.trim() || !email.trim() || !telefone.trim() || !cpf.trim() || !cep.trim() || !rua.trim() || !numero.trim() || !cidade.trim()) {
@@ -152,18 +221,104 @@ export default function CheckoutModal() {
     setFormError('');
     setStep('pay');
     mainTopRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+    // Se estiver no Pix, já inicia a geração com a Blackcat
+    if (payMethod === 'pix' && !pixCode) {
+      setTimeout(() => {
+        generatePix();
+      }, 50);
+    }
   };
 
-  const handleCompleteOrder = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      const generated = `AC-${Math.floor(100000 + Math.random() * 900000)}`;
-      setOrderId(generated);
-      setIsSubmitting(false);
-      setStep('result');
-      clearCart();
-      mainTopRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 1200);
+  const handleSwitchPaymentMethod = (method: 'pix' | 'card') => {
+    setPayMethod(method);
+    setPayError('');
+    if (method === 'pix' && !pixCode) {
+      generatePix();
+    }
+  };
+
+  // Finalizar Pagamento com Cartão ou Confirmação Manual
+  const handleCompleteOrder = async () => {
+    if (payMethod === 'card') {
+      if (!cardNumber.trim() || !cardName.trim() || !cardExpiry.trim() || !cardCvv.trim()) {
+        setPayError('Por favor, preencha todos os dados do cartão de crédito.');
+        return;
+      }
+
+      setIsSubmitting(true);
+      setPayError('');
+
+      try {
+        const deviceData = {
+          http_browser_language: typeof navigator !== 'undefined' ? navigator.language : 'pt-BR',
+          http_browser_color_depth: typeof window !== 'undefined' ? window.screen?.colorDepth : 24,
+          http_browser_screen_height: typeof window !== 'undefined' ? window.screen?.height : 1080,
+          http_browser_screen_width: typeof window !== 'undefined' ? window.screen?.width : 1920,
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        };
+
+        const res = await fetch('/api/blackcat/create-sale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cart,
+            customer: { nome, sobrenome, email, telefone, cpf },
+            address: { cep, rua, numero, complemento, bairro, cidade, estado },
+            paymentMethod: 'card',
+            cardData: {
+              number: cardNumber,
+              holderName: cardName,
+              expiry: cardExpiry,
+              cvv: cardCvv,
+              installments: cardInstallments,
+            },
+            device: deviceData,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (data.success && data.data) {
+          const txnId = data.data.transactionId;
+          setOrderId(txnId);
+
+          if (data.data.status === 'PAID') {
+            setIsSubmitting(false);
+            setStep('result');
+            clearCart();
+            mainTopRef.current?.scrollIntoView({ behavior: 'smooth' });
+          } else if (data.data.status === 'PENDING_3DS' && data.data.threeDS?.start?.acsUrl) {
+            // Desafio 3D Secure exigido pelo banco do cliente
+            window.location.href = data.data.threeDS.start.acsUrl;
+          } else if (data.data.status === 'FAILED') {
+            setPayError(data.data.refusedReason?.description || 'Pagamento recusado pela operadora do cartão.');
+            setIsSubmitting(false);
+          } else {
+            // Transação criada com sucesso
+            setIsSubmitting(false);
+            setStep('result');
+            clearCart();
+            mainTopRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }
+        } else {
+          setPayError(data.error || data.message || 'Não foi possível autorizar o cartão. Verifique os dados digitados.');
+          setIsSubmitting(false);
+        }
+      } catch {
+        setPayError('Erro ao comunicar com a gateway de pagamento Blackcat.');
+        setIsSubmitting(false);
+      }
+    } else {
+      // Confirmação manual no Pix
+      setIsSubmitting(true);
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setStep('result');
+        clearCart();
+        mainTopRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 900);
+    }
   };
 
   if (!isCheckoutOpen) return null;
@@ -478,15 +633,19 @@ export default function CheckoutModal() {
                 </div>
 
                 <p className="co-note">
-                  🔒 Ambiente 100% seguro com criptografia SSL de 256 bits. Seus dados financeiros não são armazenados.
+                  🔒 Ambiente 100% seguro com criptografia SSL de 256 bits via Blackcat Gateway. Seus dados financeiros não são armazenados.
                 </p>
+
+                {payError && (
+                  <p className="co-err" role="alert">{payError}</p>
+                )}
 
                 {/* Seletor de Pagamento: Apenas Pix e Cartão */}
                 <div className="co-pay-grid">
                   <button
                     type="button"
                     className={`co-pay-opt ${payMethod === 'pix' ? 'on' : ''}`}
-                    onClick={() => setPayMethod('pix')}
+                    onClick={() => handleSwitchPaymentMethod('pix')}
                   >
                     <div className="co-pay-opt-hd">
                       <span className="co-pay-opt-title">
@@ -508,7 +667,7 @@ export default function CheckoutModal() {
                   <button
                     type="button"
                     className={`co-pay-opt ${payMethod === 'card' ? 'on' : ''}`}
-                    onClick={() => setPayMethod('card')}
+                    onClick={() => handleSwitchPaymentMethod('card')}
                   >
                     <div className="co-pay-opt-hd">
                       <span className="co-pay-opt-title">
@@ -536,51 +695,67 @@ export default function CheckoutModal() {
                       Pague com Pix e garanta envio imediato
                     </h3>
                     <p style={{ fontSize: '13.5px', marginBottom: '18px', color: 'var(--ink-2)', maxWidth: '480px', marginInline: 'auto' }}>
-                      Abra o aplicativo do seu banco, escolha <b>Pagar com Pix</b> e aponte a câmera ou use a chave Copia e Cola:
+                      Abra o aplicativo do seu banco, escolha <b>Pagar com Pix</b> e aponte a câmera para o QR Code ou copie o código abaixo:
                     </p>
 
-                    <div style={{ background: '#fff', padding: '16px', display: 'inline-block', borderRadius: '12px', marginBottom: '18px', border: '1px solid var(--line)' }}>
-                      {/* QR Code Pix */}
-                      <svg width="180" height="180" viewBox="0 0 100 100" fill="#000">
-                        <rect width="30" height="30" fill="#000" />
-                        <rect x="5" y="5" width="20" height="20" fill="#fff" />
-                        <rect x="10" y="10" width="10" height="10" fill="#000" />
+                    {isGeneratingPix ? (
+                      <div style={{ padding: '40px 20px', color: 'var(--ink-2)' }}>
+                        <div style={{ width: '36px', height: '36px', border: '3px solid var(--line-strong)', borderTopColor: 'var(--gold)', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 12px' }} />
+                        <p style={{ fontSize: '14px', fontWeight: 600 }}>Gerando chave Pix oficial com a Blackcat...</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ background: '#fff', padding: '16px', display: 'inline-block', borderRadius: '12px', marginBottom: '18px', border: '1px solid var(--line)' }}>
+                          {pixQrImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={pixQrImage} alt="QR Code Pix" width="190" height="190" style={{ display: 'block', borderRadius: '4px' }} />
+                          ) : (
+                            /* QR Code Pix Render */
+                            <svg width="180" height="180" viewBox="0 0 100 100" fill="#000">
+                              <rect width="30" height="30" fill="#000" />
+                              <rect x="5" y="5" width="20" height="20" fill="#fff" />
+                              <rect x="10" y="10" width="10" height="10" fill="#000" />
 
-                        <rect x="70" width="30" height="30" fill="#000" />
-                        <rect x="75" y="5" width="20" height="20" fill="#fff" />
-                        <rect x="80" y="10" width="10" height="10" fill="#000" />
+                              <rect x="70" width="30" height="30" fill="#000" />
+                              <rect x="75" y="5" width="20" height="20" fill="#fff" />
+                              <rect x="80" y="10" width="10" height="10" fill="#000" />
 
-                        <rect y="70" width="30" height="30" fill="#000" />
-                        <rect x="5" y="75" width="20" height="20" fill="#fff" />
-                        <rect x="10" y="80" width="10" height="10" fill="#000" />
+                              <rect y="70" width="30" height="30" fill="#000" />
+                              <rect x="5" y="75" width="20" height="20" fill="#fff" />
+                              <rect x="10" y="80" width="10" height="10" fill="#000" />
 
-                        <rect x="40" y="10" width="20" height="10" fill="#000" />
-                        <rect x="40" y="30" width="10" height="20" fill="#000" />
-                        <rect x="60" y="40" width="20" height="10" fill="#000" />
-                        <rect x="40" y="70" width="30" height="10" fill="#000" />
-                        <rect x="80" y="70" width="10" height="20" fill="#000" />
-                      </svg>
-                    </div>
+                              <rect x="40" y="10" width="20" height="10" fill="#000" />
+                              <rect x="40" y="30" width="10" height="20" fill="#000" />
+                              <rect x="60" y="40" width="20" height="10" fill="#000" />
+                              <rect x="40" y="70" width="30" height="10" fill="#000" />
+                              <rect x="80" y="70" width="10" height="20" fill="#000" />
+                            </svg>
+                          )}
+                        </div>
 
-                    <div style={{ maxWidth: '460px', margin: '0 auto' }}>
-                      <input
-                        readOnly
-                        value="00020126580014br.gov.bcb.pix0136alfacarbon-shop-pix-checkout-pagamento5204000053039865405247.005802BR5920ALFACARBON AUTOMOTIVO6009SAO PAULO62070503***6304ABCD"
-                        style={{ width: '100%', padding: '11px', fontSize: '12px', textAlign: 'center', background: 'var(--bg-soft)', border: '1px solid var(--line)', color: 'var(--ink-2)', borderRadius: '6px', marginBottom: '12px' }}
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-line btn-lg"
-                        style={{ fontSize: '14px', padding: '12px 20px', width: '100%' }}
-                        onClick={() => {
-                          navigator.clipboard?.writeText('00020126580014br.gov.bcb.pix0136alfacarbon-shop-pix-checkout-pagamento5204000053039865405247.005802BR5920ALFACARBON AUTOMOTIVO6009SAO PAULO62070503***6304ABCD');
-                          setPixCopied(true);
-                          setTimeout(() => setPixCopied(false), 3000);
-                        }}
-                      >
-                        {pixCopied ? '✓ Código Pix Copiado com Sucesso!' : '📋 Copiar Código Pix (Copia e Cola)'}
-                      </button>
-                    </div>
+                        <div style={{ maxWidth: '460px', margin: '0 auto' }}>
+                          <input
+                            readOnly
+                            value={pixCode || 'Gerando chave Pix...'}
+                            style={{ width: '100%', padding: '11px', fontSize: '12px', textAlign: 'center', background: 'var(--bg-soft)', border: '1px solid var(--line)', color: 'var(--ink-2)', borderRadius: '6px', marginBottom: '12px' }}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-line btn-lg"
+                            style={{ fontSize: '14px', padding: '12px 20px', width: '100%' }}
+                            onClick={() => {
+                              if (pixCode) {
+                                navigator.clipboard?.writeText(pixCode);
+                                setPixCopied(true);
+                                setTimeout(() => setPixCopied(false), 3000);
+                              }
+                            }}
+                          >
+                            {pixCopied ? '✓ Código Pix Copiado com Sucesso!' : '📋 Copiar Código Pix (Copia e Cola)'}
+                          </button>
+                        </div>
+                      </>
+                    )}
 
                     <div style={{ marginTop: '20px', padding: '12px', background: 'var(--bg-soft)', borderRadius: '8px', fontSize: '12.5px', color: 'var(--ink-2)', textAlign: 'left' }}>
                       <p style={{ margin: '0 0 4px', fontWeight: 700, color: 'var(--ink)' }}>Como pagar com Pix:</p>
@@ -590,6 +765,15 @@ export default function CheckoutModal() {
                         <li>Cole o código acima ou escaneie o QR Code e confirme. A aprovação é imediata!</li>
                       </ol>
                     </div>
+
+                    <button
+                      className="btn btn-buy btn-lg co-next-btn"
+                      style={{ marginTop: '20px' }}
+                      onClick={handleCompleteOrder}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Verificando pagamento…' : `Já realizei o pagamento Pix · ${formatMoney(total)}`}
+                    </button>
                   </div>
                 )}
 
@@ -645,27 +829,26 @@ export default function CheckoutModal() {
                         <option value="12">12x de {formatMoney(Math.ceil(total / 12))} (sem juros)</option>
                       </select>
                     </div>
+
+                    <button
+                      className="btn btn-buy btn-lg co-next-btn"
+                      style={{ marginTop: '24px' }}
+                      onClick={handleCompleteOrder}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        'Processando pagamento seguro com a Blackcat…'
+                      ) : (
+                        <>
+                          <span>🔒 Finalizar Pedido no Cartão · {formatMoney(total)}</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 )}
 
-                {/* Botão de Finalização */}
-                <button
-                  className="btn btn-buy btn-lg co-next-btn"
-                  style={{ marginTop: '24px' }}
-                  onClick={handleCompleteOrder}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    'Processando pedido seguro…'
-                  ) : (
-                    <>
-                      <span>🔒 Finalizar Pedido · {formatMoney(total)}</span>
-                    </>
-                  )}
-                </button>
-
                 <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--ink-3)', marginTop: '12px' }}>
-                  Pagamento protegido com criptografia de ponta a ponta SSL de 256 bits.
+                  Pagamento protegido com criptografia bancária SSL de 256 bits via Blackcat Gateway.
                 </p>
               </div>
             )}
@@ -679,11 +862,11 @@ export default function CheckoutModal() {
                 </div>
                 <h2>Pedido Confirmado com Sucesso!</h2>
                 <p>
-                  Obrigado, <b>{nome}</b>! Seu pedido foi registrado em nossa loja oficial <b>alfacarbon.shop</b> e já foi encaminhado para a calibragem do molde 3D.
+                  Obrigado, <b>{nome}</b>! Seu pedido foi processado com segurança pela <b>Blackcat Gateway</b> e registrado em nossa loja oficial <b>alfacarbon.shop</b>. Já foi encaminhado para a calibragem do molde 3D.
                 </p>
 
                 <span className="ref">
-                  Código do Pedido: <b>#{orderId}</b>
+                  Código do Pedido: <b>#{orderId || transactionId}</b>
                 </span>
 
                 <div style={{ background: 'var(--bg-card)', padding: '18px', borderRadius: 'var(--r)', border: '1px solid var(--line)', textAlign: 'left', marginBottom: '20px' }}>
@@ -701,7 +884,7 @@ export default function CheckoutModal() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <a
                     className="btn btn-buy btn-lg"
-                    href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(`Olá, realizei o pedido #${orderId} no site alfacarbon.shop e gostaria de acompanhar o envio.`)}`}
+                    href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(`Olá, realizei o pedido #${orderId || transactionId} no site alfacarbon.shop e gostaria de acompanhar o envio.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -792,7 +975,7 @@ export default function CheckoutModal() {
               </svg>
               <div>
                 <b>Ambiente 100% Seguro e Criptografado</b>
-                <small>Certificação SSL de 256 bits. Seus dados trafegam protegidos e sob sigilo absoluto.</small>
+                <small>Certificação SSL de 256 bits via Blackcat. Seus dados trafegam protegidos e sob sigilo absoluto.</small>
               </div>
             </div>
           </aside>

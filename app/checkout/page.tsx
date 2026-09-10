@@ -36,6 +36,10 @@ function CheckoutContent() {
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('pix')
   const [copied, setCopied] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [orderId, setOrderId] = useState('')
+  const [pixPayload, setPixPayload] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
 
   const [formData, setFormData] = useState({
     nome: '',
@@ -50,22 +54,77 @@ function CheckoutContent() {
     estado: 'SP',
   })
 
+  const [cardData, setCardData] = useState({
+    number: '',
+    holderName: '',
+    expiry: '',
+    cvv: '',
+    installments: '1',
+  })
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   const handleCopyPix = () => {
-    navigator.clipboard.writeText(
-      '00020126580014br.gov.bcb.pix0136alfacarbon-shop-pix-chave-aleatoria5204000053039865802BR5920ALFACARBON AUTOMOTIVO6009SAO PAULO62070503***6304ABCD'
-    )
+    const code = pixPayload || '00020126580014br.gov.bcb.pix0136alfacarbon-shop-pix-chave-aleatoria5204000053039865802BR5920ALFACARBON AUTOMOTIVO6009SAO PAULO62070503***6304ABCD'
+    navigator.clipboard.writeText(code)
     setCopied(true)
     setTimeout(() => setCopied(false), 3000)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSuccess(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setIsSubmitting(true)
+    setErrorMsg('')
+
+    try {
+      const res = await fetch('/api/blackcat/create-sale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cart: [
+            {
+              kitName: kit,
+              vehicle: `${marca} ${modelo} (${ano})`,
+              price: amount,
+            }
+          ],
+          customer: {
+            nome: formData.nome,
+            email: formData.email,
+            telefone: formData.whatsapp,
+            cpf: formData.cpf,
+          },
+          address: {
+            cep: formData.cep,
+            rua: formData.endereco,
+            numero: formData.numero,
+            bairro: formData.bairro,
+            cidade: formData.cidade,
+            estado: formData.estado,
+          },
+          paymentMethod,
+          cardData,
+        }),
+      })
+
+      const data = await res.json()
+      if (data.success && data.data) {
+        setOrderId(data.data.transactionId)
+        if (data.data.paymentData?.copyPaste) {
+          setPixPayload(data.data.paymentData.copyPaste)
+        }
+        setIsSuccess(true)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        setErrorMsg(data.error || 'Erro ao processar transação na Blackcat.')
+      }
+    } catch {
+      setErrorMsg('Erro de conexão ao processar o pagamento.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isSuccess) {
@@ -77,8 +136,11 @@ function CheckoutContent() {
         <h2 className="text-2xl font-black text-neutral-900 mb-2">
           Pedido Gerado com Sucesso!
         </h2>
-        <p className="text-sm text-neutral-600 mb-6">
-          Enviamos os detalhes do pedido e o código de rastreamento para o seu WhatsApp e e-mail cadastrados.
+        <p className="text-sm text-neutral-600 mb-2">
+          Pedido processado com segurança pela <strong>Blackcat Gateway</strong>.
+        </p>
+        <p className="text-xs font-mono font-bold text-neutral-500 mb-6">
+          Código: #{orderId}
         </p>
 
         <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-200 text-left text-xs space-y-2 mb-6">
@@ -306,6 +368,18 @@ function CheckoutContent() {
                 <input
                   type="text"
                   placeholder="0000 0000 0000 0000"
+                  value={cardData.number}
+                  onChange={(e) => setCardData((prev) => ({ ...prev, number: e.target.value }))}
+                  className="w-full h-10 px-3 rounded-lg border border-neutral-300 bg-white text-sm focus:border-[#00B84A] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-neutral-700 mb-1">Nome no Cartão</label>
+                <input
+                  type="text"
+                  placeholder="Como impresso no cartão"
+                  value={cardData.holderName}
+                  onChange={(e) => setCardData((prev) => ({ ...prev, holderName: e.target.value }))}
                   className="w-full h-10 px-3 rounded-lg border border-neutral-300 bg-white text-sm focus:border-[#00B84A] focus:outline-none"
                 />
               </div>
@@ -315,6 +389,8 @@ function CheckoutContent() {
                   <input
                     type="text"
                     placeholder="MM/AA"
+                    value={cardData.expiry}
+                    onChange={(e) => setCardData((prev) => ({ ...prev, expiry: e.target.value }))}
                     className="w-full h-10 px-3 rounded-lg border border-neutral-300 bg-white text-sm focus:border-[#00B84A] focus:outline-none"
                   />
                 </div>
@@ -323,13 +399,19 @@ function CheckoutContent() {
                   <input
                     type="text"
                     placeholder="123"
+                    value={cardData.cvv}
+                    onChange={(e) => setCardData((prev) => ({ ...prev, cvv: e.target.value }))}
                     className="w-full h-10 px-3 rounded-lg border border-neutral-300 bg-white text-sm focus:border-[#00B84A] focus:outline-none"
                   />
                 </div>
               </div>
               <div>
                 <label className="block font-bold text-neutral-700 mb-1">Parcelamento</label>
-                <select className="w-full h-10 px-3 rounded-lg border border-neutral-300 bg-white text-sm focus:border-[#00B84A] focus:outline-none">
+                <select
+                  value={cardData.installments}
+                  onChange={(e) => setCardData((prev) => ({ ...prev, installments: e.target.value }))}
+                  className="w-full h-10 px-3 rounded-lg border border-neutral-300 bg-white text-sm focus:border-[#00B84A] focus:outline-none"
+                >
                   <option value="1">1x de R$ {amount},00 sem juros</option>
                   <option value="3">3x de R$ {(amount / 3).toFixed(2).replace('.', ',')} sem juros</option>
                   <option value="6">6x de R$ {(amount / 6).toFixed(2).replace('.', ',')} sem juros</option>
@@ -340,13 +422,20 @@ function CheckoutContent() {
           )}
         </div>
 
+        {errorMsg && (
+          <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+            {errorMsg}
+          </div>
+        )}
+
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full h-14 bg-[#00B84A] hover:bg-[#009e3f] active:scale-[0.99] text-white font-extrabold text-base uppercase tracking-wider rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+          disabled={isSubmitting}
+          className="w-full h-14 bg-[#00B84A] hover:bg-[#009e3f] disabled:opacity-60 active:scale-[0.99] text-white font-extrabold text-base uppercase tracking-wider rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
         >
           <Lock className="w-4 h-4 stroke-[2.5]" />
-          <span>FINALIZAR PEDIDO COM SEGURANÇA</span>
+          <span>{isSubmitting ? 'PROCESSANDO VIA BLACKCAT…' : 'FINALIZAR PEDIDO COM SEGURANÇA'}</span>
         </button>
 
         <div className="flex items-center justify-center gap-2 text-xs text-neutral-400 font-medium">
