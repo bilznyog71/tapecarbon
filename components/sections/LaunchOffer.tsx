@@ -61,10 +61,18 @@ export default function LaunchOffer() {
           </p>
 
           <ul className="oferta-lista">
-            <li>Envio <b>GRÁTIS</b> com código de rastreio para todo o Brasil</li>
-            <li>Fabricado com o <b>molde exato</b> da sua marca, modelo e ano</li>
-            <li><b>12 meses</b> de garantia de fábrica + 7 dias para testar</li>
-            <li>Pagamento <b>100% seguro</b> via Mercado Pago e Pix</li>
+            <li>
+              <span>Envio <b>GRÁTIS</b> com código de rastreio para todo o Brasil</span>
+            </li>
+            <li>
+              <span>Fabricado com o <b>molde exato</b> da sua marca, modelo e ano</span>
+            </li>
+            <li>
+              <span><b>12 meses</b> de garantia de fábrica + 7 dias para testar</span>
+            </li>
+            <li>
+              <span>Pagamento <b>100% seguro</b> via Mercado Pago e Pix</span>
+            </li>
           </ul>
 
           <p className="oferta-timer" id="of-timer">
