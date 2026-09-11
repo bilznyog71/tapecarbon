@@ -67,6 +67,7 @@ export default function CheckoutModal() {
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
   const discountPix = payMethod === 'pix' ? Math.round(subtotal * 0.05) : 0;
   const finalTotal = Math.max(0, subtotal - discountPix);
+  const isPixGenerated = activeStep === 3 && payMethod === 'pix' && Boolean(pixCode);
 
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const scrollToTop = () => {
@@ -175,8 +176,10 @@ export default function CheckoutModal() {
         setOrderId(txnId);
         if (pData?.copyPaste) {
           setPixCode(pData.copyPaste);
+          scrollToTop();
         } else if (pData?.qrCode) {
           setPixCode(pData.qrCode);
+          scrollToTop();
         }
         if (pData?.qrCodeBase64) {
           setPixQrImage(pData.qrCodeBase64);
@@ -404,10 +407,10 @@ export default function CheckoutModal() {
       </header>
 
       <div className="columbia-co-body">
-        <div className="wrap columbia-co-grid">
+        <div className={`wrap columbia-co-grid ${isPixGenerated ? 'yampi-mode' : ''}`}>
           
-          {/* COLUNA ESQUERDA: 3 ETAPAS SEQUENCIAIS */}
-          <div className="columbia-main-col">
+          {/* COLUNA ESQUERDA: 3 ETAPAS SEQUENCIAIS OU TELA EXCLUSIVA PIX */}
+          <div className={`columbia-main-col ${isPixGenerated ? 'yampi-pix-full' : ''}`}>
             
             {activeStep === 4 ? (
               /* Concluído */
@@ -466,6 +469,121 @@ export default function CheckoutModal() {
                     Voltar à Loja
                   </button>
                 </div>
+              </div>
+            ) : isPixGenerated ? (
+              /* TELA EXCLUSIVA DO PIX (ESTILO YAMPI / CORVEX - SEM OUTRAS ETAPAS) */
+              <div className="yampi-pix-card">
+                <div className="yampi-pix-header">
+                  <div className="yampi-pix-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.5">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                    Pague com Pix · Aprovação Imediata
+                  </div>
+
+                  <div className="yampi-pix-amount-label">Total a pagar com 5% de desconto:</div>
+                  <div className="yampi-pix-amount-val">{formatMoney(finalTotal)}</div>
+                  <div className="yampi-pix-order-id">
+                    Código do Pedido: #{orderId ? orderId.slice(-8).toUpperCase() : 'ALFA-78921'}
+                  </div>
+
+                  <div className="yampi-pix-expire-hint">
+                    <span>⏱️</span>
+                    <span>Código Pix válido por 30 minutos</span>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: 13, color: '#CBD5E1', marginBottom: 14 }}>
+                  Escaneie o QR Code ou use o botão <b>Copiar Código Pix</b> abaixo:
+                </div>
+
+                <div className="columbia-pix-qr-wrapper">
+                  <div className="columbia-pix-qr">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={
+                        pixQrImage && pixQrImage.startsWith('data:')
+                          ? pixQrImage
+                          : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                              pixCode
+                            )}`
+                      }
+                      alt="QR Code Pix"
+                      width={164}
+                      height={164}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="columbia-pix-copy-big-btn"
+                  onClick={() => {
+                    navigator.clipboard.writeText(pixCode);
+                    setPixCopied(true);
+                    setTimeout(() => setPixCopied(false), 2500);
+                  }}
+                >
+                  {pixCopied ? (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Código Pix Copiado!
+                    </>
+                  ) : (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                      </svg>
+                      Copiar Código Pix (Copia e Cola)
+                    </>
+                  )}
+                </button>
+
+                <div
+                  className="columbia-pix-code-preview"
+                  title="Clique para copiar"
+                  onClick={() => {
+                    navigator.clipboard.writeText(pixCode);
+                    setPixCopied(true);
+                    setTimeout(() => setPixCopied(false), 2500);
+                  }}
+                >
+                  <span className="columbia-pix-code-text">{pixCode}</span>
+                  <span className="columbia-pix-click-hint">
+                    {pixCopied ? '✓ Copiado' : 'Clique p/ copiar'}
+                  </span>
+                </div>
+
+                <div className="columbia-pix-steps">
+                  <div className="columbia-pix-step-item">
+                    <span className="columbia-pix-step-num">1</span>
+                    <span>Abra o app do seu banco e acesse a área <b>Pix</b>.</span>
+                  </div>
+                  <div className="columbia-pix-step-item">
+                    <span className="columbia-pix-step-num">2</span>
+                    <span>Selecione <b>Pix Copia e Cola</b> ou escaneie o <b>QR Code</b> acima.</span>
+                  </div>
+                  <div className="columbia-pix-step-item">
+                    <span className="columbia-pix-step-num">3</span>
+                    <span>Conclua o pagamento. Nosso sistema <b>identifica a aprovação automaticamente</b> em segundos!</span>
+                  </div>
+                </div>
+
+                <div className="columbia-pix-listening-badge">
+                  <span className="columbia-pix-listening-dot" />
+                  <span>Aguardando confirmação bancária em tempo real...</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setPixCode('')}
+                  className="yampi-back-btn"
+                >
+                  ← Trocar forma de pagamento ou alterar dados
+                </button>
               </div>
             ) : (
               <>
@@ -854,94 +972,8 @@ export default function CheckoutModal() {
                           {isGeneratingPix ? (
                             <div style={{ padding: '24px 0', color: '#E8B10C', fontWeight: 700 }}>
                               <div style={{ fontSize: 22, marginBottom: 6 }}>⏳</div>
-                              Gerando chave Pix segura...
+                              Gerando cobrança Pix segura...
                             </div>
-                          ) : pixCode ? (
-                            <>
-                              <div style={{ fontSize: 13, color: '#CBD5E1', marginBottom: 14 }}>
-                                Abra o aplicativo do seu banco, escaneie o QR Code ou use o botão <b>Copiar Código Pix</b>:
-                              </div>
-
-                              <div className="columbia-pix-qr-wrapper">
-                                <div className="columbia-pix-qr">
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img
-                                    src={
-                                      pixQrImage && pixQrImage.startsWith('data:')
-                                        ? pixQrImage
-                                        : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                                            pixCode
-                                          )}`
-                                    }
-                                    alt="QR Code Pix"
-                                    width={164}
-                                    height={164}
-                                  />
-                                </div>
-                              </div>
-
-                              <button
-                                type="button"
-                                className="columbia-pix-copy-big-btn"
-                                onClick={() => {
-                                  navigator.clipboard.writeText(pixCode);
-                                  setPixCopied(true);
-                                  setTimeout(() => setPixCopied(false), 2500);
-                                }}
-                              >
-                                {pixCopied ? (
-                                  <>
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                      <polyline points="20 6 9 17 4 12" />
-                                    </svg>
-                                    Código Pix Copiado!
-                                  </>
-                                ) : (
-                                  <>
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                    </svg>
-                                    Copiar Código Pix (Copia e Cola)
-                                  </>
-                                )}
-                              </button>
-
-                              <div
-                                className="columbia-pix-code-preview"
-                                title="Clique para copiar"
-                                onClick={() => {
-                                  navigator.clipboard.writeText(pixCode);
-                                  setPixCopied(true);
-                                  setTimeout(() => setPixCopied(false), 2500);
-                                }}
-                              >
-                                <span className="columbia-pix-code-text">{pixCode}</span>
-                                <span className="columbia-pix-click-hint">
-                                  {pixCopied ? '✓ Copiado' : 'Clique p/ copiar'}
-                                </span>
-                              </div>
-
-                              <div className="columbia-pix-steps">
-                                <div className="columbia-pix-step-item">
-                                  <span className="columbia-pix-step-num">1</span>
-                                  <span>Abra o app do seu banco e acesse a área <b>Pix</b>.</span>
-                                </div>
-                                <div className="columbia-pix-step-item">
-                                  <span className="columbia-pix-step-num">2</span>
-                                  <span>Selecione <b>Pix Copia e Cola</b> ou escaneie o <b>QR Code</b> acima.</span>
-                                </div>
-                                <div className="columbia-pix-step-item">
-                                  <span className="columbia-pix-step-num">3</span>
-                                  <span>Confirme o pagamento. Nosso sistema <b>identifica a aprovação automaticamente</b> em segundos!</span>
-                                </div>
-                              </div>
-
-                              <div className="columbia-pix-listening-badge">
-                                <span className="columbia-pix-listening-dot" />
-                                <span>Aguardando confirmação bancária em tempo real...</span>
-                              </div>
-                            </>
                           ) : (
                             <div>
                               <p style={{ fontSize: 13.5, color: '#A9B0BA', marginBottom: 12 }}>
@@ -1065,81 +1097,83 @@ export default function CheckoutModal() {
 
           </div>
 
-          {/* COLUNA DIREITA: RESUMO DO PEDIDO */}
-          <aside className="columbia-side-col">
-            <div className="columbia-summary-box">
-              <h3 className="columbia-summary-title">Resumo do pedido</h3>
+          {/* COLUNA DIREITA: RESUMO DO PEDIDO (OCULTO NA TELA DO PIX E CONCLUÍDO) */}
+          {!isPixGenerated && activeStep !== 4 && (
+            <aside className="columbia-side-col">
+              <div className="columbia-summary-box">
+                <h3 className="columbia-summary-title">Resumo do pedido</h3>
 
-              {/* Itens */}
-              {cartItems.map(item => (
-                <div key={item.id} className="columbia-item-row">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/assets/img/hero-mockup.webp"
-                    alt={item.kitName}
-                    className="columbia-item-img"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
-                    }}
-                  />
-                  <div className="columbia-item-meta">
-                    <b>{item.kitName}</b>
-                    <small>{item.vehicle} · {item.colorName}</small>
-                    <div style={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
-                      <span style={{ fontSize: 11.5, color: '#8E98A5' }}>Qtd: 1</span>
-                      {cart.length > 1 && (
-                        <button
-                          type="button"
-                          className="columbia-remove-link"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          Remover
-                        </button>
-                      )}
+                {/* Itens */}
+                {cartItems.map(item => (
+                  <div key={item.id} className="columbia-item-row">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/assets/img/hero-mockup.webp"
+                      alt={item.kitName}
+                      className="columbia-item-img"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                    <div className="columbia-item-meta">
+                      <b>{item.kitName}</b>
+                      <small>{item.vehicle} · {item.colorName}</small>
+                      <div style={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
+                        <span style={{ fontSize: 11.5, color: '#8E98A5' }}>Qtd: 1</span>
+                        {cart.length > 1 && (
+                          <button
+                            type="button"
+                            className="columbia-remove-link"
+                            onClick={() => removeFromCart(item.id)}
+                          >
+                            Remover
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="columbia-item-price">
+                      {formatMoney(item.price)}
                     </div>
                   </div>
-                  <div className="columbia-item-price">
-                    {formatMoney(item.price)}
+                ))}
+
+                {/* Totais */}
+                <div className="columbia-totals-list">
+                  <div className="columbia-total-row">
+                    <span>Subtotal</span>
+                    <span style={{ color: '#F4F6F8' }}>{formatMoney(subtotal)}</span>
+                  </div>
+
+                  <div className="columbia-total-row">
+                    <span>Envio (4 a 8 dias úteis)</span>
+                    <span style={{ color: '#3BE07C', fontWeight: 700 }}>Grátis</span>
+                  </div>
+
+                  {payMethod === 'pix' && discountPix > 0 && (
+                    <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
+                      <span>Desconto no PIX (5%)</span>
+                      <span>- {formatMoney(discountPix)}</span>
+                    </div>
+                  )}
+
+                  <div className="columbia-total-row big">
+                    <span>Total</span>
+                    <b>{formatMoney(finalTotal)}</b>
                   </div>
                 </div>
-              ))}
 
-              {/* Totais */}
-              <div className="columbia-totals-list">
-                <div className="columbia-total-row">
-                  <span>Subtotal</span>
-                  <span style={{ color: '#F4F6F8' }}>{formatMoney(subtotal)}</span>
+                {/* Selo Discreto */}
+                <div className="columbia-trust-strip">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BE07C" strokeWidth="2.4">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <span>Pagamento Criptografado &amp; Rastreamento Garantido</span>
                 </div>
 
-                <div className="columbia-total-row">
-                  <span>Envio (4 a 8 dias úteis)</span>
-                  <span style={{ color: '#3BE07C', fontWeight: 700 }}>Grátis</span>
-                </div>
-
-                {payMethod === 'pix' && discountPix > 0 && (
-                  <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
-                    <span>Desconto no PIX (5%)</span>
-                    <span>- {formatMoney(discountPix)}</span>
-                  </div>
-                )}
-
-                <div className="columbia-total-row big">
-                  <span>Total</span>
-                  <b>{formatMoney(finalTotal)}</b>
-                </div>
               </div>
-
-              {/* Selo Discreto */}
-              <div className="columbia-trust-strip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BE07C" strokeWidth="2.4">
-                  <rect x="3" y="11" width="18" height="11" rx="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <span>Pagamento Criptografado &amp; Rastreamento Garantido</span>
-              </div>
-
-            </div>
-          </aside>
+            </aside>
+          )}
 
         </div>
       </div>
