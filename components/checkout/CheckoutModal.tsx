@@ -456,11 +456,11 @@ export default function CheckoutModal() {
                 >
                   ✓
                 </div>
-                <h2 style={{ fontSize: 22, fontWeight: 900, color: '#F4F6F8', margin: '0 0 6px' }}>
+                <h2 style={{ fontSize: 22, fontWeight: 900, color: '#F4F6F8', margin: '0 0 8px' }}>
                   Pedido Realizado com Sucesso!
                 </h2>
                 <p style={{ fontSize: 13.5, color: '#A9B0BA', margin: '0 0 20px', lineHeight: 1.5 }}>
-                  Enviamos o comprovante para <b style={{ color: '#F4F6F8' }}>{email || 'seu e-mail'}</b> e WhatsApp <b style={{ color: '#F4F6F8' }}>{telefone || 'cadastrado'}</b>.
+                  Agradecemos a sua preferência e confiança na AlfaCarbon.
                 </p>
 
                 <div

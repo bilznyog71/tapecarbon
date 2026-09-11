@@ -402,8 +402,7 @@ function CheckoutContent() {
               Pedido Realizado com Sucesso!
             </h2>
             <p style={{ fontSize: 14.5, color: '#A9B0BA', margin: '0 0 22px', lineHeight: 1.5 }}>
-              Agradecemos a sua preferência. O comprovante e os dados de rastreamento foram enviados para{' '}
-              <b style={{ color: '#F4F6F8' }}>{email || 'seu e-mail'}</b> e WhatsApp <b style={{ color: '#F4F6F8' }}>{telefone || 'cadastrado'}</b>.
+              Agradecemos a sua preferência e confiança na AlfaCarbon.
             </p>
 
             <div
