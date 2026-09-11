@@ -344,14 +344,6 @@ function CheckoutContent() {
     }
   };
 
-  const handleConfirmPixPaid = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setActiveStep(4);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 800);
-  };
 
   return (
     <div className="wrap columbia-co-grid">
@@ -816,64 +808,88 @@ function CheckoutContent() {
                       ) : pixCode ? (
                         <>
                           <div style={{ fontSize: 13.5, color: '#CBD5E1', marginBottom: 14 }}>
-                            Abra o aplicativo do seu banco e escaneie o QR Code abaixo ou utilize o <b>Pix Copia e Cola</b>:
+                            Abra o aplicativo do seu banco, escaneie o QR Code ou use o botão <b>Copiar Código Pix</b>:
                           </div>
 
-                          <div className="columbia-pix-qr">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={
-                                pixQrImage && pixQrImage.startsWith('data:')
-                                  ? pixQrImage
-                                  : `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
-                                      pixCode
-                                    )}`
-                              }
-                              alt="QR Code Pix"
-                              width={200}
-                              height={200}
-                              style={{ display: 'block', margin: '0 auto' }}
-                            />
-                          </div>
-
-                          <div style={{ fontSize: 12.5, fontWeight: 700, color: '#F4F6F8', marginBottom: 6 }}>
-                            Código Pix Copia e Cola:
-                          </div>
-
-                          <div className="columbia-pix-copy-input">
-                            <input
-                              type="text"
-                              className="columbia-pix-code-field"
-                              readOnly
-                              value={pixCode}
-                              onClick={e => (e.target as HTMLInputElement).select()}
-                            />
-                            <button
-                              type="button"
-                              className="columbia-pix-copy-btn"
-                              onClick={() => {
-                                navigator.clipboard.writeText(pixCode);
-                                setPixCopied(true);
-                                setTimeout(() => setPixCopied(false), 2500);
-                              }}
-                            >
-                              {pixCopied ? '✓ Copiado!' : 'Copiar Código'}
-                            </button>
-                          </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, fontSize: 12.5, color: '#3BE07C' }}>
-                            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#19C25A', animation: 'pulse 1.5s infinite' }} />
-                            Aguardando confirmação em tempo real...
+                          <div className="columbia-pix-qr-wrapper">
+                            <div className="columbia-pix-qr">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={
+                                  pixQrImage && pixQrImage.startsWith('data:')
+                                    ? pixQrImage
+                                    : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                                        pixCode
+                                      )}`
+                                }
+                                alt="QR Code Pix"
+                                width={164}
+                                height={164}
+                              />
+                            </div>
                           </div>
 
                           <button
                             type="button"
-                            className="columbia-btn-finish"
-                            onClick={handleConfirmPixPaid}
-                            disabled={isSubmitting}
+                            className="columbia-pix-copy-big-btn"
+                            onClick={() => {
+                              navigator.clipboard.writeText(pixCode);
+                              setPixCopied(true);
+                              setTimeout(() => setPixCopied(false), 2500);
+                            }}
                           >
-                            {isSubmitting ? 'Verificando Pagamento...' : 'JÁ REALIZEI O PAGAMENTO ✓'}
+                            {pixCopied ? (
+                              <>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                                Código Pix Copiado!
+                              </>
+                            ) : (
+                              <>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copiar Código Pix (Copia e Cola)
+                              </>
+                            )}
                           </button>
+
+                          <div
+                            className="columbia-pix-code-preview"
+                            title="Clique para copiar"
+                            onClick={() => {
+                              navigator.clipboard.writeText(pixCode);
+                              setPixCopied(true);
+                              setTimeout(() => setPixCopied(false), 2500);
+                            }}
+                          >
+                            <span className="columbia-pix-code-text">{pixCode}</span>
+                            <span className="columbia-pix-click-hint">
+                              {pixCopied ? '✓ Copiado' : 'Clique p/ copiar'}
+                            </span>
+                          </div>
+
+                          <div className="columbia-pix-steps">
+                            <div className="columbia-pix-step-item">
+                              <span className="columbia-pix-step-num">1</span>
+                              <span>Abra o app do seu banco e acesse a área <b>Pix</b>.</span>
+                            </div>
+                            <div className="columbia-pix-step-item">
+                              <span className="columbia-pix-step-num">2</span>
+                              <span>Selecione <b>Pix Copia e Cola</b> ou escaneie o <b>QR Code</b> acima.</span>
+                            </div>
+                            <div className="columbia-pix-step-item">
+                              <span className="columbia-pix-step-num">3</span>
+                              <span>Confirme o pagamento. Nosso sistema <b>identifica a aprovação automaticamente</b> em segundos!</span>
+                            </div>
+                          </div>
+
+                          <div className="columbia-pix-listening-badge">
+                            <span className="columbia-pix-listening-dot" />
+                            <span>Aguardando confirmação bancária em tempo real...</span>
+                          </div>
                         </>
                       ) : (
                         <div>
