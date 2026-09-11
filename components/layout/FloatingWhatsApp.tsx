@@ -1,11 +1,12 @@
 'use client'
 
 import { MessageCircle } from 'lucide-react'
+import { CONFIG } from '@/data/config'
 
 export default function FloatingWhatsApp() {
   return (
     <a
-      href="https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida%20sobre%20o%20kit%20TAPECARBON%20para%20o%20meu%20carro."
+      href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá! Gostaria de tirar uma dúvida sobre o kit TAPECARBON para o meu carro.')}`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"

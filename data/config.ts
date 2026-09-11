@@ -22,8 +22,8 @@ export const CONFIG = {
 
   /* ---- Contato ---- */
   email: 'contato@alfacarbon.shop',
-  whatsapp: '5511999998888',
-  whatsappLabel: '(11) 99999-8888',
+  whatsapp: '5563981077852',
+  whatsappLabel: '(63) 98107-7852',
   hours: 'Segunda a sexta, das 9h às 18h',
   cnpj: '48.912.345/0001-89',
   address: 'São Paulo - SP, Brasil',
