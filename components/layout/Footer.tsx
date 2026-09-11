@@ -19,15 +19,6 @@ export default function Footer() {
             <p style={{ maxWidth: '36ch' }}>
               Tapetes automotivos bandeja 3D sob medida para o assoalho do seu carro. Envio para todo o Brasil.
             </p>
-            <div className="pays">
-              <span>Pix</span>
-              <span>Visa</span>
-              <span>Mastercard</span>
-              <span>Elo</span>
-              <span>Hipercard</span>
-              <span>Amex</span>
-              <span>SSL Blindado</span>
-            </div>
           </div>
 
           <div>
