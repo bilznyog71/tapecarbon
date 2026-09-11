@@ -9,8 +9,6 @@ export default function CheckoutModal() {
 
   // 3 etapas sequenciais: 1 = Identificação, 2 = Entrega, 3 = Pagamento, 4 = Concluído
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | 4>(1);
-  const [payMethod, setPayMethod] = useState<'pix' | 'card'>('pix');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingPix, setIsGeneratingPix] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [pixCopied, setPixCopied] = useState(false);
@@ -43,12 +41,6 @@ export default function CheckoutModal() {
   const [cepFeedback, setCepFeedback] = useState('');
   const numeroInputRef = useRef<HTMLInputElement>(null);
 
-  // Step 3: Cartão
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
-  const [cardInstallments, setCardInstallments] = useState('1');
 
   // Itens do carrinho
   const cartItems = cart.length > 0 ? cart : [
@@ -65,9 +57,9 @@ export default function CheckoutModal() {
   ];
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const discountPix = payMethod === 'pix' ? Math.round(subtotal * 0.05) : 0;
+  const discountPix = Math.round(subtotal * 0.05);
   const finalTotal = Math.max(0, subtotal - discountPix);
-  const isPixGenerated = activeStep === 3 && payMethod === 'pix' && Boolean(pixCode);
+  const isPixGenerated = activeStep === 3 && Boolean(pixCode);
 
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const scrollToTop = () => {
@@ -132,24 +124,6 @@ export default function CheckoutModal() {
     setCpf(masked);
   };
 
-  const handleCardNumberChange = (val: string) => {
-    const raw = val.replace(/\D/g, '').slice(0, 16);
-    const parts = raw.match(/.{1,4}/g);
-    setCardNumber(parts ? parts.join(' ') : raw);
-  };
-
-  const handleCardExpiryChange = (val: string) => {
-    const raw = val.replace(/\D/g, '').slice(0, 4);
-    if (raw.length > 2) {
-      setCardExpiry(`${raw.slice(0, 2)}/${raw.slice(2)}`);
-    } else {
-      setCardExpiry(raw);
-    }
-  };
-
-  const handleCardCvvChange = (val: string) => {
-    setCardCvv(val.replace(/\D/g, '').slice(0, 4));
-  };
 
   // Gerador PIX Blackcat com valor com desconto exato
   const generatePix = useCallback(async (customAmount?: number) => {
@@ -261,89 +235,10 @@ export default function CheckoutModal() {
     setActiveStep(3);
     scrollToTop();
 
-    if (payMethod === 'pix' && !pixCode) {
+    if (!pixCode) {
       setTimeout(() => {
         generatePix(finalTotal);
       }, 50);
-    }
-  };
-
-  const handleSwitchPaymentMethod = (method: 'pix' | 'card') => {
-    setPayMethod(method);
-    setPayError('');
-    if (method === 'pix' && !pixCode) {
-      const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05));
-      generatePix(discounted);
-    }
-  };
-
-  // Pagamento com Cartão
-  const handleCardPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const rawCard = cardNumber.replace(/\D/g, '');
-    if (rawCard.length < 15) {
-      setPayError('Informe o número completo do cartão.');
-      return;
-    }
-    if (!cardName.trim() || !cardExpiry.trim() || !cardCvv.trim()) {
-      setPayError('Preencha todos os dados do cartão.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setPayError('');
-
-    try {
-      const expParts = cardExpiry.split('/');
-      const expMonth = expParts[0]?.trim() || '';
-      const expYear = expParts[1]?.trim() ? `20${expParts[1].trim()}`.slice(-4) : '';
-
-      const res = await fetch('/api/blackcat/create-sale', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cart: cartItems,
-          customer: { nome, sobrenome, email, telefone, cpf },
-          address: { cep, rua, numero, complemento, bairro, cidade, estado },
-          paymentMethod: 'card',
-          amount: finalTotal,
-          card: {
-            number: rawCard,
-            holderName: cardName.trim(),
-            expMonth,
-            expYear,
-            cvv: cardCvv.trim(),
-            installments: Number(cardInstallments) || 1,
-          },
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success && data.data) {
-        setOrderId(data.data.transactionId || 'CARD-' + Date.now().toString(36).toUpperCase());
-        if (data.data.status === 'PAID' || data.data.status === 'AUTHORIZED') {
-          setIsSubmitting(false);
-          setActiveStep(4);
-          clearCart();
-          scrollToTop();
-        } else if (data.data.status === 'PENDING_3DS' && data.data.threeDS?.start?.acsUrl) {
-          window.location.href = data.data.threeDS.start.acsUrl;
-        } else if (data.data.status === 'FAILED') {
-          setPayError(data.data.refusedReason?.description || 'Pagamento recusado pela operadora.');
-          setIsSubmitting(false);
-        } else {
-          setIsSubmitting(false);
-          setActiveStep(4);
-          clearCart();
-          scrollToTop();
-        }
-      } else {
-        setPayError(data.error || data.message || 'Não foi possível autorizar o cartão.');
-        setIsSubmitting(false);
-      }
-    } catch {
-      setPayError('Erro de conexão ao processar o pagamento com cartão.');
-      setIsSubmitting(false);
     }
   };
 
@@ -582,7 +477,7 @@ export default function CheckoutModal() {
                   onClick={() => setPixCode('')}
                   className="yampi-back-btn"
                 >
-                  ← Trocar forma de pagamento ou alterar dados
+                  ← Voltar ou alterar dados de entrega
                 </button>
               </div>
             ) : (
@@ -930,165 +825,45 @@ export default function CheckoutModal() {
                         </div>
                       )}
 
-                      {/* Selector de Método */}
-                      <div className="columbia-pay-selector">
-                        <div
-                          className={`columbia-pay-card ${payMethod === 'pix' ? 'active' : ''}`}
-                          onClick={() => handleSwitchPaymentMethod('pix')}
-                        >
+                      {/* Método de Pagamento Pix Exclusivo */}
+                      <div className="columbia-pay-selector" style={{ gridTemplateColumns: '1fr' }}>
+                        <div className="columbia-pay-card active" style={{ cursor: 'default' }}>
                           <div className="columbia-pay-card-hd">
                             <span className="columbia-pay-name">
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.4">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.4">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                               </svg>
-                              PIX
+                              PIX (Pagamento Oficial)
                             </span>
                             <span className="columbia-pay-badge">5% OFF</span>
                           </div>
-                          <span className="columbia-pay-desc">Aprovação imediata</span>
-                        </div>
-
-                        <div
-                          className={`columbia-pay-card ${payMethod === 'card' ? 'active' : ''}`}
-                          onClick={() => handleSwitchPaymentMethod('card')}
-                        >
-                          <div className="columbia-pay-card-hd">
-                            <span className="columbia-pay-name">
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.4">
-                                <rect x="1" y="4" width="22" height="16" rx="2" />
-                                <line x1="1" y1="10" x2="23" y2="10" />
-                              </svg>
-                              Cartão de Crédito
-                            </span>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: '#E8B10C' }}>Até 12x</span>
-                          </div>
-                          <span className="columbia-pay-desc">Todas as bandeiras</span>
+                          <span className="columbia-pay-desc">Aprovação imediata · Envio prioritário com código de rastreamento</span>
                         </div>
                       </div>
 
                       {/* PIX */}
-                      {payMethod === 'pix' && (
-                        <div className="columbia-pix-box">
-                          {isGeneratingPix ? (
-                            <div style={{ padding: '24px 0', color: '#E8B10C', fontWeight: 700 }}>
-                              <div style={{ fontSize: 22, marginBottom: 6 }}>⏳</div>
-                              Gerando cobrança Pix segura...
-                            </div>
-                          ) : (
-                            <div>
-                              <p style={{ fontSize: 13.5, color: '#A9B0BA', marginBottom: 12 }}>
-                                Total a pagar no Pix com 5% de desconto: <b style={{ color: '#E8B10C' }}>{formatMoney(finalTotal)}</b>
-                              </p>
-                              <button
-                                type="button"
-                                className="columbia-btn-next"
-                                onClick={() => generatePix(finalTotal)}
-                                disabled={isGeneratingPix}
-                              >
-                                {isGeneratingPix ? 'Gerando Pix...' : 'GERAR CÓDIGO PIX'}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* CARTÃO */}
-                      {payMethod === 'card' && (
-                        <form onSubmit={handleCardPayment} noValidate>
-                          <div className="columbia-fld">
-                            <label className="columbia-label" htmlFor="fld-c-number">
-                              Número do Cartão *
-                            </label>
-                            <input
-                              id="fld-c-number"
-                              type="text"
-                              className="columbia-input"
-                              placeholder="0000 0000 0000 0000"
-                              value={cardNumber}
-                              onChange={e => handleCardNumberChange(e.target.value)}
-                              maxLength={19}
-                              required
-                            />
+                      <div className="columbia-pix-box">
+                        {isGeneratingPix ? (
+                          <div style={{ padding: '24px 0', color: '#E8B10C', fontWeight: 700 }}>
+                            <div style={{ fontSize: 22, marginBottom: 6 }}>⏳</div>
+                            Gerando cobrança Pix segura...
                           </div>
-
-                          <div className="columbia-fld">
-                            <label className="columbia-label" htmlFor="fld-c-name">
-                              Nome impresso no Cartão *
-                            </label>
-                            <input
-                              id="fld-c-name"
-                              type="text"
-                              className="columbia-input"
-                              placeholder="Como está gravado no cartão"
-                              value={cardName}
-                              onChange={e => setCardName(e.target.value.toUpperCase())}
-                              required
-                            />
-                          </div>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                            <div className="columbia-fld">
-                              <label className="columbia-label" htmlFor="fld-c-expiry">
-                                Validade (MM/AA) *
-                              </label>
-                              <input
-                                id="fld-c-expiry"
-                                type="text"
-                                className="columbia-input"
-                                placeholder="MM/AA"
-                                value={cardExpiry}
-                                onChange={e => handleCardExpiryChange(e.target.value)}
-                                maxLength={5}
-                                required
-                              />
-                            </div>
-                            <div className="columbia-fld">
-                              <label className="columbia-label" htmlFor="fld-c-cvv">
-                                CVV *
-                              </label>
-                              <input
-                                id="fld-c-cvv"
-                                type="text"
-                                className="columbia-input"
-                                placeholder="123"
-                                value={cardCvv}
-                                onChange={e => handleCardCvvChange(e.target.value)}
-                                maxLength={4}
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div className="columbia-fld">
-                            <label className="columbia-label" htmlFor="fld-c-installments">
-                              Parcelamento *
-                            </label>
-                            <select
-                              id="fld-c-installments"
-                              className="columbia-select"
-                              value={cardInstallments}
-                              onChange={e => setCardInstallments(e.target.value)}
+                        ) : (
+                          <div>
+                            <p style={{ fontSize: 13.5, color: '#A9B0BA', marginBottom: 12 }}>
+                              Total a pagar no Pix com 5% de desconto: <b style={{ color: '#E8B10C' }}>{formatMoney(finalTotal)}</b>
+                            </p>
+                            <button
+                              type="button"
+                              className="columbia-btn-next"
+                              onClick={() => generatePix(finalTotal)}
+                              disabled={isGeneratingPix}
                             >
-                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(inst => {
-                                const val = finalTotal / inst;
-                                return (
-                                  <option key={inst} value={inst.toString()}>
-                                    {inst}x de {formatMoney(val)} {inst === 1 ? '(à vista)' : 'sem juros'}
-                                  </option>
-                                );
-                              })}
-                            </select>
+                              {isGeneratingPix ? 'Gerando Pix...' : 'GERAR CÓDIGO PIX'}
+                            </button>
                           </div>
-
-                          <button
-                            type="submit"
-                            className="columbia-btn-finish"
-                            disabled={isSubmitting}
-                          >
-                            {isSubmitting ? 'Processando Cartão...' : `PAGAR ${formatMoney(finalTotal)} NO CARTÃO 🔒`}
-                          </button>
-                        </form>
-                      )}
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1149,7 +924,7 @@ export default function CheckoutModal() {
                     <span style={{ color: '#3BE07C', fontWeight: 700 }}>Grátis</span>
                   </div>
 
-                  {payMethod === 'pix' && discountPix > 0 && (
+                  {discountPix > 0 && (
                     <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
                       <span>Desconto no PIX (5%)</span>
                       <span>- {formatMoney(discountPix)}</span>

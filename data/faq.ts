@@ -26,7 +26,7 @@ export const FAQ_DATA: FAQItem[] = [
   },
   {
     question: 'Quais são as formas de pagamento?',
-    answer: 'Aceitamos Pix (com aprovação imediata e envio prioritário) e Cartões de Crédito (Visa, Mastercard, Elo, Hipercard, American Express) com parcelamento em até 12 vezes. Todo o processamento é protegido por criptografia de alta segurança SSL de 256 bits.'
+    answer: 'Aceitamos Pix com aprovação imediata, 5% de desconto exclusivo e envio prioritário. Todo o processamento é protegido por criptografia de alta segurança SSL de 256 bits.'
   },
   {
     question: 'O tapete danifica o assoalho ou carpete original do veículo?',

@@ -68,7 +68,7 @@ const KITS = [
     description: 'Dianteiros + Traseiros Inteiriço + Bandeja do Porta-Malas',
     price: 247,
     priceFormatted: 'R$ 247,00',
-    installments: 'ou 12x de R$ 24,70 sem juros',
+    installments: '5% de desconto no Pix',
     badge: 'Mais Vendido (61% OFF)',
   },
   {
@@ -77,7 +77,7 @@ const KITS = [
     description: 'Dianteiros + Traseiros Inteiriço com cobertura de túnel',
     price: 197,
     priceFormatted: 'R$ 197,00',
-    installments: 'ou 12x de R$ 19,70 sem juros',
+    installments: '5% de desconto no Pix',
     badge: null,
   },
 ]
@@ -281,7 +281,7 @@ export default function ProductSection() {
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-neutral-600 font-medium mt-1">
-                {selectedKit.installments} ou com 5% de desconto no Pix
+                À vista com 5% de desconto no Pix • Frete Grátis
               </p>
             </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { CONFIG, formatMoney, formatInstallment } from '@/data/config';
+import { CONFIG, formatMoney } from '@/data/config';
 
 export default function LaunchOffer() {
   const [timeLeft, setTimeLeft] = useState('00:00:00');
@@ -57,7 +57,7 @@ export default function LaunchOffer() {
             <span className="oferta-off" id="of-off">-{discountPercent}%</span>
           </p>
           <p className="oferta-cuotas">
-            ou <b id="of-cuota">{formatInstallment(cheapestKit.price)}</b> no cartão ou Pix
+            ou apenas <b id="of-cuota">{formatMoney(Math.round(cheapestKit.price * 0.95))}</b> à vista no Pix (5% OFF)
           </p>
 
           <ul className="oferta-lista">
@@ -71,7 +71,7 @@ export default function LaunchOffer() {
               <span><b>12 meses</b> de garantia de fábrica + 7 dias para testar</span>
             </li>
             <li>
-              <span>Pagamento <b>100% seguro</b> e protegido via Pix ou Cartão</span>
+              <span>Pagamento <b>100% seguro</b> e protegido via Pix com aprovação imediata</span>
             </li>
           </ul>
 
@@ -83,7 +83,7 @@ export default function LaunchOffer() {
           <a className="btn btn-buy oferta-cta" href="#producto">
             COMPRAR AGORA · {formatMoney(cheapestKit.price)} &rarr;
           </a>
-          <p className="oferta-mp">Pix com aprovação imediata ou Cartão de Crédito em até 12x</p>
+          <p className="oferta-mp">Pagamento exclusivo via Pix com 5% OFF e aprovação imediata</p>
         </div>
       </div>
     </section>
