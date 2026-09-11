@@ -14,7 +14,6 @@ export default function CheckoutModal() {
   const [isGeneratingPix, setIsGeneratingPix] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [pixCopied, setPixCopied] = useState(false);
-  const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false);
 
   // Blackcat Gateway State
   const [pixCode, setPixCode] = useState('');
@@ -51,7 +50,7 @@ export default function CheckoutModal() {
   const [cardCvv, setCardCvv] = useState('');
   const [cardInstallments, setCardInstallments] = useState('1');
 
-  // Coupon
+  // Cupom
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponFeedback, setCouponFeedback] = useState('');
@@ -74,7 +73,6 @@ export default function CheckoutModal() {
   const discountPix = payMethod === 'pix' ? Math.round(subtotal * 0.05 * 100) / 100 : 0;
   const finalTotal = Math.max(0, subtotal - discountPix - couponDiscount);
 
-  // Scroll to top on step change
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const scrollToTop = () => {
     modalContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -102,7 +100,7 @@ export default function CheckoutModal() {
             numeroInputRef.current?.focus();
           }, 120);
         } else {
-          setCepFeedback('CEP não encontrado. Preencha o endereço manualmente.');
+          setCepFeedback('CEP não encontrado. Digite o endereço manualmente.');
         }
       } catch {
         setCepFeedback('Não foi possível buscar o CEP automaticamente.');
@@ -157,7 +155,7 @@ export default function CheckoutModal() {
     setCardCvv(val.replace(/\D/g, '').slice(0, 4));
   };
 
-  // Coupon application
+  // Cupom
   const applyCoupon = () => {
     const clean = couponCode.trim().toUpperCase();
     if (!clean) return;
@@ -277,7 +275,6 @@ export default function CheckoutModal() {
     setActiveStep(3);
     scrollToTop();
 
-    // If Pix is selected and not generated, trigger generation immediately
     if (payMethod === 'pix' && !pixCode) {
       setTimeout(() => {
         generatePix();
@@ -285,7 +282,6 @@ export default function CheckoutModal() {
     }
   };
 
-  // Switch Payment method
   const handleSwitchPaymentMethod = (method: 'pix' | 'card') => {
     setPayMethod(method);
     setPayError('');
@@ -363,7 +359,6 @@ export default function CheckoutModal() {
     }
   };
 
-  // Manual Confirmation for Pix
   const handleConfirmPixPaid = () => {
     setIsSubmitting(true);
     setTimeout(() => {
@@ -385,7 +380,7 @@ export default function CheckoutModal() {
       aria-label="Checkout AlfaCarbon"
       ref={modalContainerRef}
     >
-      {/* Top Header - Columbia Blue */}
+      {/* Top Header - Dark Luxury */}
       <header className="columbia-co-hd">
         <div className="wrap">
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -394,14 +389,14 @@ export default function CheckoutModal() {
               <img
                 src="/assets/img/logo.png"
                 alt="AlfaCarbon"
-                style={{ height: 32, width: 'auto', filter: 'brightness(0) invert(1)' }}
+                style={{ height: 32, width: 'auto' }}
               />
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
             <div className="columbia-secure-tag">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.2">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
@@ -413,11 +408,11 @@ export default function CheckoutModal() {
               onClick={closeCheckout}
               aria-label="Fechar checkout"
               style={{
-                background: 'rgba(255,255,255,0.15)',
-                border: 'none',
-                color: '#ffffff',
-                width: 32,
-                height: 32,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid #282E38',
+                color: '#CBD5E1',
+                width: 34,
+                height: 34,
                 borderRadius: '50%',
                 cursor: 'pointer',
                 display: 'flex',
@@ -425,6 +420,7 @@ export default function CheckoutModal() {
                 justifyContent: 'center',
                 fontSize: 16,
                 fontWeight: 700,
+                transition: 'all 0.18s ease',
               }}
             >
               ✕
@@ -433,61 +429,58 @@ export default function CheckoutModal() {
         </div>
       </header>
 
-      {/* Mobile Drawer / Toggle for Order Summary */}
-      <div className="columbia-mobile-summary-bar" style={{ display: 'none' }}>
-        {/* CSS can make this visible on max-width 960px if needed */}
-      </div>
-
       <div className="columbia-co-body">
         <div className="wrap columbia-co-grid">
           
-          {/* LEFT COLUMN: 3-Step Accordion or Order Success */}
+          {/* LEFT COLUMN: 3-Step Accordion */}
           <div className="columbia-main-col">
             
             {activeStep === 4 ? (
-              /* Success / Result View */
-              <div className="columbia-step-card" style={{ textAlign: 'center', padding: '40px 24px' }}>
+              /* Step 4: Pedido Concluído (Dark Luxury) */
+              <div className="columbia-step-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
                 <div
                   style={{
-                    width: 72,
-                    height: 72,
+                    width: 76,
+                    height: 76,
                     borderRadius: '50%',
-                    background: '#dcfce7',
-                    color: '#15803d',
+                    background: 'rgba(25, 194, 90, 0.15)',
+                    border: '2px solid #19C25A',
+                    color: '#19C25A',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 20px',
-                    fontSize: 34,
+                    margin: '0 auto 24px',
+                    fontSize: 36,
+                    boxShadow: '0 0 24px rgba(25, 194, 90, 0.3)',
                   }}
                 >
                   ✓
                 </div>
-                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>
+                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#F4F6F8', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
                   Pedido Realizado com Sucesso!
                 </h2>
-                <p style={{ fontSize: 14.5, color: '#475569', margin: '0 0 18px', lineHeight: 1.5 }}>
-                  Agradecemos a sua preferência. O comprovante e os dados de rastreio foram enviados para{' '}
-                  <b>{email || 'seu e-mail'}</b> e WhatsApp <b>{telefone || 'cadastrado'}</b>.
+                <p style={{ fontSize: 14.5, color: '#A9B0BA', margin: '0 0 22px', lineHeight: 1.5 }}>
+                  Agradecemos a sua preferência. O comprovante e os dados de rastreamento foram enviados para{' '}
+                  <b style={{ color: '#F4F6F8' }}>{email || 'seu e-mail'}</b> e WhatsApp <b style={{ color: '#F4F6F8' }}>{telefone || 'cadastrado'}</b>.
                 </p>
 
                 <div
                   style={{
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: 10,
-                    padding: '16px 20px',
+                    background: '#111317',
+                    border: '1px solid #282E38',
+                    borderRadius: 12,
+                    padding: '18px 24px',
                     display: 'inline-block',
                     textAlign: 'left',
-                    marginBottom: 24,
+                    marginBottom: 28,
                   }}
                 >
-                  <div style={{ fontSize: 13, color: '#64748b' }}>Número do Pedido:</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#0047ab' }}>
+                  <div style={{ fontSize: 12.5, color: '#7E8691', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Número do Pedido:</div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#E8B10C', marginTop: 2 }}>
                     #{orderId ? orderId.slice(-8).toUpperCase() : 'ALFA-78921'}
                   </div>
-                  <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 4 }}>
-                    Previsão de entrega: <b>4 a 8 dias úteis</b>
+                  <div style={{ fontSize: 12.5, color: '#CBD5E1', marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ color: '#19C25A' }}>●</span> Previsão de entrega: <b style={{ color: '#F4F6F8' }}>4 a 8 dias úteis</b>
                   </div>
                 </div>
 
@@ -503,7 +496,7 @@ export default function CheckoutModal() {
                 </div>
               </div>
             ) : (
-              /* 3 Sequential Accordion Cards */
+              /* 3 Sequential Accordion Steps */
               <>
                 {/* ================= STEP 1: IDENTIFICAÇÃO ================= */}
                 <div
@@ -531,15 +524,13 @@ export default function CheckoutModal() {
                   </div>
 
                   {activeStep > 1 ? (
-                    /* Step 1 Summary */
                     <div className="columbia-summary-info">
                       <b>{nome} {sobrenome}</b> &bull; {email} &bull; {telefone} &bull; CPF: {cpf}
                     </div>
                   ) : (
-                    /* Step 1 Form */
                     <form className="columbia-step-content" onSubmit={handleStep1Submit} noValidate>
                       {step1Error && (
-                        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
+                        <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
                           {step1Error}
                         </div>
                       )}
@@ -622,7 +613,7 @@ export default function CheckoutModal() {
                       </div>
 
                       <button type="submit" className="columbia-btn-next">
-                        PRÓXIMO
+                        PRÓXIMO &rarr;
                       </button>
                     </form>
                   )}
@@ -660,22 +651,20 @@ export default function CheckoutModal() {
                   </div>
 
                   {activeStep > 2 ? (
-                    /* Step 2 Summary */
                     <div className="columbia-summary-info">
                       <b>{rua}, {numero}{complemento ? ` - ${complemento}` : ''}</b> &bull; {bairro}, {cidade} - {estado} &bull; CEP: {cep}
                     </div>
                   ) : activeStep === 2 ? (
-                    /* Step 2 Form */
                     <form className="columbia-step-content" onSubmit={handleStep2Submit} noValidate>
                       {step2Error && (
-                        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
+                        <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
                           {step2Error}
                         </div>
                       )}
 
                       <div className="columbia-fld">
                         <label className="columbia-label" htmlFor="fld-cep">
-                          CEP * {isSearchingCep && <span style={{ color: '#0047ab', fontSize: 12 }}> (Buscando...)</span>}
+                          CEP * {isSearchingCep && <span style={{ color: '#E8B10C', fontSize: 12 }}> (Buscando endereço...)</span>}
                         </label>
                         <input
                           id="fld-cep"
@@ -688,7 +677,7 @@ export default function CheckoutModal() {
                           required
                         />
                         {cepFeedback && (
-                          <div style={{ fontSize: 12, color: cepFeedback.startsWith('✓') ? '#16a34a' : '#475569', marginTop: 4 }}>
+                          <div style={{ fontSize: 12, color: cepFeedback.startsWith('✓') ? '#3BE07C' : '#A9B0BA', marginTop: 4 }}>
                             {cepFeedback}
                           </div>
                         )}
@@ -788,13 +777,13 @@ export default function CheckoutModal() {
                         </div>
                       </div>
 
-                      {/* Opção de Frete Fixo Expresso Grátis */}
+                      {/* Opção de Frete Expresso Grátis */}
                       <div
                         style={{
-                          background: '#f8fafc',
-                          border: '1.5px solid #bbf7d0',
-                          borderRadius: 8,
-                          padding: '12px 16px',
+                          background: '#111317',
+                          border: '1.5px solid rgba(25, 194, 90, 0.35)',
+                          borderRadius: 10,
+                          padding: '14px 16px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -802,23 +791,23 @@ export default function CheckoutModal() {
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: 18 }}>🚚</span>
+                          <span style={{ fontSize: 20 }}>🚚</span>
                           <div>
-                            <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>
+                            <div style={{ fontSize: 13.5, fontWeight: 800, color: '#F4F6F8' }}>
                               Frete Expresso Nacional (4 a 8 dias úteis)
                             </div>
-                            <div style={{ fontSize: 12, color: '#15803d' }}>
+                            <div style={{ fontSize: 12, color: '#3BE07C' }}>
                               Com código de rastreamento direto no WhatsApp
                             </div>
                           </div>
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 900, color: '#15803d', textTransform: 'uppercase' }}>
+                        <div style={{ fontSize: 13, fontWeight: 900, color: '#3BE07C', textTransform: 'uppercase' }}>
                           Grátis
                         </div>
                       </div>
 
                       <button type="submit" className="columbia-btn-next">
-                        PRÓXIMO
+                        PRÓXIMO &rarr;
                       </button>
                     </form>
                   ) : null}
@@ -844,7 +833,7 @@ export default function CheckoutModal() {
                   {activeStep === 3 && (
                     <div className="columbia-step-content">
                       {payError && (
-                        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '12px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
+                        <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '12px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
                           {payError}
                         </div>
                       )}
@@ -857,7 +846,7 @@ export default function CheckoutModal() {
                         >
                           <div className="columbia-pay-card-hd">
                             <span className="columbia-pay-name">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0047ab" strokeWidth="2.2">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.2">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                               </svg>
                               PIX
@@ -873,13 +862,13 @@ export default function CheckoutModal() {
                         >
                           <div className="columbia-pay-card-hd">
                             <span className="columbia-pay-name">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0047ab" strokeWidth="2.2">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.2">
                                 <rect x="1" y="4" width="22" height="16" rx="2" />
                                 <line x1="1" y1="10" x2="23" y2="10" />
                               </svg>
                               Cartão de Crédito
                             </span>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: '#0047ab' }}>Até 12x</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#E8B10C' }}>Até 12x</span>
                           </div>
                           <span className="columbia-pay-desc">Todas as bandeiras aceitas</span>
                         </div>
@@ -889,13 +878,13 @@ export default function CheckoutModal() {
                       {payMethod === 'pix' && (
                         <div className="columbia-pix-box">
                           {isGeneratingPix ? (
-                            <div style={{ padding: '30px 0', color: '#0047ab', fontWeight: 700 }}>
+                            <div style={{ padding: '30px 0', color: '#E8B10C', fontWeight: 700 }}>
                               <div style={{ fontSize: 24, marginBottom: 8 }}>⏳</div>
-                              Gerando cobrança Pix segura com a Blackcat...
+                              Gerando cobrança Pix segura via Blackcat Gateway...
                             </div>
                           ) : pixCode ? (
                             <>
-                              <div style={{ fontSize: 13.5, color: '#334155', marginBottom: 14 }}>
+                              <div style={{ fontSize: 13.5, color: '#CBD5E1', marginBottom: 14 }}>
                                 Abra o aplicativo do seu banco e escaneie o QR Code abaixo ou utilize o <b>Pix Copia e Cola</b>:
                               </div>
 
@@ -916,7 +905,7 @@ export default function CheckoutModal() {
                                 />
                               </div>
 
-                              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>
+                              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#F4F6F8', marginBottom: 6 }}>
                                 Código Pix Copia e Cola:
                               </div>
 
@@ -941,8 +930,8 @@ export default function CheckoutModal() {
                                 </button>
                               </div>
 
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 14, fontSize: 12.5, color: '#15803d' }}>
-                                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#16a34a', animation: 'pulse 1.5s infinite' }} />
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, fontSize: 12.5, color: '#3BE07C' }}>
+                                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#19C25A', animation: 'pulse 1.5s infinite' }} />
                                 Aguardando pagamento em tempo real...
                               </div>
 
@@ -957,7 +946,7 @@ export default function CheckoutModal() {
                             </>
                           ) : (
                             <div>
-                              <p style={{ fontSize: 14, color: '#475569', marginBottom: 14 }}>
+                              <p style={{ fontSize: 14, color: '#A9B0BA', marginBottom: 14 }}>
                                 Clique abaixo para gerar o QR Code oficial de pagamento Pix com <b>5% de desconto</b>.
                               </p>
                               <button
@@ -1085,7 +1074,7 @@ export default function CheckoutModal() {
 
               {/* Cupom de Desconto */}
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: '#334155', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: '#CBD5E1', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                   🏷️ Tem um cupom?
                 </div>
                 <div className="columbia-coupon-row">
@@ -1101,14 +1090,14 @@ export default function CheckoutModal() {
                   </button>
                 </div>
                 {couponFeedback && (
-                  <div style={{ fontSize: 12, color: couponFeedback.startsWith('✓') ? '#16a34a' : '#ef4444', marginTop: -12, marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, color: couponFeedback.startsWith('✓') ? '#3BE07C' : '#F2555A', marginTop: -12, marginBottom: 12 }}>
                     {couponFeedback}
                   </div>
                 )}
               </div>
 
               {/* Lista de Produtos */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#64748b', paddingBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#7E8691', paddingBottom: 8, borderBottom: '1px solid #23272E' }}>
                 <span>Produto</span>
                 <span>Subtotal</span>
               </div>
@@ -1128,7 +1117,7 @@ export default function CheckoutModal() {
                     <b>{item.kitName}</b>
                     <small>{item.vehicle} &bull; {item.colorName}</small>
                     <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-                      <span style={{ fontSize: 12, color: '#475569' }}>Qtd: 1</span>
+                      <span style={{ fontSize: 12, color: '#A9B0BA' }}>Qtd: 1</span>
                       {cart.length > 1 && (
                         <button
                           type="button"
@@ -1150,23 +1139,23 @@ export default function CheckoutModal() {
               <div className="columbia-totals-list">
                 <div className="columbia-total-row">
                   <span>Subtotal</span>
-                  <span>{formatMoney(subtotal)}</span>
+                  <span style={{ color: '#F4F6F8' }}>{formatMoney(subtotal)}</span>
                 </div>
 
                 <div className="columbia-total-row">
                   <span>Envio (4 a 8 dias úteis)</span>
-                  <span style={{ color: '#15803d', fontWeight: 700 }}>Grátis</span>
+                  <span style={{ color: '#3BE07C', fontWeight: 700 }}>Grátis</span>
                 </div>
 
                 {payMethod === 'pix' && discountPix > 0 && (
-                  <div className="columbia-total-row" style={{ color: '#15803d' }}>
+                  <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
                     <span>Desconto no PIX (5%)</span>
                     <span>- {formatMoney(discountPix)}</span>
                   </div>
                 )}
 
                 {couponDiscount > 0 && (
-                  <div className="columbia-total-row" style={{ color: '#15803d' }}>
+                  <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
                     <span>Desconto Cupom</span>
                     <span>- {formatMoney(couponDiscount)}</span>
                   </div>
@@ -1178,14 +1167,14 @@ export default function CheckoutModal() {
                 </div>
               </div>
 
-              {/* Caixa Verde: Compra Segura */}
+              {/* Caixa: Compra Segura */}
               <div className="columbia-secure-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
                 <div>
-                  <b>Compra segura</b>
-                  <small>Ambiente protegido e processado com segurança de ponta a ponta.</small>
+                  <b>Compra 100% segura</b>
+                  <small>Ambiente criptografado e processado com segurança via Blackcat Gateway.</small>
                 </div>
               </div>
 
@@ -1207,7 +1196,7 @@ export default function CheckoutModal() {
                     <path d="M9 12l2 2 4-4" />
                   </svg>
                   <div>
-                    <b>Embalagem discreta:</b> Proteção total contra danos no transporte.
+                    <b>Embalagem reforçada:</b> Proteção total contra danos no transporte.
                   </div>
                 </div>
 
@@ -1217,7 +1206,7 @@ export default function CheckoutModal() {
                     <path d="M9 12l2 2 4-4" />
                   </svg>
                   <div>
-                    <b>Garantia total:</b> 1 ano de garantia e troca garantida sem complicações.
+                    <b>Garantia total:</b> 1 ano de garantia de fábrica e devolução garantida.
                   </div>
                 </div>
               </div>

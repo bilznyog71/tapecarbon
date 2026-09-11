@@ -1859,26 +1859,29 @@ p { color: var(--ink-2); }
 }
 
 /* ==========================================================================
-   COLUMBIA-STYLE 3-STEP ACCORDION CHECKOUT
+   ALFACARBON HIGH-CONVERTING 3-STEP SEQUENTIAL CHECKOUT
+   Layout e Estrutura: 3 Etapas Sequenciais (Estilo E-commerce)
+   Identidade Visual: AlfaCarbon Original Premium Dark / Gold
    ========================================================================== */
 .columbia-co {
   position: fixed;
   inset: 0;
   z-index: 150;
-  background: #f4f6f8;
+  background: #0A0B0D;
   overflow-y: auto;
   overscroll-behavior: contain;
-  color: #1e293b;
+  color: #F4F6F8;
 }
 
 .columbia-co-hd {
-  background: #0047ab;
-  color: #ffffff;
-  padding: 14px 0;
+  background: #111317;
+  border-bottom: 1px solid #23272E;
+  color: #F4F6F8;
+  padding: 16px 0;
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .columbia-co-hd .wrap {
@@ -1894,41 +1897,46 @@ p { color: var(--ink-2); }
   gap: 8px;
   font-size: 13.5px;
   font-weight: 700;
-  color: #ffffff;
+  color: #3BE07C;
   letter-spacing: -0.01em;
 }
 
 .columbia-co-body {
-  padding: 32px 0 80px;
+  padding: 32px 0 90px;
 }
 
 .columbia-co-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
   gap: 32px;
   align-items: start;
 }
 
 /* Steps Cards (Accordion) */
 .columbia-step-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: #15181D;
+  border: 1px solid #23272E;
+  border-radius: 14px;
   padding: 24px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease;
 }
 
+.columbia-step-card.active {
+  border-color: #333944;
+}
+
 .columbia-step-card.locked {
-  background: #ffffff;
-  opacity: 0.88;
+  background: #111317;
+  opacity: 0.65;
+  border-color: #1A1D24;
   cursor: default;
 }
 
 .columbia-step-card.completed {
-  border-color: #cbd5e1;
-  background: #fafbfc;
+  border-color: rgba(25, 194, 90, 0.28);
+  background: #13161C;
 }
 
 .columbia-step-hd {
@@ -1938,79 +1946,89 @@ p { color: var(--ink-2); }
 }
 
 .columbia-step-badge {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 900;
   flex: none;
   transition: all 0.2s;
 }
 
 .columbia-step-badge.active {
-  background: #0047ab;
-  color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.15);
+  background: #E8B10C;
+  color: #0A0B0D;
+  box-shadow: 0 0 14px rgba(232, 177, 12, 0.4);
 }
 
 .columbia-step-badge.done {
-  background: #10b981;
-  color: #ffffff;
+  background: #19C25A;
+  color: #0A0B0D;
+  box-shadow: 0 0 12px rgba(25, 194, 90, 0.35);
 }
 
 .columbia-step-badge.idle {
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #cbd5e1;
+  background: #1C2027;
+  color: #7E8691;
+  border: 1px solid #282E38;
 }
 
 .columbia-step-title {
   font-size: 15px;
   font-weight: 900;
   text-transform: uppercase;
-  color: #0f172a;
-  letter-spacing: -0.01em;
+  color: #F4F6F8;
+  letter-spacing: 0.02em;
   margin: 0;
 }
 
 .columbia-step-sub {
   font-size: 12.5px;
-  color: #64748b;
+  color: #A9B0BA;
   margin: 2px 0 0;
 }
 
 .columbia-edit-link {
   margin-left: auto;
   font-size: 13px;
-  font-weight: 700;
-  color: #0047ab;
-  background: none;
-  border: none;
+  font-weight: 800;
+  color: #E8B10C;
+  background: rgba(232, 177, 12, 0.1);
+  border: 1px solid rgba(232, 177, 12, 0.25);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 5px 12px;
   border-radius: 6px;
   transition: 0.15s;
 }
 
 .columbia-edit-link:hover {
-  background: #eff6ff;
-  text-decoration: underline;
+  background: rgba(232, 177, 12, 0.2);
+  border-color: #E8B10C;
+  color: #FFD05A;
 }
 
 .columbia-step-content {
   margin-top: 22px;
   padding-top: 20px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid #23272E;
 }
 
 .columbia-summary-info {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 13.5px;
-  color: #334155;
+  color: #CBD5E1;
   line-height: 1.5;
+  padding: 10px 14px;
+  background: #0E1014;
+  border-radius: 8px;
+  border: 1px solid #1E232B;
+}
+
+.columbia-summary-info b {
+  color: #F4F6F8;
 }
 
 .columbia-fld {
@@ -2021,51 +2039,59 @@ p { color: var(--ink-2); }
   display: block;
   font-size: 12.5px;
   font-weight: 700;
-  color: #334155;
-  margin-bottom: 5px;
+  color: #CBD5E1;
+  margin-bottom: 6px;
 }
 
 .columbia-input,
 .columbia-select {
   width: 100%;
   padding: 12px 14px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
+  background: #111317;
+  border: 1px solid #282E38;
   border-radius: 8px;
-  font-size: 15px;
-  color: #0f172a;
+  font-size: 14.5px;
+  color: #F4F6F8;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.columbia-input::placeholder {
+  color: #5E6672;
 }
 
 .columbia-input:focus,
 .columbia-select:focus {
-  border-color: #0047ab;
-  box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.12);
+  border-color: #E8B10C;
+  background: #14171E;
+  box-shadow: 0 0 0 3px rgba(232, 177, 12, 0.18);
 }
 
 .columbia-btn-next {
   width: 100%;
   height: 50px;
-  background: #0047ab;
-  color: #ffffff;
+  background: linear-gradient(135deg, #E8B10C 0%, #D49E08 100%);
+  color: #0A0B0D;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: all 0.18s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   margin-top: 18px;
+  box-shadow: 0 4px 16px rgba(232, 177, 12, 0.25);
 }
 
 .columbia-btn-next:hover {
-  background: #003785;
+  background: linear-gradient(135deg, #FFD05A 0%, #E8B10C 100%);
+  box-shadow: 0 6px 22px rgba(232, 177, 12, 0.38);
+  transform: translateY(-1px);
 }
 
 .columbia-btn-next:active {
@@ -2075,35 +2101,37 @@ p { color: var(--ink-2); }
 .columbia-btn-finish {
   width: 100%;
   height: 54px;
-  background: #00b84a;
+  background: linear-gradient(135deg, #19C25A 0%, #12994A 100%);
   color: #ffffff;
   border: none;
   border-radius: 8px;
   font-size: 15px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: all 0.18s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   margin-top: 20px;
-  box-shadow: 0 4px 14px rgba(0, 184, 74, 0.28);
+  box-shadow: 0 4px 20px rgba(25, 194, 90, 0.35);
 }
 
 .columbia-btn-finish:hover {
-  background: #00993d;
+  background: linear-gradient(135deg, #22DC6B 0%, #17B256 100%);
+  box-shadow: 0 6px 24px rgba(25, 194, 90, 0.48);
+  transform: translateY(-1px);
 }
 
 /* Right Summary Card */
 .columbia-summary-box {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: #15181D;
+  border: 1px solid #23272E;
+  border-radius: 14px;
   padding: 24px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
   position: sticky;
   top: 90px;
 }
@@ -2111,8 +2139,9 @@ p { color: var(--ink-2); }
 .columbia-summary-title {
   font-size: 15px;
   font-weight: 900;
-  color: #0f172a;
+  color: #F4F6F8;
   margin: 0 0 16px;
+  letter-spacing: 0.02em;
 }
 
 .columbia-coupon-row {
@@ -2124,27 +2153,35 @@ p { color: var(--ink-2); }
 .columbia-coupon-input {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #cbd5e1;
+  background: #111317;
+  border: 1px solid #282E38;
   border-radius: 8px;
   font-size: 13px;
-  color: #0f172a;
+  color: #F4F6F8;
   text-transform: uppercase;
+}
+
+.columbia-coupon-input:focus {
+  border-color: #E8B10C;
+  outline: none;
 }
 
 .columbia-coupon-btn {
   padding: 0 18px;
-  background: #0047ab;
-  color: #ffffff;
-  border: none;
+  background: #23272E;
+  color: #E8B10C;
+  border: 1px solid rgba(232, 177, 12, 0.3);
   border-radius: 8px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.18s;
 }
 
 .columbia-coupon-btn:hover {
-  background: #003785;
+  background: #E8B10C;
+  color: #0A0B0D;
 }
 
 .columbia-item-row {
@@ -2152,17 +2189,17 @@ p { color: var(--ink-2); }
   align-items: center;
   gap: 14px;
   padding: 14px 0;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid #23272E;
 }
 
 .columbia-item-img {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #282E38;
   object-fit: cover;
   flex: none;
-  background: #f8fafc;
+  background: #111317;
 }
 
 .columbia-item-meta {
@@ -2173,30 +2210,30 @@ p { color: var(--ink-2); }
 .columbia-item-meta b {
   display: block;
   font-size: 13.5px;
-  color: #0f172a;
+  color: #F4F6F8;
   line-height: 1.35;
 }
 
 .columbia-item-meta small {
   display: block;
   font-size: 12px;
-  color: #64748b;
+  color: #A9B0BA;
   margin-top: 2px;
 }
 
 .columbia-item-price {
   font-size: 14px;
   font-weight: 800;
-  color: #0f172a;
+  color: #F4F6F8;
   text-align: right;
   flex: none;
 }
 
 .columbia-totals-list {
   padding: 14px 0;
-  border-top: 1px solid #f1f5f9;
-  border-bottom: 1px solid #f1f5f9;
-  margin: 12px 0;
+  border-top: 1px solid #23272E;
+  border-bottom: 1px solid #23272E;
+  margin: 14px 0;
   display: grid;
   gap: 8px;
 }
@@ -2205,29 +2242,30 @@ p { color: var(--ink-2); }
   display: flex;
   justify-content: space-between;
   font-size: 13.5px;
-  color: #475569;
+  color: #A9B0BA;
 }
 
 .columbia-total-row.big {
   margin-top: 6px;
-  padding-top: 10px;
-  border-top: 1px dashed #e2e8f0;
+  padding-top: 12px;
+  border-top: 1px dashed #333944;
   font-size: 17px;
   font-weight: 900;
-  color: #0f172a;
+  color: #F4F6F8;
 }
 
 .columbia-total-row.big b {
-  font-size: 20px;
-  color: #0047ab;
+  font-size: 22px;
+  color: #E8B10C;
+  letter-spacing: -0.01em;
 }
 
 .columbia-secure-box {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  background: #ebf8f0;
-  border: 1px solid #bbf7d0;
+  background: rgba(25, 194, 90, 0.08);
+  border: 1px solid rgba(25, 194, 90, 0.28);
   border-radius: 8px;
   padding: 12px 14px;
   margin: 16px 0;
@@ -2236,7 +2274,7 @@ p { color: var(--ink-2); }
 .columbia-secure-box svg {
   width: 18px;
   height: 18px;
-  stroke: #10b981;
+  stroke: #19C25A;
   flex: none;
   margin-top: 2px;
 }
@@ -2244,13 +2282,13 @@ p { color: var(--ink-2); }
 .columbia-secure-box b {
   display: block;
   font-size: 12.5px;
-  color: #065f46;
+  color: #3BE07C;
 }
 
 .columbia-secure-box small {
   display: block;
   font-size: 11.5px;
-  color: #047857;
+  color: #A3F5C3;
   margin-top: 2px;
 }
 
@@ -2265,16 +2303,20 @@ p { color: var(--ink-2); }
   align-items: flex-start;
   gap: 9px;
   font-size: 12px;
-  color: #475569;
+  color: #A9B0BA;
   line-height: 1.4;
 }
 
 .columbia-assurance-item svg {
   width: 16px;
   height: 16px;
-  stroke: #10b981;
+  stroke: #19C25A;
   flex: none;
   margin-top: 1px;
+}
+
+.columbia-assurance-item b {
+  color: #F4F6F8;
 }
 
 /* Mobile Responsiveness */
@@ -2304,10 +2346,10 @@ p { color: var(--ink-2); }
 .columbia-qty-ctrl {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #282E38;
   border-radius: 6px;
   overflow: hidden;
-  background: #f8fafc;
+  background: #111317;
   margin-top: 6px;
 }
 .columbia-qty-btn {
@@ -2317,25 +2359,25 @@ p { color: var(--ink-2); }
   background: none;
   font-size: 13px;
   font-weight: 700;
-  color: #475569;
+  color: #CBD5E1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .columbia-qty-btn:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #23272E;
+  color: #F4F6F8;
 }
 .columbia-qty-num {
   padding: 0 8px;
   font-size: 12px;
   font-weight: 700;
-  color: #0f172a;
+  color: #F4F6F8;
 }
 .columbia-remove-link {
   font-size: 11.5px;
-  color: #ef4444;
+  color: #F2555A;
   margin-left: 10px;
   background: none;
   border: none;
@@ -2343,7 +2385,7 @@ p { color: var(--ink-2); }
   text-decoration: underline;
 }
 .columbia-remove-link:hover {
-  color: #b91c1c;
+  color: #FF7B80;
 }
 
 .columbia-pay-selector {
@@ -2359,23 +2401,25 @@ p { color: var(--ink-2); }
 }
 
 .columbia-pay-card {
-  border: 2px solid #e2e8f0;
+  border: 1.5px solid #282E38;
   border-radius: 10px;
-  padding: 14px;
+  padding: 15px;
   cursor: pointer;
   transition: all 0.18s ease;
-  background: #ffffff;
+  background: #111317;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   position: relative;
 }
 .columbia-pay-card:hover {
-  border-color: #94a3b8;
+  border-color: #4B5565;
+  background: #14171E;
 }
 .columbia-pay-card.active {
-  border-color: #0047ab;
-  background: #f0f7ff;
+  border-color: #E8B10C;
+  background: rgba(232, 177, 12, 0.08);
+  box-shadow: 0 0 0 1px #E8B10C;
 }
 .columbia-pay-card-hd {
   display: flex;
@@ -2385,7 +2429,7 @@ p { color: var(--ink-2); }
 .columbia-pay-name {
   font-size: 14px;
   font-weight: 800;
-  color: #0f172a;
+  color: #F4F6F8;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2395,28 +2439,28 @@ p { color: var(--ink-2); }
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 999px;
-  background: #dcfce7;
-  color: #15803d;
+  background: rgba(25, 194, 90, 0.18);
+  color: #3BE07C;
 }
 .columbia-pay-desc {
   font-size: 12px;
-  color: #64748b;
+  color: #A9B0BA;
 }
 
 .columbia-pix-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: #111317;
+  border: 1px solid #23272E;
   border-radius: 10px;
-  padding: 20px;
+  padding: 22px;
   text-align: center;
 }
 .columbia-pix-qr {
   display: inline-block;
-  padding: 10px;
+  padding: 12px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 .columbia-pix-copy-input {
   display: flex;
@@ -2425,33 +2469,34 @@ p { color: var(--ink-2); }
 }
 .columbia-pix-code-field {
   flex: 1;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
+  background: #0A0B0D;
+  border: 1px solid #282E38;
   border-radius: 6px;
-  padding: 10px;
+  padding: 10px 12px;
   font-size: 12px;
   font-family: monospace;
-  color: #334155;
+  color: #CBD5E1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .columbia-pix-copy-btn {
-  background: #0047ab;
-  color: #ffffff;
+  background: #E8B10C;
+  color: #0A0B0D;
   border: none;
   border-radius: 6px;
-  padding: 0 16px;
-  font-size: 12.5px;
-  font-weight: 700;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 6px;
+  transition: background 0.18s;
 }
 .columbia-pix-copy-btn:hover {
-  background: #003785;
+  background: #FFD05A;
 }
 
 /* Floating WhatsApp Button */
@@ -2460,24 +2505,25 @@ p { color: var(--ink-2); }
   bottom: 20px;
   right: 20px;
   z-index: 200;
-  background: #00c853;
-  color: #ffffff;
+  background: #19C25A;
+  color: #0A0B0D;
   border: none;
   border-radius: 999px;
-  padding: 10px 18px;
+  padding: 11px 20px;
   font-size: 13.5px;
-  font-weight: 800;
+  font-weight: 900;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 16px rgba(0, 200, 83, 0.35);
+  box-shadow: 0 4px 18px rgba(25, 194, 90, 0.4);
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.18s, box-shadow 0.18s;
 }
 .columbia-whatsapp-float:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 200, 83, 0.45);
+  box-shadow: 0 6px 24px rgba(25, 194, 90, 0.55);
+  background: #22DC6B;
 }
 .columbia-whatsapp-float svg {
   width: 18px;
