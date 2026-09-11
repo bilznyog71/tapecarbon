@@ -15,12 +15,26 @@ export default function CheckoutModal() {
   const [orderId, setOrderId] = useState('');
   const [pixCopied, setPixCopied] = useState(false);
 
-  // Blackcat Gateway State
   const [pixCode, setPixCode] = useState('');
   const [pixQrImage, setPixQrImage] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [payError, setPayError] = useState('');
+  const [receiptFile, setReceiptFile] = useState<{ name: string; size: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const sizeKB = (file.size / 1024).toFixed(0);
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      const formattedSize = file.size > 1024 * 1024 ? `${sizeMB} MB` : `${sizeKB} KB`;
+      setReceiptFile({
+        name: file.name,
+        size: formattedSize,
+      });
+    }
+  };
 
   // Step 1: Identificação
   const [email, setEmail] = useState('');
@@ -930,9 +944,84 @@ export default function CheckoutModal() {
                                 </button>
                               </div>
 
+                              {/* Aba / Seção para Anexar Comprovante Pix */}
+                              <div className="co-receipt-box">
+                                <div className="co-receipt-hd">
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <span style={{ fontSize: 18 }}>🧾</span>
+                                    <div>
+                                      <b style={{ color: '#F4F6F8', fontSize: 13.5 }}>Anexar Comprovante de Pagamento</b>
+                                      <small style={{ display: 'block', color: '#A9B0BA', fontSize: 11.5 }}>
+                                        Agilize a liberação e o envio prioritário do seu kit anexando o comprovante
+                                      </small>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  onChange={handleReceiptChange}
+                                  accept="image/*,.pdf"
+                                  style={{ display: 'none' }}
+                                  id="modal-receipt-upload"
+                                />
+
+                                {!receiptFile ? (
+                                  <div
+                                    className="co-receipt-dropzone"
+                                    onClick={() => fileInputRef.current?.click()}
+                                  >
+                                    <div style={{ fontSize: 24, marginBottom: 6 }}>📤</div>
+                                    <div style={{ color: '#E8B10C', fontWeight: 800, fontSize: 13 }}>
+                                      Clique aqui para anexar o comprovante
+                                    </div>
+                                    <div style={{ color: '#7E8691', fontSize: 11.5, marginTop: 3 }}>
+                                      PNG, JPG ou PDF (print da tela do banco)
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="co-receipt-attached">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                                      <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(25, 194, 90, 0.15)', color: '#19C25A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>
+                                        ✓
+                                      </div>
+                                      <div style={{ minWidth: 0 }}>
+                                        <div style={{ color: '#F4F6F8', fontWeight: 800, fontSize: 13, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                          {receiptFile.name}
+                                        </div>
+                                        <div style={{ color: '#3BE07C', fontSize: 11.5 }}>
+                                          Comprovante anexado ({receiptFile.size})
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => setReceiptFile(null)}
+                                      style={{ background: 'none', border: 'none', color: '#F2555A', fontSize: 12, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
+                                    >
+                                      Trocar
+                                    </button>
+                                  </div>
+                                )}
+
+                                <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+                                  <a
+                                    href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(
+                                      `Olá! Acabei de fazer o Pix do meu pedido ${orderId ? `#ALFA-${orderId.slice(-6).toUpperCase()}` : ''}. Segue meu comprovante de pagamento.`
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="co-receipt-wa-btn"
+                                  >
+                                    <span>💬 Enviar comprovante no WhatsApp</span>
+                                  </a>
+                                </div>
+                              </div>
+
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, fontSize: 12.5, color: '#3BE07C' }}>
                                 <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#19C25A', animation: 'pulse 1.5s infinite' }} />
-                                Aguardando pagamento em tempo real...
+                                Aguardando confirmação em tempo real...
                               </div>
 
                               <button
@@ -941,7 +1030,7 @@ export default function CheckoutModal() {
                                 onClick={handleConfirmPixPaid}
                                 disabled={isSubmitting}
                               >
-                                {isSubmitting ? 'Verificando Pagamento...' : 'JÁ REALIZEI O PAGAMENTO ✓'}
+                                {isSubmitting ? 'Verificando Pagamento...' : receiptFile ? 'ENVIAR COMPROVANTE E FINALIZAR ✓' : 'JÁ REALIZEI O PAGAMENTO ✓'}
                               </button>
                             </>
                           ) : (
