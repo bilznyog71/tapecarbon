@@ -7,7 +7,7 @@ import { CONFIG, formatMoney } from '@/data/config';
 export default function CheckoutModal() {
   const { cart, isCheckoutOpen, closeCheckout, clearCart, removeFromCart } = useStore();
 
-  // 3-step sequential accordion: 1 = Identificação, 2 = Entrega, 3 = Pagamento, 4 = Concluído
+  // 3 etapas sequenciais: 1 = Identificação, 2 = Entrega, 3 = Pagamento, 4 = Concluído
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | 4>(1);
   const [payMethod, setPayMethod] = useState<'pix' | 'card'>('pix');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,26 +15,12 @@ export default function CheckoutModal() {
   const [orderId, setOrderId] = useState('');
   const [pixCopied, setPixCopied] = useState(false);
 
+  // Blackcat Gateway State
   const [pixCode, setPixCode] = useState('');
   const [pixQrImage, setPixQrImage] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [payError, setPayError] = useState('');
-  const [receiptFile, setReceiptFile] = useState<{ name: string; size: string } | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const sizeKB = (file.size / 1024).toFixed(0);
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      const formattedSize = file.size > 1024 * 1024 ? `${sizeMB} MB` : `${sizeKB} KB`;
-      setReceiptFile({
-        name: file.name,
-        size: formattedSize,
-      });
-    }
-  };
 
   // Step 1: Identificação
   const [email, setEmail] = useState('');
@@ -69,7 +55,7 @@ export default function CheckoutModal() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponFeedback, setCouponFeedback] = useState('');
 
-  // Fallback item if cart is empty
+  // Itens do carrinho
   const cartItems = cart.length > 0 ? cart : [
     {
       id: 'default-kit',
@@ -84,7 +70,7 @@ export default function CheckoutModal() {
   ];
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const discountPix = payMethod === 'pix' ? Math.round(subtotal * 0.05 * 100) / 100 : 0;
+  const discountPix = payMethod === 'pix' ? Math.round(subtotal * 0.05) : 0;
   const finalTotal = Math.max(0, subtotal - discountPix - couponDiscount);
 
   const modalContainerRef = useRef<HTMLDivElement>(null);
@@ -92,7 +78,7 @@ export default function CheckoutModal() {
     modalContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // ViaCEP Instant Lookup
+  // Busca instantânea de CEP via ViaCEP
   const handleCepChange = async (val: string) => {
     const raw = val.replace(/\D/g, '').slice(0, 8);
     const masked = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw;
@@ -100,7 +86,7 @@ export default function CheckoutModal() {
 
     if (raw.length === 8) {
       setIsSearchingCep(true);
-      setCepFeedback('Buscando endereço...');
+      setCepFeedback('Localizando...');
       try {
         const res = await fetch(`https://viacep.com.br/ws/${raw}/json/`);
         const data = await res.json();
@@ -109,15 +95,15 @@ export default function CheckoutModal() {
           setBairro(data.bairro || '');
           setCidade(data.localidade || '');
           setEstado(data.uf || 'SP');
-          setCepFeedback(`✓ Endereço localizado: ${data.localidade} - ${data.uf}`);
+          setCepFeedback(`✓ ${data.localidade} - ${data.uf}`);
           setTimeout(() => {
             numeroInputRef.current?.focus();
-          }, 120);
+          }, 100);
         } else {
-          setCepFeedback('CEP não encontrado. Digite o endereço manualmente.');
+          setCepFeedback('CEP não localizado. Preencha manualmente.');
         }
       } catch {
-        setCepFeedback('Não foi possível buscar o CEP automaticamente.');
+        setCepFeedback('');
       } finally {
         setIsSearchingCep(false);
       }
@@ -174,20 +160,21 @@ export default function CheckoutModal() {
     const clean = couponCode.trim().toUpperCase();
     if (!clean) return;
     if (clean === 'ALFA10' || clean === 'PRIMEIRACOMPRA' || clean === 'BEMVINDO') {
-      const discountVal = Math.round(subtotal * 0.1 * 100) / 100;
+      const discountVal = Math.round(subtotal * 0.1);
       setCouponDiscount(discountVal);
-      setCouponFeedback(`✓ Cupom "${clean}" aplicado: 10% de desconto!`);
+      setCouponFeedback(`✓ Cupom "${clean}" aplicado (-10%)`);
     } else {
       setCouponDiscount(0);
       setCouponFeedback('Cupom inválido ou expirado.');
     }
   };
 
-  // Blackcat Pix Generator
-  const generatePix = useCallback(async () => {
+  // Gerador PIX Blackcat com valor com desconto exato
+  const generatePix = useCallback(async (customAmount?: number) => {
     setIsGeneratingPix(true);
     setPayError('');
     try {
+      const chargeAmount = typeof customAmount === 'number' ? customAmount : finalTotal;
       const res = await fetch('/api/blackcat/create-sale', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -196,6 +183,7 @@ export default function CheckoutModal() {
           customer: { nome, sobrenome, email, telefone, cpf },
           address: { cep, rua, numero, complemento, bairro, cidade, estado },
           paymentMethod: 'pix',
+          amount: chargeAmount,
         }),
       });
       const data = await res.json();
@@ -213,7 +201,7 @@ export default function CheckoutModal() {
           setPixQrImage(pData.qrCodeBase64);
         }
 
-        // Real-time polling
+        // Polling de status em tempo real
         if (pollingRef.current) clearInterval(pollingRef.current);
         pollingRef.current = setInterval(async () => {
           try {
@@ -229,14 +217,14 @@ export default function CheckoutModal() {
           } catch {}
         }, 3500);
       } else {
-        setPayError(data.error || data.message || 'Não foi possível gerar a cobrança Pix na Blackcat.');
+        setPayError(data.error || data.message || 'Não foi possível gerar a cobrança Pix.');
       }
     } catch {
       setPayError('Erro de conexão com o servidor de pagamento. Tente novamente.');
     } finally {
       setIsGeneratingPix(false);
     }
-  }, [cartItems, nome, sobrenome, email, telefone, cpf, cep, rua, numero, complemento, bairro, cidade, estado, clearCart]);
+  }, [cartItems, nome, sobrenome, email, telefone, cpf, cep, rua, numero, complemento, bairro, cidade, estado, finalTotal, clearCart]);
 
   useEffect(() => {
     return () => {
@@ -244,7 +232,7 @@ export default function CheckoutModal() {
     };
   }, []);
 
-  // Step 1 Validation -> Next
+  // Validação da Etapa 1
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !nome.trim() || !sobrenome.trim() || !telefone.trim() || !cpf.trim()) {
@@ -253,17 +241,17 @@ export default function CheckoutModal() {
     }
     const cleanEmail = email.trim();
     if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
-      setStep1Error('Por favor, informe um endereço de e-mail válido.');
+      setStep1Error('Informe um e-mail válido.');
       return;
     }
     const cleanPhone = telefone.replace(/\D/g, '');
     if (cleanPhone.length < 10) {
-      setStep1Error('Por favor, informe um WhatsApp ou telefone válido com DDD.');
+      setStep1Error('Informe um telefone válido com DDD.');
       return;
     }
     const cleanCpf = cpf.replace(/\D/g, '');
     if (cleanCpf.length < 11) {
-      setStep1Error('Por favor, informe um CPF válido.');
+      setStep1Error('Informe um CPF válido.');
       return;
     }
 
@@ -272,16 +260,16 @@ export default function CheckoutModal() {
     scrollToTop();
   };
 
-  // Step 2 Validation -> Next
+  // Validação da Etapa 2
   const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanCep = cep.replace(/\D/g, '');
     if (cleanCep.length < 8) {
-      setStep2Error('Por favor, digite um CEP válido com 8 dígitos.');
+      setStep2Error('Digite um CEP válido com 8 dígitos.');
       return;
     }
     if (!rua.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado.trim()) {
-      setStep2Error('Por favor, preencha o endereço completo com número e bairro.');
+      setStep2Error('Preencha o endereço completo com número e bairro.');
       return;
     }
 
@@ -291,8 +279,8 @@ export default function CheckoutModal() {
 
     if (payMethod === 'pix' && !pixCode) {
       setTimeout(() => {
-        generatePix();
-      }, 80);
+        generatePix(finalTotal);
+      }, 50);
     }
   };
 
@@ -300,20 +288,21 @@ export default function CheckoutModal() {
     setPayMethod(method);
     setPayError('');
     if (method === 'pix' && !pixCode) {
-      generatePix();
+      const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05) - couponDiscount);
+      generatePix(discounted);
     }
   };
 
-  // Finalize Card Payment
+  // Pagamento com Cartão
   const handleCardPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     const rawCard = cardNumber.replace(/\D/g, '');
     if (rawCard.length < 15) {
-      setPayError('Por favor, informe o número completo do cartão.');
+      setPayError('Informe o número completo do cartão.');
       return;
     }
     if (!cardName.trim() || !cardExpiry.trim() || !cardCvv.trim()) {
-      setPayError('Por favor, preencha todos os dados do cartão de crédito.');
+      setPayError('Preencha todos os dados do cartão.');
       return;
     }
 
@@ -333,6 +322,7 @@ export default function CheckoutModal() {
           customer: { nome, sobrenome, email, telefone, cpf },
           address: { cep, rua, numero, complemento, bairro, cidade, estado },
           paymentMethod: 'card',
+          amount: finalTotal,
           card: {
             number: rawCard,
             holderName: cardName.trim(),
@@ -355,7 +345,7 @@ export default function CheckoutModal() {
         } else if (data.data.status === 'PENDING_3DS' && data.data.threeDS?.start?.acsUrl) {
           window.location.href = data.data.threeDS.start.acsUrl;
         } else if (data.data.status === 'FAILED') {
-          setPayError(data.data.refusedReason?.description || 'Pagamento recusado pela operadora do cartão.');
+          setPayError(data.data.refusedReason?.description || 'Pagamento recusado pela operadora.');
           setIsSubmitting(false);
         } else {
           setIsSubmitting(false);
@@ -364,7 +354,7 @@ export default function CheckoutModal() {
           scrollToTop();
         }
       } else {
-        setPayError(data.error || data.message || 'Não foi possível autorizar o cartão. Verifique os dados digitados.');
+        setPayError(data.error || data.message || 'Não foi possível autorizar o cartão.');
         setIsSubmitting(false);
       }
     } catch {
@@ -394,27 +384,25 @@ export default function CheckoutModal() {
       aria-label="Checkout AlfaCarbon"
       ref={modalContainerRef}
     >
-      {/* Top Header - Dark Luxury */}
+      {/* Top Header */}
       <header className="columbia-co-hd">
         <div className="wrap">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <span style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={closeCheckout}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/assets/img/logo.png"
-                alt="AlfaCarbon"
-                style={{ height: 32, width: 'auto' }}
-              />
-            </span>
-          </div>
+          <span style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={closeCheckout}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/img/logo.png"
+              alt="AlfaCarbon"
+              style={{ height: 30, width: 'auto' }}
+            />
+          </span>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div className="columbia-secure-tag">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.4">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              <span>Pagamento 100% seguro</span>
+              <span>Ambiente 100% Seguro</span>
             </div>
 
             <button
@@ -425,16 +413,15 @@ export default function CheckoutModal() {
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid #282E38',
                 color: '#CBD5E1',
-                width: 34,
-                height: 34,
+                width: 32,
+                height: 32,
                 borderRadius: '50%',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: 700,
-                transition: 'all 0.18s ease',
               }}
             >
               ✕
@@ -446,16 +433,16 @@ export default function CheckoutModal() {
       <div className="columbia-co-body">
         <div className="wrap columbia-co-grid">
           
-          {/* LEFT COLUMN: 3-Step Accordion */}
+          {/* COLUNA ESQUERDA: 3 ETAPAS SEQUENCIAIS */}
           <div className="columbia-main-col">
             
             {activeStep === 4 ? (
-              /* Step 4: Pedido Concluído (Dark Luxury) */
-              <div className="columbia-step-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+              /* Concluído */
+              <div className="columbia-step-card" style={{ textAlign: 'center', padding: '40px 24px' }}>
                 <div
                   style={{
-                    width: 76,
-                    height: 76,
+                    width: 64,
+                    height: 64,
                     borderRadius: '50%',
                     background: 'rgba(25, 194, 90, 0.15)',
                     border: '2px solid #19C25A',
@@ -463,38 +450,36 @@ export default function CheckoutModal() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 24px',
-                    fontSize: 36,
-                    boxShadow: '0 0 24px rgba(25, 194, 90, 0.3)',
+                    margin: '0 auto 18px',
+                    fontSize: 30,
                   }}
                 >
                   ✓
                 </div>
-                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#F4F6F8', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+                <h2 style={{ fontSize: 22, fontWeight: 900, color: '#F4F6F8', margin: '0 0 6px' }}>
                   Pedido Realizado com Sucesso!
                 </h2>
-                <p style={{ fontSize: 14.5, color: '#A9B0BA', margin: '0 0 22px', lineHeight: 1.5 }}>
-                  Agradecemos a sua preferência. O comprovante e os dados de rastreamento foram enviados para{' '}
-                  <b style={{ color: '#F4F6F8' }}>{email || 'seu e-mail'}</b> e WhatsApp <b style={{ color: '#F4F6F8' }}>{telefone || 'cadastrado'}</b>.
+                <p style={{ fontSize: 13.5, color: '#A9B0BA', margin: '0 0 20px', lineHeight: 1.5 }}>
+                  Enviamos o comprovante para <b style={{ color: '#F4F6F8' }}>{email || 'seu e-mail'}</b> e WhatsApp <b style={{ color: '#F4F6F8' }}>{telefone || 'cadastrado'}</b>.
                 </p>
 
                 <div
                   style={{
                     background: '#111317',
                     border: '1px solid #282E38',
-                    borderRadius: 12,
-                    padding: '18px 24px',
+                    borderRadius: 10,
+                    padding: '14px 20px',
                     display: 'inline-block',
                     textAlign: 'left',
-                    marginBottom: 28,
+                    marginBottom: 24,
                   }}
                 >
-                  <div style={{ fontSize: 12.5, color: '#7E8691', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Número do Pedido:</div>
-                  <div style={{ fontSize: 20, fontWeight: 900, color: '#E8B10C', marginTop: 2 }}>
+                  <div style={{ fontSize: 11.5, color: '#7E8691', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Código do Pedido:</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: '#E8B10C', marginTop: 2 }}>
                     #{orderId ? orderId.slice(-8).toUpperCase() : 'ALFA-78921'}
                   </div>
-                  <div style={{ fontSize: 12.5, color: '#CBD5E1', marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ color: '#19C25A' }}>●</span> Previsão de entrega: <b style={{ color: '#F4F6F8' }}>4 a 8 dias úteis</b>
+                  <div style={{ fontSize: 12, color: '#3BE07C', marginTop: 4 }}>
+                    ● Previsão de entrega: 4 a 8 dias úteis
                   </div>
                 </div>
 
@@ -503,30 +488,25 @@ export default function CheckoutModal() {
                     type="button"
                     className="columbia-btn-next"
                     onClick={closeCheckout}
-                    style={{ maxWidth: 280, margin: '0 auto' }}
+                    style={{ maxWidth: 240, margin: '0 auto' }}
                   >
                     Voltar à Loja
                   </button>
                 </div>
               </div>
             ) : (
-              /* 3 Sequential Accordion Steps */
               <>
-                {/* ================= STEP 1: IDENTIFICAÇÃO ================= */}
-                <div
-                  className={`columbia-step-card ${activeStep === 1 ? 'active' : 'completed'}`}
-                  id="card-step-1"
-                >
-                  <div className="columbia-step-hd">
-                    <div className={`columbia-step-badge ${activeStep === 1 ? 'active' : 'done'}`}>
-                      {activeStep > 1 ? '✓' : '1'}
-                    </div>
-                    <div>
-                      <h2 className="columbia-step-title">IDENTIFICAÇÃO</h2>
-                      <p className="columbia-step-sub">Preencha seus dados para envio do pedido.</p>
-                    </div>
-
-                    {activeStep > 1 && (
+                {/* ETAPA 1: IDENTIFICAÇÃO */}
+                <div className={`columbia-step-card ${activeStep === 1 ? 'active' : 'completed'}`}>
+                  {activeStep > 1 ? (
+                    <div className="columbia-step-hd">
+                      <div className="columbia-step-badge done">✓</div>
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span className="columbia-step-title" style={{ margin: 0 }}>1. Identificação:</span>
+                        <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {nome} {sobrenome} · {email}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         className="columbia-edit-link"
@@ -534,126 +514,124 @@ export default function CheckoutModal() {
                       >
                         Alterar
                       </button>
-                    )}
-                  </div>
-
-                  {activeStep > 1 ? (
-                    <div className="columbia-summary-info">
-                      <b>{nome} {sobrenome}</b> &bull; {email} &bull; {telefone} &bull; CPF: {cpf}
                     </div>
                   ) : (
-                    <form className="columbia-step-content" onSubmit={handleStep1Submit} noValidate>
-                      {step1Error && (
-                        <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
-                          {step1Error}
-                        </div>
-                      )}
-
-                      <div className="columbia-fld">
-                        <label className="columbia-label" htmlFor="fld-email">
-                          Endereço de e-mail *
-                        </label>
-                        <input
-                          id="fld-email"
-                          type="email"
-                          className="columbia-input"
-                          placeholder="seuemail@exemplo.com"
-                          value={email}
-                          onChange={e => setEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-nome">
-                            Nome *
-                          </label>
-                          <input
-                            id="fld-nome"
-                            type="text"
-                            className="columbia-input"
-                            placeholder="Nome"
-                            value={nome}
-                            onChange={e => setNome(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-sobrenome">
-                            Sobrenome *
-                          </label>
-                          <input
-                            id="fld-sobrenome"
-                            type="text"
-                            className="columbia-input"
-                            placeholder="Sobrenome"
-                            value={sobrenome}
-                            onChange={e => setSobrenome(e.target.value)}
-                            required
-                          />
+                    <>
+                      <div className="columbia-step-hd">
+                        <div className="columbia-step-badge active">1</div>
+                        <div>
+                          <h2 className="columbia-step-title">Identificação</h2>
+                          <p className="columbia-step-sub">Preencha seus dados para envio do pedido.</p>
                         </div>
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-telefone">
-                            Telefone / WhatsApp *
-                          </label>
-                          <input
-                            id="fld-telefone"
-                            type="tel"
-                            className="columbia-input"
-                            placeholder="(11) 98765-4321"
-                            value={telefone}
-                            onChange={e => handlePhoneChange(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-cpf">
-                            CPF *
-                          </label>
-                          <input
-                            id="fld-cpf"
-                            type="text"
-                            className="columbia-input"
-                            placeholder="000.000.000-00"
-                            value={cpf}
-                            onChange={e => handleCpfChange(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
+                      <form className="columbia-step-content" onSubmit={handleStep1Submit} noValidate>
+                        {step1Error && (
+                          <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '9px 12px', borderRadius: 6, fontSize: 12.5, marginBottom: 14 }}>
+                            {step1Error}
+                          </div>
+                        )}
 
-                      <button type="submit" className="columbia-btn-next">
-                        PRÓXIMO &rarr;
-                      </button>
-                    </form>
+                        <div className="columbia-fld">
+                          <label className="columbia-label" htmlFor="fld-email">
+                            Endereço de e-mail *
+                          </label>
+                          <input
+                            id="fld-email"
+                            type="email"
+                            className="columbia-input"
+                            placeholder="seuemail@exemplo.com"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-nome">
+                              Nome *
+                            </label>
+                            <input
+                              id="fld-nome"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="Nome"
+                              value={nome}
+                              onChange={e => setNome(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-sobrenome">
+                              Sobrenome *
+                            </label>
+                            <input
+                              id="fld-sobrenome"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="Sobrenome"
+                              value={sobrenome}
+                              onChange={e => setSobrenome(e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-telefone">
+                              WhatsApp / Celular *
+                            </label>
+                            <input
+                              id="fld-telefone"
+                              type="tel"
+                              className="columbia-input"
+                              placeholder="(11) 98765-4321"
+                              value={telefone}
+                              onChange={e => handlePhoneChange(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-cpf">
+                              CPF *
+                            </label>
+                            <input
+                              id="fld-cpf"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="000.000.000-00"
+                              value={cpf}
+                              onChange={e => handleCpfChange(e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <button type="submit" className="columbia-btn-next">
+                          Continuar para Entrega &rarr;
+                        </button>
+                      </form>
+                    </>
                   )}
                 </div>
 
-                {/* ================= STEP 2: ENTREGA ================= */}
+                {/* ETAPA 2: ENTREGA */}
                 <div
                   className={`columbia-step-card ${
                     activeStep === 2 ? 'active' : activeStep > 2 ? 'completed' : 'locked'
                   }`}
-                  id="card-step-2"
                 >
-                  <div className="columbia-step-hd">
-                    <div
-                      className={`columbia-step-badge ${
-                        activeStep === 2 ? 'active' : activeStep > 2 ? 'done' : 'idle'
-                      }`}
-                    >
-                      {activeStep > 2 ? '✓' : '2'}
-                    </div>
-                    <div>
-                      <h2 className="columbia-step-title">ENTREGA</h2>
-                      <p className="columbia-step-sub">Informe onde deseja receber o pedido.</p>
-                    </div>
-
-                    {activeStep > 2 && (
+                  {activeStep > 2 ? (
+                    <div className="columbia-step-hd">
+                      <div className="columbia-step-badge done">✓</div>
+                      <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span className="columbia-step-title" style={{ margin: 0 }}>2. Entrega:</span>
+                        <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {rua}, {numero} · {bairro}, {cidade} - {estado}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         className="columbia-edit-link"
@@ -661,185 +639,188 @@ export default function CheckoutModal() {
                       >
                         Alterar
                       </button>
-                    )}
-                  </div>
-
-                  {activeStep > 2 ? (
-                    <div className="columbia-summary-info">
-                      <b>{rua}, {numero}{complemento ? ` - ${complemento}` : ''}</b> &bull; {bairro}, {cidade} - {estado} &bull; CEP: {cep}
                     </div>
                   ) : activeStep === 2 ? (
-                    <form className="columbia-step-content" onSubmit={handleStep2Submit} noValidate>
-                      {step2Error && (
-                        <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
-                          {step2Error}
+                    <>
+                      <div className="columbia-step-hd">
+                        <div className="columbia-step-badge active">2</div>
+                        <div>
+                          <h2 className="columbia-step-title">Entrega</h2>
+                          <p className="columbia-step-sub">Informe onde deseja receber o pedido.</p>
                         </div>
-                      )}
+                      </div>
 
-                      <div className="columbia-fld">
-                        <label className="columbia-label" htmlFor="fld-cep">
-                          CEP * {isSearchingCep && <span style={{ color: '#E8B10C', fontSize: 12 }}> (Buscando endereço...)</span>}
-                        </label>
-                        <input
-                          id="fld-cep"
-                          type="text"
-                          className="columbia-input"
-                          placeholder="00000-000"
-                          value={cep}
-                          onChange={e => handleCepChange(e.target.value)}
-                          maxLength={9}
-                          required
-                        />
-                        {cepFeedback && (
-                          <div style={{ fontSize: 12, color: cepFeedback.startsWith('✓') ? '#3BE07C' : '#A9B0BA', marginTop: 4 }}>
-                            {cepFeedback}
+                      <form className="columbia-step-content" onSubmit={handleStep2Submit} noValidate>
+                        {step2Error && (
+                          <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '9px 12px', borderRadius: 6, fontSize: 12.5, marginBottom: 14 }}>
+                            {step2Error}
                           </div>
                         )}
-                      </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
                         <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-rua">
-                            Endereço / Rua *
+                          <label className="columbia-label" htmlFor="fld-cep">
+                            CEP * {isSearchingCep && <span style={{ color: '#E8B10C', fontSize: 11.5 }}> (Buscando...)</span>}
                           </label>
                           <input
-                            id="fld-rua"
+                            id="fld-cep"
                             type="text"
                             className="columbia-input"
-                            placeholder="Ex: Av. Paulista"
-                            value={rua}
-                            onChange={e => setRua(e.target.value)}
+                            placeholder="00000-000"
+                            value={cep}
+                            onChange={e => handleCepChange(e.target.value)}
+                            maxLength={9}
                             required
                           />
-                        </div>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-numero">
-                            Número *
-                          </label>
-                          <input
-                            id="fld-numero"
-                            ref={numeroInputRef}
-                            type="text"
-                            className="columbia-input"
-                            placeholder="123"
-                            value={numero}
-                            onChange={e => setNumero(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-complemento">
-                            Complemento (opcional)
-                          </label>
-                          <input
-                            id="fld-complemento"
-                            type="text"
-                            className="columbia-input"
-                            placeholder="Apto 42, Bloco B"
-                            value={complemento}
-                            onChange={e => setComplemento(e.target.value)}
-                          />
-                        </div>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-bairro">
-                            Bairro *
-                          </label>
-                          <input
-                            id="fld-bairro"
-                            type="text"
-                            className="columbia-input"
-                            placeholder="Bairro"
-                            value={bairro}
-                            onChange={e => setBairro(e.target.value)}
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-cidade">
-                            Cidade *
-                          </label>
-                          <input
-                            id="fld-cidade"
-                            type="text"
-                            className="columbia-input"
-                            placeholder="Cidade"
-                            value={cidade}
-                            onChange={e => setCidade(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="columbia-fld">
-                          <label className="columbia-label" htmlFor="fld-estado">
-                            Estado (UF) *
-                          </label>
-                          <input
-                            id="fld-estado"
-                            type="text"
-                            className="columbia-input"
-                            placeholder="SP"
-                            value={estado}
-                            onChange={e => setEstado(e.target.value.toUpperCase().slice(0, 2))}
-                            maxLength={2}
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      {/* Opção de Frete Expresso Grátis */}
-                      <div
-                        style={{
-                          background: '#111317',
-                          border: '1.5px solid rgba(25, 194, 90, 0.35)',
-                          borderRadius: 10,
-                          padding: '14px 16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          marginTop: 10,
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: 20 }}>🚚</span>
-                          <div>
-                            <div style={{ fontSize: 13.5, fontWeight: 800, color: '#F4F6F8' }}>
-                              Frete Expresso Nacional (4 a 8 dias úteis)
+                          {cepFeedback && (
+                            <div style={{ fontSize: 12, color: cepFeedback.startsWith('✓') ? '#3BE07C' : '#A9B0BA', marginTop: 3 }}>
+                              {cepFeedback}
                             </div>
-                            <div style={{ fontSize: 12, color: '#3BE07C' }}>
-                              Com código de rastreamento direto no WhatsApp
-                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-rua">
+                              Endereço / Rua *
+                            </label>
+                            <input
+                              id="fld-rua"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="Ex: Av. Paulista"
+                              value={rua}
+                              onChange={e => setRua(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-numero">
+                              Número *
+                            </label>
+                            <input
+                              id="fld-numero"
+                              ref={numeroInputRef}
+                              type="text"
+                              className="columbia-input"
+                              placeholder="123"
+                              value={numero}
+                              onChange={e => setNumero(e.target.value)}
+                              required
+                            />
                           </div>
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 900, color: '#3BE07C', textTransform: 'uppercase' }}>
-                          Grátis
-                        </div>
-                      </div>
 
-                      <button type="submit" className="columbia-btn-next">
-                        PRÓXIMO &rarr;
-                      </button>
-                    </form>
-                  ) : null}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-complemento">
+                              Complemento (opcional)
+                            </label>
+                            <input
+                              id="fld-complemento"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="Apto 42, Bloco B"
+                              value={complemento}
+                              onChange={e => setComplemento(e.target.value)}
+                            />
+                          </div>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-bairro">
+                              Bairro *
+                            </label>
+                            <input
+                              id="fld-bairro"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="Bairro"
+                              value={bairro}
+                              onChange={e => setBairro(e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-cidade">
+                              Cidade *
+                            </label>
+                            <input
+                              id="fld-cidade"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="Cidade"
+                              value={cidade}
+                              onChange={e => setCidade(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div className="columbia-fld">
+                            <label className="columbia-label" htmlFor="fld-estado">
+                              Estado (UF) *
+                            </label>
+                            <input
+                              id="fld-estado"
+                              type="text"
+                              className="columbia-input"
+                              placeholder="SP"
+                              value={estado}
+                              onChange={e => setEstado(e.target.value.toUpperCase().slice(0, 2))}
+                              maxLength={2}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Frete Grátis */}
+                        <div
+                          style={{
+                            background: '#111317',
+                            border: '1px solid rgba(25, 194, 90, 0.3)',
+                            borderRadius: 8,
+                            padding: '10px 14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginTop: 6,
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span>🚚</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: '#F4F6F8' }}>
+                              Frete Expresso Nacional (4 a 8 dias úteis)
+                            </span>
+                          </div>
+                          <span style={{ fontSize: 12.5, fontWeight: 900, color: '#3BE07C', textTransform: 'uppercase' }}>
+                            Grátis
+                          </span>
+                        </div>
+
+                        <button type="submit" className="columbia-btn-next">
+                          Continuar para Pagamento &rarr;
+                        </button>
+                      </form>
+                    </>
+                  ) : (
+                    <div className="columbia-step-hd">
+                      <div className="columbia-step-badge idle">2</div>
+                      <div className="columbia-step-title" style={{ color: '#7E8691' }}>2. Entrega</div>
+                    </div>
+                  )}
                 </div>
 
-                {/* ================= STEP 3: PAGAMENTO ================= */}
+                {/* ETAPA 3: PAGAMENTO */}
                 <div
                   className={`columbia-step-card ${
                     activeStep === 3 ? 'active' : 'locked'
                   }`}
-                  id="card-step-3"
                 >
                   <div className="columbia-step-hd">
                     <div className={`columbia-step-badge ${activeStep === 3 ? 'active' : 'idle'}`}>
                       3
                     </div>
                     <div>
-                      <h2 className="columbia-step-title">PAGAMENTO</h2>
+                      <h2 className="columbia-step-title">3. Pagamento</h2>
                       <p className="columbia-step-sub">Escolha a melhor forma de pagamento.</p>
                     </div>
                   </div>
@@ -847,7 +828,7 @@ export default function CheckoutModal() {
                   {activeStep === 3 && (
                     <div className="columbia-step-content">
                       {payError && (
-                        <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '12px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
+                        <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 6, fontSize: 13, marginBottom: 14 }}>
                           {payError}
                         </div>
                       )}
@@ -860,14 +841,14 @@ export default function CheckoutModal() {
                         >
                           <div className="columbia-pay-card-hd">
                             <span className="columbia-pay-name">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.2">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.4">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                               </svg>
                               PIX
                             </span>
                             <span className="columbia-pay-badge">5% OFF</span>
                           </div>
-                          <span className="columbia-pay-desc">Aprovação imediata e envio prioritário</span>
+                          <span className="columbia-pay-desc">Aprovação imediata</span>
                         </div>
 
                         <div
@@ -876,7 +857,7 @@ export default function CheckoutModal() {
                         >
                           <div className="columbia-pay-card-hd">
                             <span className="columbia-pay-name">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.2">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.4">
                                 <rect x="1" y="4" width="22" height="16" rx="2" />
                                 <line x1="1" y1="10" x2="23" y2="10" />
                               </svg>
@@ -884,22 +865,22 @@ export default function CheckoutModal() {
                             </span>
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#E8B10C' }}>Até 12x</span>
                           </div>
-                          <span className="columbia-pay-desc">Todas as bandeiras aceitas</span>
+                          <span className="columbia-pay-desc">Todas as bandeiras</span>
                         </div>
                       </div>
 
-                      {/* Conteúdo PIX */}
+                      {/* PIX */}
                       {payMethod === 'pix' && (
                         <div className="columbia-pix-box">
                           {isGeneratingPix ? (
-                            <div style={{ padding: '30px 0', color: '#E8B10C', fontWeight: 700 }}>
-                              <div style={{ fontSize: 24, marginBottom: 8 }}>⏳</div>
-                              Gerando cobrança Pix segura via Blackcat Gateway...
+                            <div style={{ padding: '24px 0', color: '#E8B10C', fontWeight: 700 }}>
+                              <div style={{ fontSize: 22, marginBottom: 6 }}>⏳</div>
+                              Gerando chave Pix segura...
                             </div>
                           ) : pixCode ? (
                             <>
-                              <div style={{ fontSize: 13.5, color: '#CBD5E1', marginBottom: 14 }}>
-                                Abra o aplicativo do seu banco e escaneie o QR Code abaixo ou utilize o <b>Pix Copia e Cola</b>:
+                              <div style={{ fontSize: 13, color: '#CBD5E1', marginBottom: 12 }}>
+                                Escaneie o QR Code ou utilize a chave <b>Pix Copia e Cola</b> abaixo:
                               </div>
 
                               <div className="columbia-pix-qr">
@@ -908,19 +889,15 @@ export default function CheckoutModal() {
                                   src={
                                     pixQrImage && pixQrImage.startsWith('data:')
                                       ? pixQrImage
-                                      : `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                                      : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
                                           pixCode
                                         )}`
                                   }
                                   alt="QR Code Pix"
-                                  width={200}
-                                  height={200}
+                                  width={180}
+                                  height={180}
                                   style={{ display: 'block', margin: '0 auto' }}
                                 />
-                              </div>
-
-                              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#F4F6F8', marginBottom: 6 }}>
-                                Código Pix Copia e Cola:
                               </div>
 
                               <div className="columbia-pix-copy-input">
@@ -944,84 +921,9 @@ export default function CheckoutModal() {
                                 </button>
                               </div>
 
-                              {/* Aba / Seção para Anexar Comprovante Pix */}
-                              <div className="co-receipt-box">
-                                <div className="co-receipt-hd">
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span style={{ fontSize: 18 }}>🧾</span>
-                                    <div>
-                                      <b style={{ color: '#F4F6F8', fontSize: 13.5 }}>Anexar Comprovante de Pagamento</b>
-                                      <small style={{ display: 'block', color: '#A9B0BA', fontSize: 11.5 }}>
-                                        Agilize a liberação e o envio prioritário do seu kit anexando o comprovante
-                                      </small>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <input
-                                  type="file"
-                                  ref={fileInputRef}
-                                  onChange={handleReceiptChange}
-                                  accept="image/*,.pdf"
-                                  style={{ display: 'none' }}
-                                  id="modal-receipt-upload"
-                                />
-
-                                {!receiptFile ? (
-                                  <div
-                                    className="co-receipt-dropzone"
-                                    onClick={() => fileInputRef.current?.click()}
-                                  >
-                                    <div style={{ fontSize: 24, marginBottom: 6 }}>📤</div>
-                                    <div style={{ color: '#E8B10C', fontWeight: 800, fontSize: 13 }}>
-                                      Clique aqui para anexar o comprovante
-                                    </div>
-                                    <div style={{ color: '#7E8691', fontSize: 11.5, marginTop: 3 }}>
-                                      PNG, JPG ou PDF (print da tela do banco)
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="co-receipt-attached">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                                      <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(25, 194, 90, 0.15)', color: '#19C25A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>
-                                        ✓
-                                      </div>
-                                      <div style={{ minWidth: 0 }}>
-                                        <div style={{ color: '#F4F6F8', fontWeight: 800, fontSize: 13, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                          {receiptFile.name}
-                                        </div>
-                                        <div style={{ color: '#3BE07C', fontSize: 11.5 }}>
-                                          Comprovante anexado ({receiptFile.size})
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => setReceiptFile(null)}
-                                      style={{ background: 'none', border: 'none', color: '#F2555A', fontSize: 12, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
-                                    >
-                                      Trocar
-                                    </button>
-                                  </div>
-                                )}
-
-                                <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                                  <a
-                                    href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(
-                                      `Olá! Acabei de fazer o Pix do meu pedido ${orderId ? `#ALFA-${orderId.slice(-6).toUpperCase()}` : ''}. Segue meu comprovante de pagamento.`
-                                    )}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="co-receipt-wa-btn"
-                                  >
-                                    <span>💬 Enviar comprovante no WhatsApp</span>
-                                  </a>
-                                </div>
-                              </div>
-
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, fontSize: 12.5, color: '#3BE07C' }}>
-                                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#19C25A', animation: 'pulse 1.5s infinite' }} />
-                                Aguardando confirmação em tempo real...
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14, fontSize: 12, color: '#3BE07C' }}>
+                                <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#19C25A' }} />
+                                Aguardando confirmação do banco em tempo real...
                               </div>
 
                               <button
@@ -1030,18 +932,18 @@ export default function CheckoutModal() {
                                 onClick={handleConfirmPixPaid}
                                 disabled={isSubmitting}
                               >
-                                {isSubmitting ? 'Verificando Pagamento...' : receiptFile ? 'ENVIAR COMPROVANTE E FINALIZAR ✓' : 'JÁ REALIZEI O PAGAMENTO ✓'}
+                                {isSubmitting ? 'Verificando Pagamento...' : 'JÁ FIZ O PIX / CONFIRMAR PAGAMENTO ✓'}
                               </button>
                             </>
                           ) : (
                             <div>
-                              <p style={{ fontSize: 14, color: '#A9B0BA', marginBottom: 14 }}>
-                                Clique abaixo para gerar o QR Code oficial de pagamento Pix com <b>5% de desconto</b>.
+                              <p style={{ fontSize: 13.5, color: '#A9B0BA', marginBottom: 12 }}>
+                                Total a pagar no Pix com 5% de desconto: <b style={{ color: '#E8B10C' }}>{formatMoney(finalTotal)}</b>
                               </p>
                               <button
                                 type="button"
                                 className="columbia-btn-next"
-                                onClick={generatePix}
+                                onClick={() => generatePix(finalTotal)}
                                 disabled={isGeneratingPix}
                               >
                                 {isGeneratingPix ? 'Gerando Pix...' : 'GERAR CÓDIGO PIX'}
@@ -1051,7 +953,7 @@ export default function CheckoutModal() {
                         </div>
                       )}
 
-                      {/* Conteúdo Cartão */}
+                      {/* CARTÃO */}
                       {payMethod === 'card' && (
                         <form onSubmit={handleCardPayment} noValidate>
                           <div className="columbia-fld">
@@ -1085,7 +987,7 @@ export default function CheckoutModal() {
                             />
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                             <div className="columbia-fld">
                               <label className="columbia-label" htmlFor="fld-c-expiry">
                                 Validade (MM/AA) *
@@ -1120,7 +1022,7 @@ export default function CheckoutModal() {
 
                           <div className="columbia-fld">
                             <label className="columbia-label" htmlFor="fld-c-installments">
-                              Número de Parcelas *
+                              Parcelamento *
                             </label>
                             <select
                               id="fld-c-installments"
@@ -1144,7 +1046,7 @@ export default function CheckoutModal() {
                             className="columbia-btn-finish"
                             disabled={isSubmitting}
                           >
-                            {isSubmitting ? 'Processando Cartão...' : `FINALIZAR COMPRA 🔒 (${formatMoney(finalTotal)})`}
+                            {isSubmitting ? 'Processando Cartão...' : `PAGAR ${formatMoney(finalTotal)} NO CARTÃO 🔒`}
                           </button>
                         </form>
                       )}
@@ -1156,16 +1058,13 @@ export default function CheckoutModal() {
 
           </div>
 
-          {/* RIGHT COLUMN: Resumo do Pedido (Sticky) */}
+          {/* COLUNA DIREITA: RESUMO DO PEDIDO */}
           <aside className="columbia-side-col">
             <div className="columbia-summary-box">
               <h3 className="columbia-summary-title">Resumo do pedido</h3>
 
-              {/* Cupom de Desconto */}
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: '#CBD5E1', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                  🏷️ Tem um cupom?
-                </div>
+              {/* Cupom */}
+              <div style={{ marginBottom: 12 }}>
                 <div className="columbia-coupon-row">
                   <input
                     type="text"
@@ -1179,18 +1078,13 @@ export default function CheckoutModal() {
                   </button>
                 </div>
                 {couponFeedback && (
-                  <div style={{ fontSize: 12, color: couponFeedback.startsWith('✓') ? '#3BE07C' : '#F2555A', marginTop: -12, marginBottom: 12 }}>
+                  <div style={{ fontSize: 11.5, color: couponFeedback.startsWith('✓') ? '#3BE07C' : '#F2555A', marginTop: -8, marginBottom: 10 }}>
                     {couponFeedback}
                   </div>
                 )}
               </div>
 
-              {/* Lista de Produtos */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#7E8691', paddingBottom: 8, borderBottom: '1px solid #23272E' }}>
-                <span>Produto</span>
-                <span>Subtotal</span>
-              </div>
-
+              {/* Itens */}
               {cartItems.map(item => (
                 <div key={item.id} className="columbia-item-row">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1204,9 +1098,9 @@ export default function CheckoutModal() {
                   />
                   <div className="columbia-item-meta">
                     <b>{item.kitName}</b>
-                    <small>{item.vehicle} &bull; {item.colorName}</small>
-                    <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-                      <span style={{ fontSize: 12, color: '#A9B0BA' }}>Qtd: 1</span>
+                    <small>{item.vehicle} · {item.colorName}</small>
+                    <div style={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
+                      <span style={{ fontSize: 11.5, color: '#8E98A5' }}>Qtd: 1</span>
                       {cart.length > 1 && (
                         <button
                           type="button"
@@ -1256,48 +1150,13 @@ export default function CheckoutModal() {
                 </div>
               </div>
 
-              {/* Caixa: Compra Segura */}
-              <div className="columbia-secure-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              {/* Selo Discreto */}
+              <div className="columbia-trust-strip">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BE07C" strokeWidth="2.4">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                <div>
-                  <b>Compra 100% segura</b>
-                  <small>Ambiente criptografado e processado com segurança via Blackcat Gateway.</small>
-                </div>
-              </div>
-
-              {/* Assurances */}
-              <div className="columbia-assurances">
-                <div className="columbia-assurance-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9 12l2 2 4-4" />
-                  </svg>
-                  <div>
-                    <b>Postagem rápida:</b> Despacho direto e rastreamento em território brasileiro.
-                  </div>
-                </div>
-
-                <div className="columbia-assurance-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9 12l2 2 4-4" />
-                  </svg>
-                  <div>
-                    <b>Embalagem reforçada:</b> Proteção total contra danos no transporte.
-                  </div>
-                </div>
-
-                <div className="columbia-assurance-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9 12l2 2 4-4" />
-                  </svg>
-                  <div>
-                    <b>Garantia total:</b> 1 ano de garantia de fábrica e devolução garantida.
-                  </div>
-                </div>
+                <span>Pagamento Criptografado &amp; Rastreamento Garantido</span>
               </div>
 
             </div>
@@ -1306,7 +1165,7 @@ export default function CheckoutModal() {
         </div>
       </div>
 
-      {/* Floating WhatsApp Support Button */}
+      {/* WhatsApp Float */}
       <a
         href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá! Estou no checkout da AlfaCarbon e gostaria de tirar uma dúvida.')}`}
         target="_blank"

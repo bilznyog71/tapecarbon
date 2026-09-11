@@ -1916,10 +1916,10 @@ p { color: var(--ink-2); }
 .columbia-step-card {
   background: #15181D;
   border: 1px solid #23272E;
-  border-radius: 14px;
-  padding: 24px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease;
 }
 
@@ -1929,30 +1929,32 @@ p { color: var(--ink-2); }
 
 .columbia-step-card.locked {
   background: #111317;
-  opacity: 0.65;
+  opacity: 0.6;
   border-color: #1A1D24;
   cursor: default;
+  padding: 16px 20px;
 }
 
 .columbia-step-card.completed {
-  border-color: rgba(25, 194, 90, 0.28);
-  background: #13161C;
+  border-color: rgba(25, 194, 90, 0.22);
+  background: #12151B;
+  padding: 14px 20px;
 }
 
 .columbia-step-hd {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .columbia-step-badge {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 900;
   flex: none;
   transition: all 0.2s;
@@ -1961,13 +1963,13 @@ p { color: var(--ink-2); }
 .columbia-step-badge.active {
   background: #E8B10C;
   color: #0A0B0D;
-  box-shadow: 0 0 14px rgba(232, 177, 12, 0.4);
+  box-shadow: 0 0 12px rgba(232, 177, 12, 0.35);
 }
 
 .columbia-step-badge.done {
   background: #19C25A;
   color: #0A0B0D;
-  box-shadow: 0 0 12px rgba(25, 194, 90, 0.35);
+  box-shadow: 0 0 10px rgba(25, 194, 90, 0.3);
 }
 
 .columbia-step-badge.idle {
@@ -1977,80 +1979,77 @@ p { color: var(--ink-2); }
 }
 
 .columbia-step-title {
-  font-size: 15px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 800;
   text-transform: uppercase;
   color: #F4F6F8;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   margin: 0;
 }
 
 .columbia-step-sub {
-  font-size: 12.5px;
-  color: #A9B0BA;
+  font-size: 12px;
+  color: #8E98A5;
   margin: 2px 0 0;
 }
 
 .columbia-edit-link {
   margin-left: auto;
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   color: #E8B10C;
-  background: rgba(232, 177, 12, 0.1);
-  border: 1px solid rgba(232, 177, 12, 0.25);
+  background: none;
+  border: none;
   cursor: pointer;
-  padding: 5px 12px;
-  border-radius: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
   transition: 0.15s;
+  text-decoration: underline;
 }
 
 .columbia-edit-link:hover {
-  background: rgba(232, 177, 12, 0.2);
-  border-color: #E8B10C;
   color: #FFD05A;
 }
 
 .columbia-step-content {
-  margin-top: 22px;
-  padding-top: 20px;
+  margin-top: 18px;
+  padding-top: 16px;
   border-top: 1px solid #23272E;
 }
 
-.columbia-summary-info {
-  margin-top: 12px;
-  font-size: 13.5px;
-  color: #CBD5E1;
-  line-height: 1.5;
-  padding: 10px 14px;
-  background: #0E1014;
-  border-radius: 8px;
-  border: 1px solid #1E232B;
+.columbia-compact-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #A9B0BA;
+  width: 100%;
 }
 
-.columbia-summary-info b {
+.columbia-compact-summary b {
   color: #F4F6F8;
 }
 
 .columbia-fld {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .columbia-label {
   display: block;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   color: #CBD5E1;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .columbia-input,
 .columbia-select {
   width: 100%;
-  padding: 12px 14px;
+  padding: 11px 13px;
   background: #111317;
   border: 1px solid #282E38;
   border-radius: 8px;
-  font-size: 14.5px;
+  font-size: 14px;
   color: #F4F6F8;
   outline: none;
   transition: border-color 0.18s, box-shadow 0.18s;
@@ -2064,17 +2063,17 @@ p { color: var(--ink-2); }
 .columbia-select:focus {
   border-color: #E8B10C;
   background: #14171E;
-  box-shadow: 0 0 0 3px rgba(232, 177, 12, 0.18);
+  box-shadow: 0 0 0 3px rgba(232, 177, 12, 0.15);
 }
 
 .columbia-btn-next {
   width: 100%;
-  height: 50px;
+  height: 48px;
   background: linear-gradient(135deg, #E8B10C 0%, #D49E08 100%);
   color: #0A0B0D;
   border: none;
   border-radius: 8px;
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -2084,14 +2083,13 @@ p { color: var(--ink-2); }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 18px;
-  box-shadow: 0 4px 16px rgba(232, 177, 12, 0.25);
+  margin-top: 16px;
+  box-shadow: 0 4px 14px rgba(232, 177, 12, 0.22);
 }
 
 .columbia-btn-next:hover {
   background: linear-gradient(135deg, #FFD05A 0%, #E8B10C 100%);
-  box-shadow: 0 6px 22px rgba(232, 177, 12, 0.38);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(232, 177, 12, 0.32);
 }
 
 .columbia-btn-next:active {
@@ -2100,7 +2098,7 @@ p { color: var(--ink-2); }
 
 .columbia-btn-finish {
   width: 100%;
-  height: 54px;
+  height: 52px;
   background: linear-gradient(135deg, #19C25A 0%, #12994A 100%);
   color: #ffffff;
   border: none;
@@ -2108,55 +2106,54 @@ p { color: var(--ink-2); }
   font-size: 15px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.18s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 20px;
-  box-shadow: 0 4px 20px rgba(25, 194, 90, 0.35);
+  margin-top: 18px;
+  box-shadow: 0 4px 18px rgba(25, 194, 90, 0.3);
 }
 
 .columbia-btn-finish:hover {
   background: linear-gradient(135deg, #22DC6B 0%, #17B256 100%);
-  box-shadow: 0 6px 24px rgba(25, 194, 90, 0.48);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(25, 194, 90, 0.42);
 }
 
 /* Right Summary Card */
 .columbia-summary-box {
   background: #15181D;
   border: 1px solid #23272E;
-  border-radius: 14px;
-  padding: 24px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
   position: sticky;
-  top: 90px;
+  top: 86px;
 }
 
 .columbia-summary-title {
-  font-size: 15px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 800;
   color: #F4F6F8;
-  margin: 0 0 16px;
+  margin: 0 0 14px;
   letter-spacing: 0.02em;
 }
 
 .columbia-coupon-row {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .columbia-coupon-input {
   flex: 1;
-  padding: 10px 12px;
+  padding: 9px 12px;
   background: #111317;
   border: 1px solid #282E38;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12.5px;
   color: #F4F6F8;
   text-transform: uppercase;
 }
@@ -2167,12 +2164,12 @@ p { color: var(--ink-2); }
 }
 
 .columbia-coupon-btn {
-  padding: 0 18px;
+  padding: 0 14px;
   background: #23272E;
   color: #E8B10C;
-  border: 1px solid rgba(232, 177, 12, 0.3);
-  border-radius: 8px;
-  font-size: 13px;
+  border: 1px solid rgba(232, 177, 12, 0.25);
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
@@ -2187,14 +2184,14 @@ p { color: var(--ink-2); }
 .columbia-item-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 0;
+  gap: 12px;
+  padding: 12px 0;
   border-top: 1px solid #23272E;
 }
 
 .columbia-item-img {
-  width: 56px;
-  height: 56px;
+  width: 50px;
+  height: 50px;
   border-radius: 8px;
   border: 1px solid #282E38;
   object-fit: cover;
@@ -2209,20 +2206,20 @@ p { color: var(--ink-2); }
 
 .columbia-item-meta b {
   display: block;
-  font-size: 13.5px;
+  font-size: 13px;
   color: #F4F6F8;
   line-height: 1.35;
 }
 
 .columbia-item-meta small {
   display: block;
-  font-size: 12px;
-  color: #A9B0BA;
+  font-size: 11.5px;
+  color: #8E98A5;
   margin-top: 2px;
 }
 
 .columbia-item-price {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
   color: #F4F6F8;
   text-align: right;
@@ -2230,100 +2227,52 @@ p { color: var(--ink-2); }
 }
 
 .columbia-totals-list {
-  padding: 14px 0;
+  padding: 12px 0;
   border-top: 1px solid #23272E;
   border-bottom: 1px solid #23272E;
-  margin: 14px 0;
+  margin: 12px 0;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .columbia-total-row {
   display: flex;
   justify-content: space-between;
-  font-size: 13.5px;
+  font-size: 13px;
   color: #A9B0BA;
 }
 
 .columbia-total-row.big {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px dashed #333944;
-  font-size: 17px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed #2E3644;
+  font-size: 16px;
   font-weight: 900;
   color: #F4F6F8;
 }
 
 .columbia-total-row.big b {
-  font-size: 22px;
+  font-size: 20px;
   color: #E8B10C;
   letter-spacing: -0.01em;
 }
 
-.columbia-secure-box {
+.columbia-trust-strip {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  background: rgba(25, 194, 90, 0.08);
-  border: 1px solid rgba(25, 194, 90, 0.28);
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin: 16px 0;
-}
-
-.columbia-secure-box svg {
-  width: 18px;
-  height: 18px;
-  stroke: #19C25A;
-  flex: none;
-  margin-top: 2px;
-}
-
-.columbia-secure-box b {
-  display: block;
-  font-size: 12.5px;
-  color: #3BE07C;
-}
-
-.columbia-secure-box small {
-  display: block;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
   font-size: 11.5px;
-  color: #A3F5C3;
-  margin-top: 2px;
-}
-
-.columbia-assurances {
-  margin-top: 18px;
-  display: grid;
-  gap: 10px;
-}
-
-.columbia-assurance-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  font-size: 12px;
-  color: #A9B0BA;
-  line-height: 1.4;
-}
-
-.columbia-assurance-item svg {
-  width: 16px;
-  height: 16px;
-  stroke: #19C25A;
-  flex: none;
-  margin-top: 1px;
-}
-
-.columbia-assurance-item b {
-  color: #F4F6F8;
+  font-weight: 700;
+  color: #3BE07C;
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 960px) {
   .columbia-co-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
   }
   .columbia-summary-box {
     position: static;
@@ -2335,64 +2284,21 @@ p { color: var(--ink-2); }
     padding-inline: 14px;
   }
   .columbia-step-card {
-    padding: 18px 14px;
+    padding: 16px 14px;
+  }
+  .columbia-step-card.completed {
+    padding: 12px 14px;
   }
   .columbia-co-body {
-    padding: 14px 0 70px;
+    padding: 12px 0 60px;
   }
-}
-
-/* Additional Columbia-Style Elements */
-.columbia-qty-ctrl {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid #282E38;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #111317;
-  margin-top: 6px;
-}
-.columbia-qty-btn {
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: none;
-  font-size: 13px;
-  font-weight: 700;
-  color: #CBD5E1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.columbia-qty-btn:hover {
-  background: #23272E;
-  color: #F4F6F8;
-}
-.columbia-qty-num {
-  padding: 0 8px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #F4F6F8;
-}
-.columbia-remove-link {
-  font-size: 11.5px;
-  color: #F2555A;
-  margin-left: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-}
-.columbia-remove-link:hover {
-  color: #FF7B80;
 }
 
 .columbia-pay-selector {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 @media (max-width: 520px) {
   .columbia-pay-selector {
@@ -2402,24 +2308,21 @@ p { color: var(--ink-2); }
 
 .columbia-pay-card {
   border: 1.5px solid #282E38;
-  border-radius: 10px;
-  padding: 15px;
+  border-radius: 8px;
+  padding: 12px 14px;
   cursor: pointer;
   transition: all 0.18s ease;
   background: #111317;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  position: relative;
+  gap: 4px;
 }
 .columbia-pay-card:hover {
   border-color: #4B5565;
-  background: #14171E;
 }
 .columbia-pay-card.active {
   border-color: #E8B10C;
   background: rgba(232, 177, 12, 0.08);
-  box-shadow: 0 0 0 1px #E8B10C;
 }
 .columbia-pay-card-hd {
   display: flex;
@@ -2427,40 +2330,39 @@ p { color: var(--ink-2); }
   justify-content: space-between;
 }
 .columbia-pay-name {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
   color: #F4F6F8;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .columbia-pay-badge {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 999px;
   background: rgba(25, 194, 90, 0.18);
   color: #3BE07C;
 }
 .columbia-pay-desc {
-  font-size: 12px;
-  color: #A9B0BA;
+  font-size: 11.5px;
+  color: #8E98A5;
 }
 
 .columbia-pix-box {
   background: #111317;
   border: 1px solid #23272E;
   border-radius: 10px;
-  padding: 22px;
+  padding: 20px;
   text-align: center;
 }
 .columbia-pix-qr {
   display: inline-block;
-  padding: 12px;
+  padding: 10px;
   background: #ffffff;
-  border-radius: 10px;
-  margin-bottom: 14px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  margin-bottom: 12px;
 }
 .columbia-pix-copy-input {
   display: flex;
@@ -2472,7 +2374,7 @@ p { color: var(--ink-2); }
   background: #0A0B0D;
   border: 1px solid #282E38;
   border-radius: 6px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   font-size: 12px;
   font-family: monospace;
   color: #CBD5E1;
@@ -2485,8 +2387,8 @@ p { color: var(--ink-2); }
   color: #0A0B0D;
   border: none;
   border-radius: 6px;
-  padding: 0 18px;
-  font-size: 13px;
+  padding: 0 16px;
+  font-size: 12.5px;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
@@ -2509,91 +2411,25 @@ p { color: var(--ink-2); }
   color: #0A0B0D;
   border: none;
   border-radius: 999px;
-  padding: 11px 20px;
-  font-size: 13.5px;
+  padding: 10px 18px;
+  font-size: 13px;
   font-weight: 900;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 18px rgba(25, 194, 90, 0.4);
+  box-shadow: 0 4px 16px rgba(25, 194, 90, 0.4);
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.18s, box-shadow 0.18s;
 }
 .columbia-whatsapp-float:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(25, 194, 90, 0.55);
   background: #22DC6B;
 }
 .columbia-whatsapp-float svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
-/* Receipt Attachment Box (Comprovante Pix) */
-.co-receipt-box {
-  margin-top: 18px;
-  background: #0A0B0D;
-  border: 1.5px dashed #2E3644;
-  border-radius: 10px;
-  padding: 16px;
-  text-align: left;
-  transition: border-color 0.2s;
-}
-.co-receipt-box:hover {
-  border-color: #E8B10C;
-}
-
-.co-receipt-hd {
-  margin-bottom: 12px;
-}
-
-.co-receipt-dropzone {
-  background: #111317;
-  border: 1px solid #23272E;
-  border-radius: 8px;
-  padding: 18px 14px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-.co-receipt-dropzone:hover {
-  background: #151820;
-  border-color: #E8B10C;
-}
-
-.co-receipt-attached {
-  background: #111317;
-  border: 1px solid rgba(25, 194, 90, 0.35);
-  border-radius: 8px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.co-receipt-wa-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #111317;
-  border: 1px solid rgba(25, 194, 90, 0.4);
-  color: #3BE07C;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 12.5px;
-  font-weight: 800;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-.co-receipt-wa-btn:hover {
-  background: rgba(25, 194, 90, 0.12);
-  border-color: #19C25A;
-  color: #55EE93;
-}
 

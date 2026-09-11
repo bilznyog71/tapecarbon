@@ -29,29 +29,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Calcula o total em centavos
-    const totalAmount = Array.isArray(cart) && cart.length > 0
+    // Calcula o total considerando desconto PIX e cupons
+    const subtotal = Array.isArray(cart) && cart.length > 0
       ? cart.reduce((sum: number, item: { price: number }) => sum + item.price, 0)
       : 247;
 
-    const amountInCents = Math.round(totalAmount * 100);
+    let finalAmount = typeof body.amount === 'number' && body.amount > 0
+      ? body.amount
+      : (paymentMethod === 'pix' ? Math.round(subtotal * 0.95) : subtotal);
 
-    // Mapeia os itens
-    const items: BlackcatItem[] = Array.isArray(cart) && cart.length > 0
-      ? cart.map((item: { kitName?: string; vehicle?: string; price: number }) => ({
-          title: `${item.kitName || 'Tapete Bandeja 3D'} - ${item.vehicle || 'AlfaCarbon'}`,
-          unitPrice: Math.round(item.price * 100),
-          quantity: 1,
-          tangible: true,
-        }))
-      : [
-          {
-            title: 'Kit Tapetes Bandeja 3D AlfaCarbon',
-            unitPrice: amountInCents,
-            quantity: 1,
-            tangible: true,
-          },
-        ];
+    // Garante valor positivo
+    if (finalAmount <= 0) finalAmount = subtotal;
+
+    const amountInCents = Math.round(finalAmount * 100);
+
+    // Mapeia o item garantindo que unitPrice coincida exatamente com amountInCents
+    const itemTitle = Array.isArray(cart) && cart.length > 0
+      ? `${cart[0].kitName || 'Tapete Bandeja 3D'} - ${cart[0].vehicle || 'AlfaCarbon'}${cart.length > 1 ? ` (+${cart.length - 1} item)` : ''}`
+      : 'Kit Tapetes Bandeja 3D AlfaCarbon';
+
+    const items: BlackcatItem[] = [
+      {
+        title: itemTitle,
+        unitPrice: amountInCents,
+        quantity: 1,
+        tangible: true,
+      },
+    ];
 
     const host = req.headers.get('host') || 'alfacarbon.shop';
     const protocol = host.includes('localhost') ? 'http' : 'https';

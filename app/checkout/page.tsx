@@ -28,22 +28,7 @@ function CheckoutContent() {
   const [pixQrImage, setPixQrImage] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [payError, setPayError] = useState('');
-  const [receiptFile, setReceiptFile] = useState<{ name: string; size: string } | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const sizeKB = (file.size / 1024).toFixed(0);
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      const formattedSize = file.size > 1024 * 1024 ? `${sizeMB} MB` : `${sizeKB} KB`;
-      setReceiptFile({
-        name: file.name,
-        size: formattedSize,
-      });
-    }
-  };
 
   // Step 1: Identificação
   const [email, setEmail] = useState('');
@@ -173,11 +158,12 @@ function CheckoutContent() {
     }
   };
 
-  // Blackcat Pix Generator
-  const generatePix = useCallback(async () => {
+  // Blackcat Pix Generator com valor exato com desconto
+  const generatePix = useCallback(async (customAmount?: number) => {
     setIsGeneratingPix(true);
     setPayError('');
     try {
+      const chargeAmount = typeof customAmount === 'number' ? customAmount : finalTotal;
       const res = await fetch('/api/blackcat/create-sale', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -193,6 +179,7 @@ function CheckoutContent() {
           customer: { nome, sobrenome, email, telefone, cpf },
           address: { cep, rua, numero, complemento, bairro, cidade, estado },
           paymentMethod: 'pix',
+          amount: chargeAmount,
         }),
       });
       const data = await res.json();
@@ -232,7 +219,7 @@ function CheckoutContent() {
     } finally {
       setIsGeneratingPix(false);
     }
-  }, [kit, marca, modelo, ano, cor, amount, nome, sobrenome, email, telefone, cpf, cep, rua, numero, complemento, bairro, cidade, estado]);
+  }, [kit, marca, modelo, ano, cor, amount, nome, sobrenome, email, telefone, cpf, cep, rua, numero, complemento, bairro, cidade, estado, finalTotal]);
 
   useEffect(() => {
     return () => {
@@ -286,8 +273,9 @@ function CheckoutContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (payMethod === 'pix' && !pixCode) {
+      const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05 * 100) / 100 - couponDiscount);
       setTimeout(() => {
-        generatePix();
+        generatePix(discounted);
       }, 80);
     }
   };
@@ -336,6 +324,7 @@ function CheckoutContent() {
           customer: { nome, sobrenome, email, telefone, cpf },
           address: { cep, rua, numero, complemento, bairro, cidade, estado },
           paymentMethod: 'card',
+          amount: finalTotal,
           card: {
             number: rawCard,
             holderName: cardName.trim(),
@@ -451,16 +440,15 @@ function CheckoutContent() {
           <>
             {/* ================= STEP 1: IDENTIFICAÇÃO ================= */}
             <div className={`columbia-step-card ${activeStep === 1 ? 'active' : 'completed'}`}>
-              <div className="columbia-step-hd">
-                <div className={`columbia-step-badge ${activeStep === 1 ? 'active' : 'done'}`}>
-                  {activeStep > 1 ? '✓' : '1'}
-                </div>
-                <div>
-                  <h2 className="columbia-step-title">IDENTIFICAÇÃO</h2>
-                  <p className="columbia-step-sub">Preencha seus dados para envio do pedido.</p>
-                </div>
-
-                {activeStep > 1 && (
+              {activeStep > 1 ? (
+                <div className="columbia-step-hd">
+                  <div className="columbia-step-badge done">✓</div>
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span className="columbia-step-title" style={{ margin: 0 }}>1. Identificação:</span>
+                    <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {nome} {sobrenome} · {email}
+                    </span>
+                  </div>
                   <button
                     type="button"
                     className="columbia-edit-link"
@@ -468,15 +456,18 @@ function CheckoutContent() {
                   >
                     Alterar
                   </button>
-                )}
-              </div>
-
-              {activeStep > 1 ? (
-                <div className="columbia-summary-info">
-                  <b>{nome} {sobrenome}</b> &bull; {email} &bull; {telefone} &bull; CPF: {cpf}
                 </div>
               ) : (
-                <form className="columbia-step-content" onSubmit={handleStep1Submit} noValidate>
+                <>
+                  <div className="columbia-step-hd">
+                    <div className="columbia-step-badge active">1</div>
+                    <div>
+                      <h2 className="columbia-step-title">IDENTIFICAÇÃO</h2>
+                      <p className="columbia-step-sub">Preencha seus dados para envio do pedido.</p>
+                    </div>
+                  </div>
+
+                  <form className="columbia-step-content" onSubmit={handleStep1Submit} noValidate>
                   {step1Error && (
                     <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
                       {step1Error}
@@ -564,45 +555,51 @@ function CheckoutContent() {
                     PRÓXIMO &rarr;
                   </button>
                 </form>
-              )}
-            </div>
+              </>
+            )}
+          </div>
 
-            {/* ================= STEP 2: ENTREGA ================= */}
-            <div
-              className={`columbia-step-card ${
-                activeStep === 2 ? 'active' : activeStep > 2 ? 'completed' : 'locked'
-              }`}
-            >
+          {/* ================= STEP 2: ENTREGA ================= */}
+          <div
+            className={`columbia-step-card ${
+              activeStep === 2 ? 'active' : activeStep > 2 ? 'completed' : 'locked'
+            }`}
+          >
+            {activeStep > 2 ? (
               <div className="columbia-step-hd">
-                <div
-                  className={`columbia-step-badge ${
-                    activeStep === 2 ? 'active' : activeStep > 2 ? 'done' : 'idle'
-                  }`}
+                <div className="columbia-step-badge done">✓</div>
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <span className="columbia-step-title" style={{ margin: 0 }}>2. Entrega:</span>
+                  <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {rua}, {numero} · {bairro}, {cidade} - {estado}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="columbia-edit-link"
+                  onClick={() => setActiveStep(2)}
                 >
-                  {activeStep > 2 ? '✓' : '2'}
-                </div>
-                <div>
-                  <h2 className="columbia-step-title">ENTREGA</h2>
-                  <p className="columbia-step-sub">Informe onde deseja receber o pedido.</p>
-                </div>
-
-                {activeStep > 2 && (
-                  <button
-                    type="button"
-                    className="columbia-edit-link"
-                    onClick={() => setActiveStep(2)}
-                  >
-                    Alterar
-                  </button>
-                )}
+                  Alterar
+                </button>
               </div>
-
-              {activeStep > 2 ? (
-                <div className="columbia-summary-info">
-                  <b>{rua}, {numero}{complemento ? ` - ${complemento}` : ''}</b> &bull; {bairro}, {cidade} - {estado} &bull; CEP: {cep}
+            ) : (
+              <>
+                <div className="columbia-step-hd">
+                  <div
+                    className={`columbia-step-badge ${
+                      activeStep === 2 ? 'active' : 'idle'
+                    }`}
+                  >
+                    2
+                  </div>
+                  <div>
+                    <h2 className="columbia-step-title">ENTREGA</h2>
+                    <p className="columbia-step-sub">Informe onde deseja receber o pedido.</p>
+                  </div>
                 </div>
-              ) : activeStep === 2 ? (
-                <form className="columbia-step-content" onSubmit={handleStep2Submit} noValidate>
+
+                {activeStep === 2 && (
+                  <form className="columbia-step-content" onSubmit={handleStep2Submit} noValidate>
                   {step2Error && (
                     <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
                       {step2Error}
@@ -757,8 +754,10 @@ function CheckoutContent() {
                     PRÓXIMO &rarr;
                   </button>
                 </form>
-              ) : null}
-            </div>
+              )}
+            </>
+          )}
+        </div>
 
             {/* ================= STEP 3: PAGAMENTO ================= */}
             <div
@@ -876,81 +875,6 @@ function CheckoutContent() {
                             </button>
                           </div>
 
-                          {/* Aba / Seção para Anexar Comprovante Pix */}
-                          <div className="co-receipt-box">
-                            <div className="co-receipt-hd">
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 18 }}>🧾</span>
-                                <div>
-                                  <b style={{ color: '#F4F6F8', fontSize: 13.5 }}>Anexar Comprovante de Pagamento</b>
-                                  <small style={{ display: 'block', color: '#A9B0BA', fontSize: 11.5 }}>
-                                    Agilize a liberação e o envio prioritário do seu kit anexando o comprovante
-                                  </small>
-                                </div>
-                              </div>
-                            </div>
-
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={handleReceiptChange}
-                              accept="image/*,.pdf"
-                              style={{ display: 'none' }}
-                              id="page-receipt-upload"
-                            />
-
-                            {!receiptFile ? (
-                              <div
-                                className="co-receipt-dropzone"
-                                onClick={() => fileInputRef.current?.click()}
-                              >
-                                <div style={{ fontSize: 24, marginBottom: 6 }}>📤</div>
-                                <div style={{ color: '#E8B10C', fontWeight: 800, fontSize: 13 }}>
-                                  Clique aqui para anexar o comprovante
-                                </div>
-                                <div style={{ color: '#7E8691', fontSize: 11.5, marginTop: 3 }}>
-                                  PNG, JPG ou PDF (print da tela do banco)
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="co-receipt-attached">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-                                  <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(25, 194, 90, 0.15)', color: '#19C25A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>
-                                    ✓
-                                  </div>
-                                  <div style={{ minWidth: 0 }}>
-                                    <div style={{ color: '#F4F6F8', fontWeight: 800, fontSize: 13, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                      {receiptFile.name}
-                                    </div>
-                                    <div style={{ color: '#3BE07C', fontSize: 11.5 }}>
-                                      Comprovante anexado ({receiptFile.size})
-                                    </div>
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => setReceiptFile(null)}
-                                  style={{ background: 'none', border: 'none', color: '#F2555A', fontSize: 12, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
-                                >
-                                  Trocar
-                                </button>
-                              </div>
-                            )}
-
-                            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                              <a
-                                href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(
-                                  `Olá! Acabei de fazer o Pix do meu pedido ${orderId ? `#ALFA-${orderId.slice(-6).toUpperCase()}` : ''}. Segue meu comprovante de pagamento.`
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="co-receipt-wa-btn"
-                              >
-                                <span>💬 Enviar comprovante no WhatsApp</span>
-                              </a>
-                            </div>
-                          </div>
-
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, fontSize: 12.5, color: '#3BE07C' }}>
                             <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#19C25A', animation: 'pulse 1.5s infinite' }} />
                             Aguardando confirmação em tempo real...
@@ -962,7 +886,7 @@ function CheckoutContent() {
                             onClick={handleConfirmPixPaid}
                             disabled={isSubmitting}
                           >
-                            {isSubmitting ? 'Verificando Pagamento...' : receiptFile ? 'ENVIAR COMPROVANTE E FINALIZAR ✓' : 'JÁ REALIZEI O PAGAMENTO ✓'}
+                            {isSubmitting ? 'Verificando Pagamento...' : 'JÁ REALIZEI O PAGAMENTO ✓'}
                           </button>
                         </>
                       ) : (
@@ -973,7 +897,7 @@ function CheckoutContent() {
                           <button
                             type="button"
                             className="columbia-btn-next"
-                            onClick={generatePix}
+                            onClick={() => generatePix(finalTotal)}
                             disabled={isGeneratingPix}
                           >
                             {isGeneratingPix ? 'Gerando Pix...' : 'GERAR CÓDIGO PIX'}
