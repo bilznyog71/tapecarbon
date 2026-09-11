@@ -421,18 +421,21 @@ function CheckoutContent() {
             {/* ================= STEP 1: IDENTIFICAÇÃO ================= */}
             <div className={`columbia-step-card ${activeStep === 1 ? 'active' : 'completed'}`}>
               {activeStep > 1 ? (
-                <div className="columbia-step-hd">
-                  <div className="columbia-step-badge done">✓</div>
-                  <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span className="columbia-step-title" style={{ margin: 0 }}>1. Identificação:</span>
-                    <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {nome} {sobrenome} · {email}
-                    </span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                    <div className="columbia-step-badge done">✓</div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', color: '#F4F6F8' }}>1. Identificação</div>
+                      <div style={{ fontSize: 12, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {nome} {sobrenome} · {email}
+                      </div>
+                    </div>
                   </div>
                   <button
                     type="button"
                     className="columbia-edit-link"
                     onClick={() => setActiveStep(1)}
+                    style={{ flexShrink: 0, margin: 0 }}
                   >
                     Alterar
                   </button>
@@ -546,18 +549,21 @@ function CheckoutContent() {
             }`}
           >
             {activeStep > 2 ? (
-              <div className="columbia-step-hd">
-                <div className="columbia-step-badge done">✓</div>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span className="columbia-step-title" style={{ margin: 0 }}>2. Entrega:</span>
-                  <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {rua}, {numero} · {bairro}, {cidade} - {estado}
-                  </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                  <div className="columbia-step-badge done">✓</div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', color: '#F4F6F8' }}>2. Entrega</div>
+                    <div style={{ fontSize: 12, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {rua}, {numero} · {bairro}, {cidade} - {estado}
+                    </div>
+                  </div>
                 </div>
                 <button
                   type="button"
                   className="columbia-edit-link"
                   onClick={() => setActiveStep(2)}
+                  style={{ flexShrink: 0, margin: 0 }}
                 >
                   Alterar
                 </button>
@@ -1071,24 +1077,24 @@ export default function CheckoutPage() {
       {/* Top Header - Dark Luxury */}
       <header className="columbia-co-hd">
         <div className="wrap">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/assets/img/logo.png"
                 alt="AlfaCarbon"
-                style={{ height: 32, width: 'auto' }}
+                style={{ height: 26, width: 'auto' }}
               />
             </Link>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <div className="columbia-secure-tag">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.4">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              <span>Pagamento 100% seguro</span>
+              <span>100% Seguro</span>
             </div>
 
             <Link
@@ -1097,15 +1103,16 @@ export default function CheckoutPage() {
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid #282E38',
                 color: '#CBD5E1',
-                width: 34,
-                height: 34,
+                width: 32,
+                height: 32,
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: 700,
                 textDecoration: 'none',
+                flexShrink: 0,
               }}
               aria-label="Voltar para a Loja"
             >

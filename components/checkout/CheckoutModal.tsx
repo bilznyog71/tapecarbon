@@ -377,13 +377,13 @@ export default function CheckoutModal() {
             />
           </span>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <div className="columbia-secure-tag">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.4">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.4">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              <span>Ambiente 100% Seguro</span>
+              <span>100% Seguro</span>
             </div>
 
             <button
@@ -403,6 +403,7 @@ export default function CheckoutModal() {
                 justifyContent: 'center',
                 fontSize: 15,
                 fontWeight: 700,
+                flexShrink: 0,
               }}
             >
               ✕
@@ -480,18 +481,21 @@ export default function CheckoutModal() {
                 {/* ETAPA 1: IDENTIFICAÇÃO */}
                 <div className={`columbia-step-card ${activeStep === 1 ? 'active' : 'completed'}`}>
                   {activeStep > 1 ? (
-                    <div className="columbia-step-hd">
-                      <div className="columbia-step-badge done">✓</div>
-                      <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <span className="columbia-step-title" style={{ margin: 0 }}>1. Identificação:</span>
-                        <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {nome} {sobrenome} · {email}
-                        </span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                        <div className="columbia-step-badge done">✓</div>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', color: '#F4F6F8' }}>1. Identificação</div>
+                          <div style={{ fontSize: 12, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {nome} {sobrenome} · {email}
+                          </div>
+                        </div>
                       </div>
                       <button
                         type="button"
                         className="columbia-edit-link"
                         onClick={() => setActiveStep(1)}
+                        style={{ flexShrink: 0, margin: 0 }}
                       >
                         Alterar
                       </button>
@@ -605,18 +609,21 @@ export default function CheckoutModal() {
                   }`}
                 >
                   {activeStep > 2 ? (
-                    <div className="columbia-step-hd">
-                      <div className="columbia-step-badge done">✓</div>
-                      <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <span className="columbia-step-title" style={{ margin: 0 }}>2. Entrega:</span>
-                        <span style={{ fontSize: 13, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {rua}, {numero} · {bairro}, {cidade} - {estado}
-                        </span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                        <div className="columbia-step-badge done">✓</div>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', color: '#F4F6F8' }}>2. Entrega</div>
+                          <div style={{ fontSize: 12, color: '#CBD5E1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {rua}, {numero} · {bairro}, {cidade} - {estado}
+                          </div>
+                        </div>
                       </div>
                       <button
                         type="button"
                         className="columbia-edit-link"
                         onClick={() => setActiveStep(2)}
+                        style={{ flexShrink: 0, margin: 0 }}
                       >
                         Alterar
                       </button>
@@ -1118,19 +1125,17 @@ export default function CheckoutModal() {
         </div>
       </div>
 
-      {/* WhatsApp Float */}
-      <a
-        href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá! Estou no checkout da AlfaCarbon e gostaria de tirar uma dúvida.')}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="columbia-whatsapp-float"
-        aria-label="Atendimento via WhatsApp"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M20.52 3.48A11.93 11.93 0 0012.06 0C5.46 0 .09 5.37.09 11.97c0 2.11.55 4.17 1.6 6L0 24l6.23-1.63a11.95 11.95 0 005.83 1.51h.01c6.6 0 11.97-5.37 11.97-11.97 0-3.2-1.25-6.21-3.52-8.43zM12.06 21.9h-.01a9.94 9.94 0 01-5.07-1.39l-.36-.22-3.76.99 1-3.67-.24-.38a9.93 9.93 0 01-1.53-5.26c0-5.5 4.48-9.98 9.98-9.98 2.66 0 5.17 1.04 7.05 2.92a9.93 9.93 0 012.92 7.06c0 5.5-4.48 9.98-9.99 9.98zm5.47-7.48c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.18.2-.35.23-.65.08-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.18-.3-.02-.46.13-.61.14-.14.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.03-.53-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52-.18-.01-.38-.01-.58-.01-.2 0-.53.08-.8.38-.28.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.13 3.25 5.15 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.78-.73 2.03-1.43.25-.7.25-1.3.18-1.43-.08-.12-.28-.2-.58-.35z"/>
-        </svg>
-        <span>Atendimento</span>
-      </a>
+      {/* Suporte WhatsApp em linha (não obstrui o QR Code ou botões) */}
+      <div style={{ textAlign: 'center', padding: '16px 20px 32px' }}>
+        <a
+          href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá! Estou no checkout da AlfaCarbon e gostaria de tirar uma dúvida.')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#3BE07C', fontSize: 12.5, fontWeight: 700, textDecoration: 'none' }}
+        >
+          <span>💬 Precisa de ajuda? Fale conosco no WhatsApp</span>
+        </a>
+      </div>
     </div>
   );
 }
