@@ -50,11 +50,6 @@ export default function CheckoutModal() {
   const [cardCvv, setCardCvv] = useState('');
   const [cardInstallments, setCardInstallments] = useState('1');
 
-  // Cupom
-  const [couponCode, setCouponCode] = useState('');
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [couponFeedback, setCouponFeedback] = useState('');
-
   // Itens do carrinho
   const cartItems = cart.length > 0 ? cart : [
     {
@@ -71,7 +66,7 @@ export default function CheckoutModal() {
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
   const discountPix = payMethod === 'pix' ? Math.round(subtotal * 0.05) : 0;
-  const finalTotal = Math.max(0, subtotal - discountPix - couponDiscount);
+  const finalTotal = Math.max(0, subtotal - discountPix);
 
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const scrollToTop = () => {
@@ -153,20 +148,6 @@ export default function CheckoutModal() {
 
   const handleCardCvvChange = (val: string) => {
     setCardCvv(val.replace(/\D/g, '').slice(0, 4));
-  };
-
-  // Cupom
-  const applyCoupon = () => {
-    const clean = couponCode.trim().toUpperCase();
-    if (!clean) return;
-    if (clean === 'ALFA10' || clean === 'PRIMEIRACOMPRA' || clean === 'BEMVINDO') {
-      const discountVal = Math.round(subtotal * 0.1);
-      setCouponDiscount(discountVal);
-      setCouponFeedback(`✓ Cupom "${clean}" aplicado (-10%)`);
-    } else {
-      setCouponDiscount(0);
-      setCouponFeedback('Cupom inválido ou expirado.');
-    }
   };
 
   // Gerador PIX Blackcat com valor com desconto exato
@@ -288,7 +269,7 @@ export default function CheckoutModal() {
     setPayMethod(method);
     setPayError('');
     if (method === 'pix' && !pixCode) {
-      const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05) - couponDiscount);
+      const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05));
       generatePix(discounted);
     }
   };
@@ -1063,27 +1044,6 @@ export default function CheckoutModal() {
             <div className="columbia-summary-box">
               <h3 className="columbia-summary-title">Resumo do pedido</h3>
 
-              {/* Cupom */}
-              <div style={{ marginBottom: 12 }}>
-                <div className="columbia-coupon-row">
-                  <input
-                    type="text"
-                    className="columbia-coupon-input"
-                    placeholder="CÓDIGO DO CUPOM"
-                    value={couponCode}
-                    onChange={e => setCouponCode(e.target.value)}
-                  />
-                  <button type="button" className="columbia-coupon-btn" onClick={applyCoupon}>
-                    Adicionar
-                  </button>
-                </div>
-                {couponFeedback && (
-                  <div style={{ fontSize: 11.5, color: couponFeedback.startsWith('✓') ? '#3BE07C' : '#F2555A', marginTop: -8, marginBottom: 10 }}>
-                    {couponFeedback}
-                  </div>
-                )}
-              </div>
-
               {/* Itens */}
               {cartItems.map(item => (
                 <div key={item.id} className="columbia-item-row">
@@ -1134,13 +1094,6 @@ export default function CheckoutModal() {
                   <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
                     <span>Desconto no PIX (5%)</span>
                     <span>- {formatMoney(discountPix)}</span>
-                  </div>
-                )}
-
-                {couponDiscount > 0 && (
-                  <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
-                    <span>Desconto Cupom</span>
-                    <span>- {formatMoney(couponDiscount)}</span>
                   </div>
                 )}
 

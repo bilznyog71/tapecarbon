@@ -58,14 +58,9 @@ function CheckoutContent() {
   const [cardCvv, setCardCvv] = useState('');
   const [cardInstallments, setCardInstallments] = useState('1');
 
-  // Cupom
-  const [couponCode, setCouponCode] = useState('');
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [couponFeedback, setCouponFeedback] = useState('');
-
   const subtotal = amount;
   const discountPix = payMethod === 'pix' ? Math.round(subtotal * 0.05 * 100) / 100 : 0;
-  const finalTotal = Math.max(0, subtotal - discountPix - couponDiscount);
+  const finalTotal = Math.max(0, subtotal - discountPix);
 
   // ViaCEP Instant Lookup
   const handleCepChange = async (val: string) => {
@@ -142,20 +137,6 @@ function CheckoutContent() {
 
   const handleCardCvvChange = (val: string) => {
     setCardCvv(val.replace(/\D/g, '').slice(0, 4));
-  };
-
-  // Cupom
-  const applyCoupon = () => {
-    const clean = couponCode.trim().toUpperCase();
-    if (!clean) return;
-    if (clean === 'ALFA10' || clean === 'PRIMEIRACOMPRA' || clean === 'BEMVINDO') {
-      const discountVal = Math.round(subtotal * 0.1 * 100) / 100;
-      setCouponDiscount(discountVal);
-      setCouponFeedback(`✓ Cupom "${clean}" aplicado: 10% de desconto!`);
-    } else {
-      setCouponDiscount(0);
-      setCouponFeedback('Cupom inválido ou expirado.');
-    }
   };
 
   // Blackcat Pix Generator com valor exato com desconto
@@ -273,7 +254,7 @@ function CheckoutContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (payMethod === 'pix' && !pixCode) {
-      const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05 * 100) / 100 - couponDiscount);
+      const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05 * 100) / 100);
       setTimeout(() => {
         generatePix(discounted);
       }, 80);
@@ -1015,30 +996,6 @@ function CheckoutContent() {
         <div className="columbia-summary-box">
           <h3 className="columbia-summary-title">Resumo do pedido</h3>
 
-          {/* Cupom */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#CBD5E1', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-              🏷️ Tem um cupom?
-            </div>
-            <div className="columbia-coupon-row">
-              <input
-                type="text"
-                className="columbia-coupon-input"
-                placeholder="CÓDIGO DO CUPOM"
-                value={couponCode}
-                onChange={e => setCouponCode(e.target.value)}
-              />
-              <button type="button" className="columbia-coupon-btn" onClick={applyCoupon}>
-                Adicionar
-              </button>
-            </div>
-            {couponFeedback && (
-              <div style={{ fontSize: 12, color: couponFeedback.startsWith('✓') ? '#3BE07C' : '#F2555A', marginTop: -12, marginBottom: 12 }}>
-                {couponFeedback}
-              </div>
-            )}
-          </div>
-
           {/* Item */}
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#7E8691', paddingBottom: 8, borderBottom: '1px solid #23272E' }}>
             <span>Produto</span>
@@ -1086,61 +1043,19 @@ function CheckoutContent() {
               </div>
             )}
 
-            {couponDiscount > 0 && (
-              <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
-                <span>Desconto Cupom</span>
-                <span>- {formatMoney(couponDiscount)}</span>
-              </div>
-            )}
-
             <div className="columbia-total-row big">
               <span>Total</span>
               <b>{formatMoney(finalTotal)}</b>
             </div>
           </div>
 
-          {/* Caixa: Compra Segura */}
-          <div className="columbia-secure-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          {/* Selo Discreto */}
+          <div className="columbia-trust-strip">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BE07C" strokeWidth="2.4">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            <div>
-              <b>Compra 100% segura</b>
-              <small>Ambiente criptografado e processado com segurança via Blackcat Gateway.</small>
-            </div>
-          </div>
-
-          {/* Assurances */}
-          <div className="columbia-assurances">
-            <div className="columbia-assurance-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9 12l2 2 4-4" />
-              </svg>
-              <div>
-                <b>Postagem rápida:</b> Despacho direto e rastreamento em território brasileiro.
-              </div>
-            </div>
-
-            <div className="columbia-assurance-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9 12l2 2 4-4" />
-              </svg>
-              <div>
-                <b>Embalagem reforçada:</b> Proteção total contra danos no transporte.
-              </div>
-            </div>
-
-            <div className="columbia-assurance-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9 12l2 2 4-4" />
-              </svg>
-              <div>
-                <b>Garantia total:</b> 1 ano de garantia de fábrica e devolução garantida.
-              </div>
-            </div>
+            <span>Pagamento Criptografado &amp; Rastreamento Garantido</span>
           </div>
 
         </div>
