@@ -213,14 +213,14 @@ export default function VehicleFinder() {
   }))
 
   const modelOptions: SelectOption[] = selectedBrand
-    ? getModelsByBrand(selectedBrand.id).map((m) => ({
+    ? getModelsByBrand(selectedBrand.id).map((m: { id: string; name: string }) => ({
         value: m.id,
         label: m.name,
       }))
     : []
 
-  const yearOptions: SelectOption[] = selectedModel
-    ? getYearsByModel(selectedModel.id).map((y) => ({
+  const yearOptions: SelectOption[] = selectedModel && selectedBrand
+    ? getYearsByModel(selectedBrand.id, selectedModel.id).map((y: string | number) => ({
         value: String(y),
         label: String(y),
       }))
@@ -243,8 +243,8 @@ export default function VehicleFinder() {
     (value: string) => {
       if (!selectedBrand) return
       const models = getModelsByBrand(selectedBrand.id)
-      const model = models.find((m) => m.id === value) || null
-      setSelectedModel(model)
+      const model = models.find((m: { id: string }) => m.id === value) || null
+      setSelectedModel(model as any)
       setSelectedYear(null)
       setSubmitted(false)
     },

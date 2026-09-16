@@ -1,112 +1,175 @@
 'use client';
 
-import React, { useState } from 'react';
-import { REVIEWS_DATA } from '@/data/reviews';
-import { CONFIG } from '@/data/config';
+import React, { useRef, useState } from 'react';
+import { REVIEWS_DATA, ReviewItem } from '@/data/reviews';
 
-export default function ReviewsSection() {
-  const [showAll, setShowAll] = useState(false);
-  const displayedReviews = showAll ? REVIEWS_DATA : REVIEWS_DATA.slice(0, 6);
+function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onPlay: (id: string) => void; activeVideoId: string | null }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+
+  // Sync if another video took over playing
+  React.useEffect(() => {
+    if (activeVideoId !== review.id && isPlaying) {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      setIsPlaying(false);
+    }
+  }, [activeVideoId, review.id, isPlaying]);
+
+  const togglePlay = async () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      onPlay(review.id);
+      try {
+        videoRef.current.muted = isMuted;
+        await videoRef.current.play();
+        setIsPlaying(true);
+      } catch {
+        videoRef.current.muted = true;
+        setIsMuted(true);
+        await videoRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!videoRef.current) return;
+    const nextMuted = !videoRef.current.muted;
+    videoRef.current.muted = nextMuted;
+    setIsMuted(nextMuted);
+  };
 
   return (
-    <section className="sec" id="opiniones">
-      <div className="wrap">
-        <div className="sec-head mid">
-          <span className="kicker">O que dizem</span>
-          <h2>Avaliações de clientes</h2>
-          <p>Com fotos do produto instalado no veículo de cada um.</p>
-        </div>
-
-        {/* Resumo das notas */}
-        <div className="rev-top">
+    <article className="bg-[#171a21] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-xl transition-transform hover:-translate-y-1">
+      {/* Top Header */}
+      <div>
+        <div className="flex items-center gap-3.5 mb-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={review.avatar}
+            alt={review.name}
+            className="w-12 h-12 rounded-full object-cover border border-white/15 shadow-sm"
+            loading="lazy"
+          />
           <div>
-            <div className="rev-big">{CONFIG.ratingAvg.toString().replace('.', ',')}</div>
-            <div className="stars" aria-hidden="true">★★★★★</div>
-            <small style={{ color: 'var(--ink-3)', fontSize: '12.5px' }}>
-              {CONFIG.reviewCount} avaliações
-            </small>
-          </div>
-
-          <div className="rev-bars">
-            <div className="rb">
-              <span>5★</span>
-              <span className="t"><i style={{ width: '91%' }}></i></span>
-              <span>91%</span>
-            </div>
-            <div className="rb">
-              <span>4★</span>
-              <span className="t"><i style={{ width: '7%' }}></i></span>
-              <span>7%</span>
-            </div>
-            <div className="rb">
-              <span>3★</span>
-              <span className="t"><i style={{ width: '2%' }}></i></span>
-              <span>2%</span>
-            </div>
-            <div className="rb">
-              <span>2★</span>
-              <span className="t"><i style={{ width: '0%' }}></i></span>
-              <span>0%</span>
-            </div>
-            <div className="rb">
-              <span>1★</span>
-              <span className="t"><i style={{ width: '0%' }}></i></span>
-              <span>0%</span>
-            </div>
+            <strong className="text-white text-base block font-bold leading-tight">{review.name}</strong>
+            <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 mt-0.5">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+              </svg>
+              {review.name.includes('a') && !review.name.includes('Lucas') && !review.name.includes('Rafael') && !review.name.includes('Bruno') ? 'Cliente verificada' : 'Cliente verificado'}
+            </span>
           </div>
         </div>
 
-        {/* Grade de depoimentos */}
-        <div className="revs" id="revs">
-          {displayedReviews.map(r => {
-            const initials = r.name
-              .split(' ')
-              .map(w => w[0])
-              .join('')
-              .slice(0, 2)
-              .toUpperCase();
-
-            return (
-              <article className="rev" key={r.id}>
-                {r.photo && (
-                  <>
-                    <span className="rev-tag">Foto do cliente</span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className="rev-foto"
-                      src={`/assets/img/${r.photo}`}
-                      alt={`Tapete AlfaCarbon instalado no ${r.vehicle}`}
-                      loading="lazy"
-                    />
-                  </>
-                )}
-                <div className="rev-hd">
-                  <span className="rev-av">{initials}</span>
-                  <div>
-                    <b>{r.name}</b>
-                    <small>{r.city}, {r.state} · {r.vehicle}</small>
-                  </div>
-                </div>
-                <div className="stars" aria-label="5 de 5">★★★★★</div>
-                <p>{r.text}</p>
-                <span className="ok">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Compra verificada
-                </span>
-              </article>
-            );
-          })}
+        {/* Stars */}
+        <div className="flex items-center gap-1.5 text-amber-400 text-sm mb-2.5 font-bold">
+          <span>★★★★★</span>
+          <span className="text-white font-extrabold text-xs">5.0</span>
         </div>
 
-        {!showAll && (
-          <p style={{ marginTop: '26px', textAlign: 'center' }}>
-            <button className="btn btn-line" onClick={() => setShowAll(true)}>
-              Ver todas as avaliações ({REVIEWS_DATA.length})
+        {/* Text */}
+        <p className="text-gray-300 text-sm leading-relaxed mb-4">
+          &ldquo;{review.text}&rdquo;
+        </p>
+      </div>
+
+      {/* Video Container */}
+      <div
+        className="relative aspect-[9/16] w-full rounded-xl overflow-hidden bg-black/50 border border-white/10 cursor-pointer group shadow-inner"
+        onClick={togglePlay}
+      >
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          playsInline
+          preload="none"
+          poster={review.poster}
+          onEnded={() => setIsPlaying(false)}
+          onPause={() => setIsPlaying(false)}
+        >
+          <source src={review.video} type="video/mp4" />
+        </video>
+
+        {/* Play/Pause Overlay Button */}
+        {!isPlaying && (
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
+            <button
+              type="button"
+              className="w-14 h-14 rounded-full bg-red-600/90 text-white flex items-center justify-center text-xl pl-1 shadow-2xl hover:scale-110 transition-transform"
+              aria-label="Reproduzir vídeo"
+            >
+              ▶
             </button>
-          </p>
+          </div>
         )}
+
+        {/* Mute/Unmute Button */}
+        <button
+          type="button"
+          onClick={toggleMute}
+          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-xs backdrop-blur-sm transition-colors border border-white/20 z-10"
+          aria-label={isMuted ? 'Ativar áudio' : 'Desativar áudio'}
+        >
+          {isMuted ? '🔇' : '🔊'}
+        </button>
+      </div>
+    </article>
+  );
+}
+
+export default function ReviewsSection() {
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+
+  const handleVideoPlay = (id: string) => {
+    setActiveVideoId(id);
+  };
+
+  return (
+    <section className="py-16 md:py-24 bg-[#0f1115] border-t border-b border-white/5" id="reviewsCarousel">
+      <div className="wrap max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20 inline-block mb-3">
+            Vídeos Reais de Clientes
+          </span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+            Avaliações de Clientes
+          </h2>
+          <p className="text-gray-400 text-sm md:text-base mt-2">
+            Veja o resultado e a opinião de quem já instalou no carro.
+          </p>
+        </div>
+
+        {/* Video Reviews Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {REVIEWS_DATA.map((r) => (
+            <ReviewCard
+              key={r.id}
+              review={r}
+              onPlay={handleVideoPlay}
+              activeVideoId={activeVideoId}
+            />
+          ))}
+        </div>
+
+        {/* Footer Score Banner */}
+        <div className="mt-14 p-6 md:p-8 rounded-2xl bg-[#171a21] border border-white/10 text-center flex flex-col items-center justify-center shadow-xl">
+          <div className="text-amber-400 text-2xl tracking-widest mb-1">★★★★★</div>
+          <div className="text-lg md:text-xl font-bold text-white mb-1.5">
+            <strong className="text-white text-2xl font-black">4,9</strong> de 5 • 1.284 avaliações
+          </div>
+          <div className="text-sm font-medium text-emerald-400 flex items-center justify-center gap-1.5">
+            <span>Mais de 5.000 clientes satisfeitos em todo o Brasil</span>
+            <span>🇧🇷</span>
+          </div>
+        </div>
       </div>
     </section>
   );

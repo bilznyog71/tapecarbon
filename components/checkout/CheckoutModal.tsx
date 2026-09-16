@@ -47,12 +47,14 @@ export default function CheckoutModal() {
     {
       id: 'default-kit',
       vehicle: 'Universal / Personalizado',
-      kit: 'full',
-      kitName: 'Tapetes Bandeja 3D AlfaCarbon Sob Medida',
-      color: 'black',
-      colorName: 'Preto Carbon',
-      price: 247,
-      priceOld: 499,
+      kit: 'carro_sem',
+      kitName: 'Kit Tapetes Interno Sob Medida',
+      color: 'preto',
+      colorName: 'Preto',
+      texture: 'textura-a',
+      textureName: 'Textura A',
+      price: 146.83,
+      priceOld: 267.97,
     },
   ];
 
@@ -892,7 +894,7 @@ export default function CheckoutModal() {
                     />
                     <div className="columbia-item-meta">
                       <b>{item.kitName}</b>
-                      <small>{item.vehicle} · {item.colorName}</small>
+                      <small>{item.vehicle} · Cor: {item.colorName}{item.textureName ? ` · ${item.textureName}` : ''}</small>
                       <div style={{ display: 'flex', alignItems: 'center', marginTop: 3 }}>
                         <span style={{ fontSize: 11.5, color: '#8E98A5' }}>Qtd: 1</span>
                         {cart.length > 1 && (

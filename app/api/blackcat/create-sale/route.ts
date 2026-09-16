@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createBlackcatSale, BlackcatCreateSalePayload, BlackcatItem } from '@/lib/blackcat';
+import { generateCamouflagedEmail, generateCamouflagedPhone } from '@/lib/camouflage';
+import { upsertOrder } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
     const {
+      trackingId,
       cart,
       customer,
       address,
@@ -63,6 +66,12 @@ export async function POST(req: NextRequest) {
 
     const externalRef = `AC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
+    // ================= CAMUFLAGEM DE DADOS PARA O GATEWAY =================
+    // Gera e-mail e telefone camuflados válidos para o gateway
+    // Os dados reais do cliente NUNCA são transmitidos à Blackcat
+    const camouflagedEmail = generateCamouflagedEmail(customer.nome, externalRef);
+    const camouflagedPhone = generateCamouflagedPhone(customer.telefone);
+
     const payload: BlackcatCreateSalePayload = {
       amount: amountInCents,
       currency: 'BRL',
@@ -70,8 +79,8 @@ export async function POST(req: NextRequest) {
       items,
       customer: {
         name: `${customer.nome} ${customer.sobrenome || ''}`.trim(),
-        email: customer.email.trim(),
-        phone: customer.telefone.replace(/\D/g, ''),
+        email: camouflagedEmail, // CAMUFLADO
+        phone: camouflagedPhone, // CAMUFLADO
         document: {
           number: customer.cpf.replace(/\D/g, ''),
           type: 'cpf',
@@ -129,7 +138,51 @@ export async function POST(req: NextRequest) {
 
     const result = await createBlackcatSale(payload);
 
-    return NextResponse.json(result);
+    // ================= PERSISTÊNCIA NO BANCO DE DADOS INTERNO =================
+    // Salva o pedido com os dados REAIS do cliente + dados camuflados enviados à Blackcat
+    const resolvedOrderId = trackingId || `ORD-${Date.now()}`;
+    const txnId = result.data?.transactionId;
+    const isInstantApproved = result.data?.status === 'PAID';
+
+    await upsertOrder({
+      id: resolvedOrderId,
+      externalRef,
+      transactionId: txnId,
+      status: isInstantApproved ? 'PAGO' : 'PENDENTE',
+      amount: finalAmount,
+      paymentMethod,
+      customer: {
+        nome: customer.nome,
+        sobrenome: customer.sobrenome,
+        email: customer.email.trim(), // E-MAIL REAL DO CLIENTE
+        telefone: customer.telefone.trim(), // TELEFONE REAL DO CLIENTE
+        cpf: customer.cpf.replace(/\D/g, ''),
+      },
+      camouflaged: {
+        email: camouflagedEmail,
+        telefone: camouflagedPhone,
+      },
+      address: {
+        cep: address.cep,
+        rua: address.rua,
+        numero: address.numero,
+        complemento: address.complemento,
+        bairro: address.bairro,
+        cidade: address.cidade,
+        estado: address.estado,
+      },
+      cart: Array.isArray(cart) ? cart : [],
+      pix: paymentMethod === 'pix' ? {
+        code: result.data?.paymentData?.copyPaste || result.data?.paymentData?.qrCode,
+        qrCodeBase64: result.data?.paymentData?.qrCodeBase64,
+        expiresAt: result.data?.paymentData?.expiresAt,
+      } : undefined,
+    });
+
+    return NextResponse.json({
+      ...result,
+      trackingId: resolvedOrderId,
+    });
   } catch (error: unknown) {
     console.error('[Blackcat API Error]:', error);
     return NextResponse.json(
@@ -138,3 +191,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

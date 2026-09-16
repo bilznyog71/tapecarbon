@@ -99,9 +99,9 @@ export default function ProductSection() {
 
   const selectedBrand = MOCK_BRANDS.find((b) => b.id === selectedBrandId) ?? null
   const availableModels = selectedBrand ? getModelsByBrand(selectedBrand.id) : []
-  const selectedModel = availableModels.find((m) => m.id === selectedModelId) ?? null
+  const selectedModel = availableModels.find((m: { id: string }) => m.id === selectedModelId) ?? null
   const availableYears = selectedModel
-    ? getYearsByModel(selectedModel.id)
+    ? getYearsByModel(selectedBrand?.id || '', selectedModel.id)
     : Array.from({ length: 27 }, (_, i) => 2026 - i)
 
   const selectedKit = KITS.find((k) => k.id === selectedKitId) ?? KITS[0]
@@ -337,7 +337,7 @@ export default function ProductSection() {
                       <option value="">
                         {selectedBrandId ? 'Selecione o modelo...' : 'Aguardando marca...'}
                       </option>
-                      {availableModels.map((model) => (
+                      {availableModels.map((model: { id: string; name: string }) => (
                         <option key={model.id} value={model.id}>
                           {model.name}
                         </option>
@@ -364,7 +364,7 @@ export default function ProductSection() {
                       <option value="">
                         {selectedBrandId ? 'Selecione o ano...' : 'Aguardando modelo...'}
                       </option>
-                      {availableYears.map((yr) => (
+                      {availableYears.map((yr: string | number) => (
                         <option key={yr} value={yr}>
                           {yr}
                         </option>

@@ -20,6 +20,7 @@ function CheckoutContent() {
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | 4>(1);
   const [isGeneratingPix, setIsGeneratingPix] = useState(false);
   const [orderId, setOrderId] = useState('');
+  const [trackingId, setTrackingId] = useState('');
   const [pixCopied, setPixCopied] = useState(false);
 
   const [pixCode, setPixCode] = useState('');
@@ -112,8 +113,7 @@ function CheckoutContent() {
     setCpf(masked);
   };
 
-
-  // Blackcat Pix Generator com valor exato com desconto
+  // Blackcat Pix Generator com valor exato com desconto e dados camuflados no backend
   const generatePix = useCallback(async (customAmount?: number) => {
     setIsGeneratingPix(true);
     setPayError('');
@@ -123,6 +123,7 @@ function CheckoutContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          trackingId: trackingId || undefined,
           cart: [
             {
               kitName: kit,
@@ -176,7 +177,7 @@ function CheckoutContent() {
     } finally {
       setIsGeneratingPix(false);
     }
-  }, [kit, marca, modelo, ano, cor, amount, nome, sobrenome, email, telefone, cpf, cep, rua, numero, complemento, bairro, cidade, estado, finalTotal]);
+  }, [kit, marca, modelo, ano, cor, amount, nome, sobrenome, email, telefone, cpf, cep, rua, numero, complemento, bairro, cidade, estado, finalTotal, trackingId]);
 
   useEffect(() => {
     return () => {
@@ -184,7 +185,7 @@ function CheckoutContent() {
     };
   }, []);
 
-  // Step 1 Validation -> Next
+  // Step 1 Validation -> Dispara Rastreamento de Compra Iniciada -> Next
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !nome.trim() || !sobrenome.trim() || !telefone.trim() || !cpf.trim()) {
@@ -210,9 +211,40 @@ function CheckoutContent() {
     setStep1Error('');
     setActiveStep(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Salva compra iniciada em segundo plano para o painel administrativo
+    const activeLeadId = trackingId || `LEAD-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    if (!trackingId) {
+      setTrackingId(activeLeadId);
+    }
+
+    fetch('/api/orders/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: activeLeadId,
+        customer: {
+          nome: nome.trim(),
+          sobrenome: sobrenome.trim(),
+          email: cleanEmail,
+          telefone: cleanPhone,
+          cpf: cleanCpf,
+        },
+        cart: [
+          {
+            kitName: kit,
+            vehicle: `${marca} ${modelo} (${ano})`,
+            colorName: cor,
+            price: amount,
+          },
+        ],
+        amount: finalTotal,
+        status: 'INICIADA',
+      }),
+    }).catch(() => {});
   };
 
-  // Step 2 Validation -> Next
+  // Step 2 Validation -> Atualiza Rastreamento -> Next
   const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanCep = cep.replace(/\D/g, '');
@@ -229,6 +261,29 @@ function CheckoutContent() {
     setActiveStep(3);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Atualiza o lead com endereço
+    if (trackingId) {
+      fetch('/api/orders/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: trackingId,
+          customer: { nome, sobrenome, email, telefone, cpf },
+          address: { cep: cleanCep, rua, numero, complemento, bairro, cidade, estado },
+          cart: [
+            {
+              kitName: kit,
+              vehicle: `${marca} ${modelo} (${ano})`,
+              colorName: cor,
+              price: amount,
+            },
+          ],
+          amount: finalTotal,
+          status: 'INICIADA',
+        }),
+      }).catch(() => {});
+    }
+
     if (!pixCode) {
       const discounted = Math.max(0, subtotal - Math.round(subtotal * 0.05 * 100) / 100);
       setTimeout(() => {
@@ -236,6 +291,7 @@ function CheckoutContent() {
       }, 80);
     }
   };
+
 
 
   return (
@@ -450,7 +506,7 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  <form className="columbia-step-content" onSubmit={handleStep1Submit} noValidate>
+                  <form className="columbia-step-content" onSubmit={handleStep1Submit} noValidate autoComplete="off">
                   {step1Error && (
                     <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
                       {step1Error}
@@ -468,6 +524,7 @@ function CheckoutContent() {
                       placeholder="seuemail@exemplo.com"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
+                      autoComplete="off"
                       required
                     />
                   </div>
@@ -484,6 +541,7 @@ function CheckoutContent() {
                         placeholder="Nome"
                         value={nome}
                         onChange={e => setNome(e.target.value)}
+                        autoComplete="off"
                         required
                       />
                     </div>
@@ -498,6 +556,7 @@ function CheckoutContent() {
                         placeholder="Sobrenome"
                         value={sobrenome}
                         onChange={e => setSobrenome(e.target.value)}
+                        autoComplete="off"
                         required
                       />
                     </div>
@@ -515,6 +574,7 @@ function CheckoutContent() {
                         placeholder="(11) 98765-4321"
                         value={telefone}
                         onChange={e => handlePhoneChange(e.target.value)}
+                        autoComplete="off"
                         required
                       />
                     </div>
@@ -529,10 +589,12 @@ function CheckoutContent() {
                         placeholder="000.000.000-00"
                         value={cpf}
                         onChange={e => handleCpfChange(e.target.value)}
+                        autoComplete="off"
                         required
                       />
                     </div>
                   </div>
+
 
                   <button type="submit" className="columbia-btn-next">
                     PRÓXIMO &rarr;

@@ -18,30 +18,23 @@ export default function MaterialSection() {
     >
       <div className="container-site">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Image — macro texture */}
+          {/* Video — Material Premium */}
           <div
             className={cn(
-              'relative rounded-xl overflow-hidden border border-white/10 shadow-2xl transition-all duration-700',
+              'relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl transition-all duration-700 bg-black/60',
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             )}
-            style={{ aspectRatio: '4/3' }}
-            aria-label="Detalhe macro do material TAPECARBON"
+            style={{ aspectRatio: '16/9' }}
+            aria-label="Demonstração do material TAPECARBON"
           >
-            <Image
-              src="/images/product-main.webp"
-              alt="Polímero TPE automotivo de alta densidade TAPECARBON com ranhuras e bordas elevadas"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            {/* Subtle overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(140,198,63,0.06) 0%, transparent 60%), linear-gradient(to top, rgba(9,9,9,0.5) 0%, transparent 40%)',
-              }}
-              aria-hidden="true"
+            <video
+              src="/media/material.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover"
             />
           </div>
 

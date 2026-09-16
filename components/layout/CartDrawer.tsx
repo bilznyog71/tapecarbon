@@ -56,7 +56,7 @@ export default function CartDrawer() {
                   <div className="m">
                     <b>{item.kitName}</b>
                     <small>{item.vehicle}</small>
-                    <small>Cor: {item.colorName}</small>
+                    <small>Cor: {item.colorName}{item.textureName ? ` · ${item.textureName}` : ''}</small>
                     <button
                       className="rm"
                       type="button"

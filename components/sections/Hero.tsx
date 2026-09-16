@@ -43,10 +43,6 @@ export default function Hero() {
           </div>
         </div>
       </div>
-
-      <a className="hero-down" href="#producto" aria-label="Ver o produto">
-        <span></span>
-      </a>
     </section>
   );
 }

@@ -5,7 +5,7 @@ import AnnouncementBar from '@/components/layout/AnnouncementBar';
 import Header from '@/components/layout/Header';
 import Hero from '@/components/sections/Hero';
 import LaunchOffer from '@/components/sections/LaunchOffer';
-import TopProof from '@/components/sections/TopProof';
+import VideoBenefitsSection from '@/components/sections/VideoBenefitsSection';
 import ProductConfigurator from '@/components/sections/ProductConfigurator';
 import WarrantySeal from '@/components/sections/WarrantySeal';
 import TrustStrip from '@/components/sections/TrustStrip';
@@ -13,6 +13,7 @@ import WaterproofFeature from '@/components/sections/WaterproofFeature';
 import BeforeAfterCompare from '@/components/sections/BeforeAfterCompare';
 import OriginalFitFeature from '@/components/sections/OriginalFitFeature';
 import DetailsGrid from '@/components/sections/DetailsGrid';
+import MaterialSection from '@/components/sections/MaterialSection';
 import ComparisonTable from '@/components/sections/ComparisonTable';
 import TechnicalSpecs from '@/components/sections/TechnicalSpecs';
 import SatisfactionStats from '@/components/sections/SatisfactionStats';
@@ -40,8 +41,8 @@ export default function HomePage() {
         {/* 02. Oferta de Lançamento */}
         <LaunchOffer />
 
-        {/* 03. Prova Social Antecipada com Fotos */}
-        <TopProof />
+        {/* 03. Benefícios com Vídeo Demonstrativo */}
+        <VideoBenefitsSection />
 
         {/* 04. Produto + Galeria Dinâmica + Seletor de Carro 3D + Kits + Cores */}
         <ProductConfigurator />
@@ -64,6 +65,9 @@ export default function HomePage() {
         {/* 10. Detalhes Técnicos de Perto */}
         <DetailsGrid />
 
+        {/* 10.1 Material de Alta Performance (Vídeo) */}
+        <MaterialSection />
+
         {/* 11. Comparativa TapeCarbon vs Comum */}
         <ComparisonTable />
 
@@ -73,7 +77,7 @@ export default function HomePage() {
         {/* 13. Números e Satisfação Garantida */}
         <SatisfactionStats />
 
-        {/* 14. Mural de Avaliações com Fotos */}
+        {/* 14. Avaliações com Vídeo */}
         <ReviewsSection />
 
         {/* 15. Perguntas Frequentes (FAQ) */}

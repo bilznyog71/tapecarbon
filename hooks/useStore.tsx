@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CONFIG, Kit, ColorOption } from '@/data/config';
+import { CONFIG, Kit, ColorOption, TextureOption } from '@/data/config';
 
 export interface CartItem {
   id: string;
@@ -10,6 +10,8 @@ export interface CartItem {
   kitName: string;
   color: string;
   colorName: string;
+  texture?: string;
+  textureName?: string;
   price: number;
   priceOld: number;
 }
@@ -26,9 +28,12 @@ interface StoreContextType {
   setKitId: (k: string) => void;
   colorId: string;
   setColorId: (c: string) => void;
+  textureId: string;
+  setTextureId: (t: string) => void;
 
   selectedKit: Kit;
   selectedColor: ColorOption;
+  selectedTexture: TextureOption;
 
   cart: CartItem[];
   addToCart: () => void;
@@ -61,6 +66,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const [kitId, setKitId] = useState<string>(CONFIG.kits[0].id);
   const [colorId, setColorId] = useState<string>(CONFIG.colors[0].id);
+  const [textureId, setTextureId] = useState<string>(CONFIG.textures[0].id);
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -69,6 +75,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const selectedKit = CONFIG.kits.find(k => k.id === kitId) || CONFIG.kits[0];
   const selectedColor = CONFIG.colors.find(c => c.id === colorId) || CONFIG.colors[0];
+  const selectedTexture = CONFIG.textures.find(t => t.id === textureId) || CONFIG.textures[0];
 
   const formattedVehicle = (brand && model && year) ? `${brand} ${model} ${year}` : null;
 
@@ -113,6 +120,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       kitName: selectedKit.name,
       color: selectedColor.id,
       colorName: selectedColor.name,
+      texture: selectedTexture.id,
+      textureName: selectedTexture.name,
       price: selectedKit.price,
       priceOld: selectedKit.priceOld,
     };
@@ -168,8 +177,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setKitId,
         colorId,
         setColorId,
+        textureId,
+        setTextureId,
         selectedKit,
         selectedColor,
+        selectedTexture,
         cart,
         addToCart,
         removeFromCart,

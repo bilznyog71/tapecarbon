@@ -40,50 +40,100 @@ export default function LaunchOffer() {
   }, []);
 
   return (
-    <section className="oferta">
-      <div className="wrap">
-        <div className="oferta-card">
-          <span className="oferta-flag">Oferta de lançamento &mdash; só por hoje</span>
+    <section className="relative py-8 sm:py-14 px-4 sm:px-6 bg-[#0a0c10] overflow-hidden" id="oferta">
+      <div className="max-w-4xl mx-auto">
+        <div className="relative rounded-3xl bg-gradient-to-b from-[#181b22] to-[#0f1116] border border-white/10 p-6 sm:p-10 md:p-12 shadow-2xl text-center overflow-hidden">
+          {/* Top highlight bar */}
+          <div className="absolute top-0 left-1/4 right-1/4 h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent" />
 
-          <h2>Kit de tapetes 3D sob medida para o seu veículo</h2>
-          <p className="oferta-rate">
-            <span className="stars" aria-hidden="true">★★★★★</span>
-            <b>{CONFIG.ratingAvg.toString().replace('.', ',')}</b> · {CONFIG.reviewCount} avaliações verificadas
-          </p>
+          {/* Offer Pill Badge */}
+          <div className="inline-flex items-center gap-2 bg-red-600/15 border border-red-500/30 text-red-400 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span>Oferta de lançamento &mdash; só por hoje</span>
+          </div>
 
-          <p className="oferta-precio">
-            <s id="of-was">{formatMoney(cheapestKit.priceOld)}</s>
-            <b id="of-now">{formatMoney(cheapestKit.price)}</b>
-            <span className="oferta-off" id="of-off">-{discountPercent}%</span>
-          </p>
-          <p className="oferta-cuotas">
-            ou apenas <b id="of-cuota">{formatMoney(Math.round(cheapestKit.price * 0.95))}</b> à vista no Pix (5% OFF)
-          </p>
+          {/* Title */}
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-snug mb-3">
+            Kit de Tapetes Bandeja 3D Sob Medida
+          </h2>
 
-          <ul className="oferta-lista">
-            <li>
-              <span>Envio <b>GRÁTIS</b> com código de rastreio para todo o Brasil</span>
+          {/* Rating */}
+          <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-300 mb-6">
+            <span className="text-amber-400 text-sm tracking-widest" aria-hidden="true">★★★★★</span>
+            <span className="font-bold text-white">{CONFIG.ratingAvg.toString().replace('.', ',')}</span>
+            <span className="text-gray-500">&bull;</span>
+            <span>+5.000 clientes satisfeitos</span>
+          </div>
+
+          {/* Price Container */}
+          <div className="bg-[#12141a]/80 border border-white/10 rounded-2xl p-5 sm:p-7 max-w-lg mx-auto mb-8 shadow-inner">
+            <div className="flex items-center justify-center gap-3 flex-wrap mb-2">
+              <s className="text-gray-400 text-base sm:text-lg font-medium">
+                {formatMoney(cheapestKit.priceOld)}
+              </s>
+              <span className="text-3xl sm:text-4xl md:text-5xl font-black text-amber-400 tracking-tight">
+                {formatMoney(cheapestKit.price)}
+              </span>
+              <span className="bg-red-500 text-white text-xs sm:text-sm font-extrabold px-2.5 py-1 rounded-md uppercase">
+                -{discountPercent}% OFF
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-emerald-400 font-bold">
+              ou apenas <strong className="text-emerald-300">{formatMoney(Math.round(cheapestKit.price * 0.95))}</strong> no Pix à vista (5% OFF extra)
+            </p>
+          </div>
+
+          {/* Benefits Grid (Responsive 2 cols on tablet+) */}
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left max-w-2xl mx-auto mb-8 text-xs sm:text-sm text-gray-300">
+            <li className="flex items-center gap-2.5 bg-white/[0.03] p-3 rounded-xl border border-white/5">
+              <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Envio <strong>GRÁTIS</strong> com rastreio para todo o Brasil</span>
             </li>
-            <li>
-              <span>Fabricado com o <b>molde exato</b> da sua marca, modelo e ano</span>
+            <li className="flex items-center gap-2.5 bg-white/[0.03] p-3 rounded-xl border border-white/5">
+              <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Fabricado no <strong>molde exato</strong> do seu carro</span>
             </li>
-            <li>
-              <span><b>12 meses</b> de garantia de fábrica + 7 dias para testar</span>
+            <li className="flex items-center gap-2.5 bg-white/[0.03] p-3 rounded-xl border border-white/5">
+              <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              <span><strong>12 meses</strong> de garantia oficial de fábrica</span>
             </li>
-            <li>
-              <span>Pagamento <b>100% seguro</b> e protegido via Pix com aprovação imediata</span>
+            <li className="flex items-center gap-2.5 bg-white/[0.03] p-3 rounded-xl border border-white/5">
+              <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Pagamento <strong>100% seguro</strong> com aprovação rápida</span>
             </li>
           </ul>
 
-          <p className="oferta-timer" id="of-timer">
-            O desconto de <b>{discountPercent}% OFF</b> e o frete grátis encerram em{' '}
-            <time id="of-clock">{timeLeft}</time>
-          </p>
+          {/* Urgency Countdown */}
+          <div className="inline-flex items-center justify-center gap-2 bg-black/40 border border-white/10 px-4 py-2 rounded-xl text-xs sm:text-sm text-gray-400 mb-8 max-w-full">
+            <svg className="w-4 h-4 text-red-500 flex-shrink-0 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>
+              Preço promocional e frete grátis encerram em:{' '}
+              <strong className="text-white font-mono font-bold tracking-wider">{timeLeft}</strong>
+            </span>
+          </div>
 
-          <a className="btn btn-buy oferta-cta" href="#producto">
-            COMPRAR AGORA · {formatMoney(cheapestKit.price)} &rarr;
-          </a>
-          <p className="oferta-mp">Pagamento exclusivo via Pix com 5% OFF e aprovação imediata</p>
+          {/* CTA Action Button */}
+          <div>
+            <a
+              href="#producto"
+              className="inline-flex items-center justify-center w-full sm:w-auto px-8 sm:px-12 py-4 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-black text-sm sm:text-base uppercase tracking-wider shadow-xl shadow-red-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              GARANTIR MEU DESCONTO AGORA &rarr;
+            </a>
+            <p className="text-[11px] sm:text-xs text-gray-500 mt-3">
+              Entrega rápida via Correios &bull; Pague com Pix ou Cartão de Crédito
+            </p>
+          </div>
         </div>
       </div>
     </section>
