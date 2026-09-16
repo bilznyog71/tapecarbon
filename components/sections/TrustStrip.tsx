@@ -2,57 +2,63 @@
 
 import React from 'react';
 
+const TRUST_ITEMS = [
+  {
+    icon: '/images/enviorastreavel.png',
+    title: 'Envio rápido',
+    subtitle: 'Código de rastreio enviado',
+    alt: 'Ícone de envio rastreável'
+  },
+  {
+    icon: '/images/atrendimento.png',
+    title: 'Suporte ao cliente',
+    subtitle: 'Atendimento humanizado',
+    alt: 'Ícone de atendimento humanizado'
+  },
+  {
+    icon: '/images/iconpixcheckout.png',
+    title: 'Pagamento à vista',
+    subtitle: '5% de desconto no Pix',
+    alt: 'Ícone de desconto Pix'
+  },
+  {
+    icon: '/images/protecao.png',
+    title: 'Compra 100% segura',
+    subtitle: 'Site protegido com SSL',
+    alt: 'Ícone de segurança SSL'
+  }
+];
+
 export default function TrustStrip() {
   return (
-    <div className="strip">
-      <div className="wrap" style={{ padding: 0 }}>
-        <ul>
-          <li>
-            <svg viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="1" y="3" width="15" height="13" />
-              <path d="M16 8h4l3 3v5h-7z" />
-              <circle cx="5.5" cy="18.5" r="2.5" />
-              <circle cx="18.5" cy="18.5" r="2.5" />
-            </svg>
-            <div>
-              <b>Frete grátis</b>
-              <small>Entrega em 2 a 5 dias úteis</small>
+    <section className="py-6 sm:py-8 bg-[#090b0e] border-t border-b border-white/5 overflow-hidden" id="confianca">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Horizontal scroll on mobile ("uma ao lado da outra"), centered on desktop */}
+        <div className="flex items-center gap-3.5 overflow-x-auto no-scrollbar py-2 px-1 sm:justify-center flex-nowrap scroll-smooth snap-x snap-mandatory">
+          {TRUST_ITEMS.map((item, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-3 bg-[#11141b] border border-white/10 rounded-2xl px-4 py-3 flex-shrink-0 shadow-lg snap-start transition-all hover:border-white/20 hover:scale-[1.02]"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.icon}
+                alt={item.alt}
+                className="w-6 h-6 object-contain flex-shrink-0 invert opacity-90"
+                loading="lazy"
+              />
+              <div className="flex flex-col text-left">
+                <span className="text-[13px] sm:text-[14px] font-bold text-white leading-tight tracking-tight">
+                  {item.title}
+                </span>
+                <span className="text-[11px] sm:text-[12px] text-gray-400 font-normal leading-tight mt-0.5">
+                  {item.subtitle}
+                </span>
+              </div>
             </div>
-          </li>
-
-          <li>
-            <svg viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            <div>
-              <b>Pagamento seguro</b>
-              <small>Pix com aprovação imediata</small>
-            </div>
-          </li>
-
-          <li>
-            <svg viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="1 4 1 10 7 10" />
-              <path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10" />
-            </svg>
-            <div>
-              <b>7 dias</b>
-              <small>Para troca ou devolução sem custo</small>
-            </div>
-          </li>
-
-          <li>
-            <svg viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-            <div>
-              <b>12 meses</b>
-              <small>De garantia real de fábrica</small>
-            </div>
-          </li>
-        </ul>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

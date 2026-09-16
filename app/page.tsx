@@ -4,28 +4,19 @@ import React from 'react';
 import AnnouncementBar from '@/components/layout/AnnouncementBar';
 import Header from '@/components/layout/Header';
 import Hero from '@/components/sections/Hero';
-import LaunchOffer from '@/components/sections/LaunchOffer';
 import VideoBenefitsSection from '@/components/sections/VideoBenefitsSection';
-import ProductConfigurator from '@/components/sections/ProductConfigurator';
-import WarrantySeal from '@/components/sections/WarrantySeal';
-import TrustStrip from '@/components/sections/TrustStrip';
-import WaterproofFeature from '@/components/sections/WaterproofFeature';
 import BeforeAfterCompare from '@/components/sections/BeforeAfterCompare';
-import OriginalFitFeature from '@/components/sections/OriginalFitFeature';
-import DetailsGrid from '@/components/sections/DetailsGrid';
+import TrustStrip from '@/components/sections/TrustStrip';
 import MaterialSection from '@/components/sections/MaterialSection';
-import ComparisonTable from '@/components/sections/ComparisonTable';
 import TechnicalSpecs from '@/components/sections/TechnicalSpecs';
+import ProductConfigurator from '@/components/sections/ProductConfigurator';
 import SatisfactionStats from '@/components/sections/SatisfactionStats';
 import ReviewsSection from '@/components/sections/ReviewsSection';
 import FAQSection from '@/components/sections/FAQSection';
-import FinalUrgencyCTA from '@/components/sections/FinalUrgencyCTA';
-import CompanySection from '@/components/sections/CompanySection';
 import Footer from '@/components/layout/Footer';
 import CartDrawer from '@/components/layout/CartDrawer';
 import CheckoutModal from '@/components/checkout/CheckoutModal';
 import Modals from '@/components/layout/Modals';
-import RecentPurchases from '@/components/layout/RecentPurchases';
 import MobileStickyBar from '@/components/layout/MobileStickyBar';
 
 export default function HomePage() {
@@ -38,66 +29,41 @@ export default function HomePage() {
         {/* 01. Hero Cinematográfico */}
         <Hero />
 
-        {/* 02. Oferta de Lançamento */}
-        <LaunchOffer />
-
-        {/* 03. Benefícios com Vídeo Demonstrativo */}
+        {/* 02. Benefícios em Vídeo (Carrossel Horizontal no Mobile) */}
         <VideoBenefitsSection />
 
-        {/* 04. Produto + Galeria Dinâmica + Seletor de Carro 3D + Kits + Cores */}
-        <ProductConfigurator />
-
-        {/* 05. Garantia de 12 Meses e 7 Dias CDC */}
-        <WarrantySeal />
-
-        {/* 06. Tira de Confiança / Diferenciais */}
-        <TrustStrip />
-
-        {/* 07. Impermeável de Verdade */}
-        <WaterproofFeature />
-
-        {/* 08. Comparador Antes e Depois Deslizante */}
+        {/* 03. Comparador Antes e Depois Interativo */}
         <BeforeAfterCompare />
 
-        {/* 09. Fixação Original nos Pinos de Fábrica */}
-        <OriginalFitFeature />
+        {/* 04. Barra de Confiança / Benefícios (Cards lado a lado como no print) */}
+        <TrustStrip />
 
-        {/* 10. Detalhes Técnicos de Perto */}
-        <DetailsGrid />
-
-        {/* 10.1 Material de Alta Performance (Vídeo) */}
+        {/* 05. Material de Alta Performance em Vídeo */}
         <MaterialSection />
 
-        {/* 11. Comparativa TapeCarbon vs Comum */}
-        <ComparisonTable />
-
-        {/* 12. Ficha Técnica Completa */}
+        {/* 06. Ficha Técnica Compacta */}
         <TechnicalSpecs />
 
-        {/* 13. Números e Satisfação Garantida */}
+        {/* 07. Produto + Galeria + Seletor de Carro + Kits + Cores e Texturas */}
+        <ProductConfigurator />
+
+        {/* 08. Números e Satisfação Garantida (+5 mil clientes) */}
         <SatisfactionStats />
 
-        {/* 14. Avaliações com Vídeo */}
+        {/* 09. Avaliações com Vídeo de Clientes Reais */}
         <ReviewsSection />
 
-        {/* 15. Perguntas Frequentes (FAQ) */}
+        {/* 10. Perguntas Frequentes (FAQ) */}
         <FAQSection />
-
-        {/* 16. CTA Final de Urgência */}
-        <FinalUrgencyCTA />
-
-        {/* 17. A Empresa */}
-        <CompanySection />
       </main>
 
-      {/* 18. Rodapé Institucional */}
+      {/* 11. Rodapé Institucional */}
       <Footer />
 
-      {/* 19. Overlays Interativos */}
+      {/* 12. Overlays Interativos */}
       <CartDrawer />
       <CheckoutModal />
       <Modals />
-      <RecentPurchases />
       <MobileStickyBar />
     </>
   );

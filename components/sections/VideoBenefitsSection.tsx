@@ -32,15 +32,15 @@ export default function VideoBenefitsSection() {
             Por que escolher os tapetes <span className="text-red-500">BANDEJA 3D?</span>
           </h2>
           <p className="text-gray-400 text-sm md:text-base mt-2">
-            Veja a proteção na prática. Acabamento sob medida que valoriza seu veículo.
+            3 benefícios rápidos. Deslize para ver.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto md:overflow-visible no-scrollbar pb-3 px-1 snap-x snap-mandatory">
           {BENEFITS.map((b, i) => (
             <article
               key={i}
-              className="bg-[#171a21] border border-white/10 rounded-2xl overflow-hidden p-4 shadow-xl flex flex-col hover:border-white/20 transition-all duration-300"
+              className="w-[82vw] max-w-[320px] sm:w-[340px] md:w-auto md:max-w-none flex-shrink-0 snap-start bg-[#171a21] border border-white/10 rounded-2xl overflow-hidden p-4 shadow-xl flex flex-col hover:border-white/20 transition-all duration-300"
             >
               <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-black/60 mb-4 border border-white/5">
                 <video
@@ -53,8 +53,8 @@ export default function VideoBenefitsSection() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-white mb-2">{b.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{b.desc}</p>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-1.5">{b.title}</h3>
+              <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">{b.desc}</p>
             </article>
           ))}
         </div>
