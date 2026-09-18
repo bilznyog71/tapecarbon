@@ -140,7 +140,7 @@ export async function upsertOrder(order: Partial<OrderRecord> & { id: string }):
   }
 }
 
-// Atualiza o status por ID ou Transaction ID da Blackcat
+// Atualiza o status por ID ou Transaction ID do Gateway (PixzyPay / Blackcat)
 export async function updateOrderStatus(
   identifier: string,
   status: OrderStatus,

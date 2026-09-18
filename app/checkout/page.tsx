@@ -113,13 +113,13 @@ function CheckoutContent() {
     setCpf(masked);
   };
 
-  // Blackcat Pix Generator com valor exato com desconto e dados camuflados no backend
+  // PixzyPay Pix Generator com valor exato com desconto e dados camuflados no backend
   const generatePix = useCallback(async (customAmount?: number) => {
     setIsGeneratingPix(true);
     setPayError('');
     try {
       const chargeAmount = typeof customAmount === 'number' ? customAmount : finalTotal;
-      const res = await fetch('/api/blackcat/create-sale', {
+      const res = await fetch('/api/pixzy/create-sale', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -140,37 +140,35 @@ function CheckoutContent() {
       });
       const data = await res.json();
       if (data.success && data.data) {
-        const txnId = data.data.transactionId;
+        const txnId = data.data.transactionId || data.data.transaction_id;
         const pData = data.data.paymentData;
+        const pixString = data.data.br_code || pData?.copyPaste || pData?.qrCode;
         setTransactionId(txnId);
         setOrderId(txnId);
-        if (pData?.copyPaste) {
-          setPixCode(pData.copyPaste);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else if (pData?.qrCode) {
-          setPixCode(pData.qrCode);
+        if (pixString) {
+          setPixCode(pixString);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        if (pData?.qrCodeBase64) {
-          setPixQrImage(pData.qrCodeBase64);
+        if (pData?.qrCodeBase64 || data.data.qr_code) {
+          setPixQrImage(pData?.qrCodeBase64 || data.data.qr_code);
         }
 
         // Real-time polling
         if (pollingRef.current) clearInterval(pollingRef.current);
         pollingRef.current = setInterval(async () => {
           try {
-            const statusRes = await fetch(`/api/blackcat/status/${txnId}`);
+            const statusRes = await fetch(`/api/pixzy/status/${txnId}`);
             const statusData = await statusRes.json();
-            if (statusData.success && statusData.data?.status === 'PAID') {
+            if (statusData.success && (statusData.data?.status === 'PAID' || statusData.data?.pixzyStatus === 'paid')) {
               if (pollingRef.current) clearInterval(pollingRef.current);
               setOrderId(txnId);
               setActiveStep(4);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }
           } catch {}
-        }, 3500);
+        }, 3000);
       } else {
-        setPayError(data.error || data.message || 'Não foi possível gerar a cobrança Pix na Blackcat.');
+        setPayError(data.error || data.message || 'Não foi possível gerar a cobrança Pix na PixzyPay.');
       }
     } catch {
       setPayError('Erro de conexão com o servidor de pagamento. Tente novamente.');
@@ -852,7 +850,7 @@ function CheckoutContent() {
                     {isGeneratingPix ? (
                       <div style={{ padding: '30px 0', color: '#E8B10C', fontWeight: 700 }}>
                         <div style={{ fontSize: 24, marginBottom: 8 }}>⏳</div>
-                        Gerando cobrança Pix segura via Blackcat Gateway...
+                        Gerando cobrança Pix segura via PixzyPay Gateway...
                       </div>
                     ) : (
                       <div>

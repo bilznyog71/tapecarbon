@@ -1,6 +1,6 @@
 /**
- * Utilitário de Camuflagem de Dados para o Gateway Blackcat
- * Permite enviar dados válidos para a API da Blackcat sem vazar o e-mail ou telefone real do cliente.
+ * Utilitário de Camuflagem de Dados para Gateways de Pagamento (PixzyPay / Blackcat)
+ * Permite enviar dados válidos para a API sem vazar o e-mail ou telefone real do cliente.
  */
 
 // Gera um e-mail camuflado válido para o gateway

@@ -127,13 +127,13 @@ export default function CheckoutModal() {
   };
 
 
-  // Gerador PIX Blackcat com valor com desconto exato
+  // Gerador PIX PixzyPay com valor com desconto exato
   const generatePix = useCallback(async (customAmount?: number) => {
     setIsGeneratingPix(true);
     setPayError('');
     try {
       const chargeAmount = typeof customAmount === 'number' ? customAmount : finalTotal;
-      const res = await fetch('/api/blackcat/create-sale', {
+      const res = await fetch('/api/pixzy/create-sale', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -146,28 +146,26 @@ export default function CheckoutModal() {
       });
       const data = await res.json();
       if (data.success && data.data) {
-        const txnId = data.data.transactionId;
+        const txnId = data.data.transactionId || data.data.transaction_id;
         const pData = data.data.paymentData;
+        const pixString = data.data.br_code || pData?.copyPaste || pData?.qrCode;
         setTransactionId(txnId);
         setOrderId(txnId);
-        if (pData?.copyPaste) {
-          setPixCode(pData.copyPaste);
-          scrollToTop();
-        } else if (pData?.qrCode) {
-          setPixCode(pData.qrCode);
+        if (pixString) {
+          setPixCode(pixString);
           scrollToTop();
         }
-        if (pData?.qrCodeBase64) {
-          setPixQrImage(pData.qrCodeBase64);
+        if (pData?.qrCodeBase64 || data.data.qr_code) {
+          setPixQrImage(pData?.qrCodeBase64 || data.data.qr_code);
         }
 
         // Polling de status em tempo real
         if (pollingRef.current) clearInterval(pollingRef.current);
         pollingRef.current = setInterval(async () => {
           try {
-            const statusRes = await fetch(`/api/blackcat/status/${txnId}`);
+            const statusRes = await fetch(`/api/pixzy/status/${txnId}`);
             const statusData = await statusRes.json();
-            if (statusData.success && statusData.data?.status === 'PAID') {
+            if (statusData.success && (statusData.data?.status === 'PAID' || statusData.data?.pixzyStatus === 'paid')) {
               if (pollingRef.current) clearInterval(pollingRef.current);
               setOrderId(txnId);
               setActiveStep(4);
@@ -175,9 +173,9 @@ export default function CheckoutModal() {
               scrollToTop();
             }
           } catch {}
-        }, 3500);
+        }, 3000);
       } else {
-        setPayError(data.error || data.message || 'Não foi possível gerar a cobrança Pix.');
+        setPayError(data.error || data.message || 'Não foi possível gerar a cobrança Pix no gateway PixzyPay.');
       }
     } catch {
       setPayError('Erro de conexão com o servidor de pagamento. Tente novamente.');
