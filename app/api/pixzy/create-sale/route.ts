@@ -114,39 +114,43 @@ export async function POST(req: NextRequest) {
 
     // ================= PERSISTÊNCIA NO BANCO DE DADOS INTERNO =================
     // Salva o pedido com os dados REAIS do cliente + dados camuflados enviados à PixzyPay
-    await upsertOrder({
-      id: resolvedOrderId,
-      externalRef,
-      transactionId: txnId,
-      status: 'PENDENTE',
-      amount: finalAmount,
-      paymentMethod: 'pix',
-      customer: {
-        nome: customer.nome,
-        sobrenome: customer.sobrenome,
-        email: customer.email.trim(), // E-MAIL REAL DO CLIENTE
-        telefone: customer.telefone.trim(), // TELEFONE REAL DO CLIENTE
-        cpf: customer.cpf.replace(/\D/g, ''),
-      },
-      camouflaged: {
-        email: camouflagedEmail,
-        telefone: camouflagedPhone,
-      },
-      address: {
-        cep: address.cep,
-        rua: address.rua,
-        numero: address.numero,
-        complemento: address.complemento,
-        bairro: address.bairro,
-        cidade: address.cidade,
-        estado: address.estado,
-      },
-      cart: Array.isArray(cart) ? cart : [],
-      pix: {
-        code: result.data.br_code,
-        expiresAt: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-      },
-    });
+    try {
+      await upsertOrder({
+        id: resolvedOrderId,
+        externalRef,
+        transactionId: txnId,
+        status: 'PENDENTE',
+        amount: finalAmount,
+        paymentMethod: 'pix',
+        customer: {
+          nome: customer.nome,
+          sobrenome: customer.sobrenome,
+          email: customer.email.trim(), // E-MAIL REAL DO CLIENTE
+          telefone: customer.telefone.trim(), // TELEFONE REAL DO CLIENTE
+          cpf: customer.cpf.replace(/\D/g, ''),
+        },
+        camouflaged: {
+          email: camouflagedEmail,
+          telefone: camouflagedPhone,
+        },
+        address: {
+          cep: address.cep,
+          rua: address.rua,
+          numero: address.numero,
+          complemento: address.complemento,
+          bairro: address.bairro,
+          cidade: address.cidade,
+          estado: address.estado,
+        },
+        cart: Array.isArray(cart) ? cart : [],
+        pix: {
+          code: result.data.br_code,
+          expiresAt: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+        },
+      });
+    } catch (dbErr) {
+      console.warn('[PixzyPay Route DB Warning] Não foi possível gravar pedido no arquivo, continuando com a resposta PIX:', dbErr);
+    }
 
     return NextResponse.json({
       success: true,

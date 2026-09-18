@@ -52,16 +52,25 @@ export interface OrderRecord {
   notes?: string;
 }
 
-const DB_FILE_PATH = path.join(process.cwd(), 'data', 'orders.json');
+const DB_FILE_PATH = (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME)
+  ? path.join('/tmp', 'orders.json')
+  : path.join(process.cwd(), 'data', 'orders.json');
+
+// Cache em memória para ambientes serverless
+let memoryOrders: OrderRecord[] = [];
 
 // Garante que o arquivo existe
 function ensureDbFile(): void {
-  const dir = path.dirname(DB_FILE_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  if (!fs.existsSync(DB_FILE_PATH)) {
-    fs.writeFileSync(DB_FILE_PATH, JSON.stringify([], null, 2), 'utf-8');
+  try {
+    const dir = path.dirname(DB_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(DB_FILE_PATH)) {
+      fs.writeFileSync(DB_FILE_PATH, JSON.stringify([], null, 2), 'utf-8');
+    }
+  } catch (err) {
+    console.warn('[DB] Sistema de arquivos somente leitura ou sem permissão:', err);
   }
 }
 
@@ -69,21 +78,32 @@ function ensureDbFile(): void {
 export async function getAllOrders(): Promise<OrderRecord[]> {
   try {
     ensureDbFile();
-    const data = await fs.promises.readFile(DB_FILE_PATH, 'utf-8');
-    if (!data.trim()) return [];
-    return JSON.parse(data) as OrderRecord[];
+    if (fs.existsSync(DB_FILE_PATH)) {
+      const data = await fs.promises.readFile(DB_FILE_PATH, 'utf-8');
+      if (data.trim()) {
+        const parsed = JSON.parse(data) as OrderRecord[];
+        memoryOrders = parsed;
+        return parsed;
+      }
+    }
+    return memoryOrders;
   } catch (err) {
-    console.error('[DB] Erro ao ler banco de dados:', err);
-    return [];
+    console.error('[DB] Erro ao ler banco de dados, usando memória:', err);
+    return memoryOrders;
   }
 }
 
-// Gravação atômica via arquivo temporário
+// Gravação atômica via arquivo temporário com fallback de memória
 async function writeAllOrders(orders: OrderRecord[]): Promise<void> {
-  ensureDbFile();
-  const tempPath = `${DB_FILE_PATH}.tmp.${Date.now()}.${Math.random().toString(36).substring(2, 6)}`;
-  await fs.promises.writeFile(tempPath, JSON.stringify(orders, null, 2), 'utf-8');
-  await fs.promises.rename(tempPath, DB_FILE_PATH);
+  memoryOrders = orders;
+  try {
+    ensureDbFile();
+    const tempPath = `${DB_FILE_PATH}.tmp.${Date.now()}.${Math.random().toString(36).substring(2, 6)}`;
+    await fs.promises.writeFile(tempPath, JSON.stringify(orders, null, 2), 'utf-8');
+    await fs.promises.rename(tempPath, DB_FILE_PATH);
+  } catch (err) {
+    console.warn('[DB] Não foi possível persistir no disco (normal em Serverless), mantido em memória:', err);
+  }
 }
 
 // Cria ou atualiza um pedido/lead

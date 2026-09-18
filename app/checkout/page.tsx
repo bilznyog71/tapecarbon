@@ -298,37 +298,37 @@ function CheckoutContent() {
       {/* LEFT COLUMN: 3-Step Accordion OU Tela Exclusiva Pix */}
       <div className={`columbia-main-col ${isPixGenerated ? 'yampi-pix-full' : ''}`}>
         {activeStep === 4 ? (
-          /* Step 4: Pedido Concluído (Dark Luxury) */
+          /* Step 4: Pedido Concluído (Clean E-commerce) */
           <div className="columbia-step-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
             <div
               style={{
-                width: 76,
-                height: 76,
+                width: 72,
+                height: 72,
                 borderRadius: '50%',
-                background: 'rgba(25, 194, 90, 0.15)',
-                border: '2px solid #19C25A',
-                color: '#19C25A',
+                background: '#ECFDF5',
+                border: '2px solid #059669',
+                color: '#059669',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto 24px',
-                fontSize: 36,
-                boxShadow: '0 0 24px rgba(25, 194, 90, 0.3)',
+                fontSize: 34,
+                fontWeight: 800,
               }}
             >
               ✓
             </div>
-            <h2 style={{ fontSize: 24, fontWeight: 900, color: '#F4F6F8', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontSize: 24, fontWeight: 900, color: '#0F172A', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
               Pedido Realizado com Sucesso!
             </h2>
-            <p style={{ fontSize: 14.5, color: '#A9B0BA', margin: '0 0 22px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 14.5, color: '#64748B', margin: '0 0 22px', lineHeight: 1.5 }}>
               Agradecemos a sua preferência e confiança na AlfaCarbon.
             </p>
 
             <div
               style={{
-                background: '#111317',
-                border: '1px solid #282E38',
+                background: '#F8FAFC',
+                border: '1px solid #E2E8F0',
                 borderRadius: 12,
                 padding: '18px 24px',
                 display: 'inline-block',
@@ -336,12 +336,12 @@ function CheckoutContent() {
                 marginBottom: 28,
               }}
             >
-              <div style={{ fontSize: 12.5, color: '#7E8691', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Número do Pedido:</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: '#E8B10C', marginTop: 2 }}>
+              <div style={{ fontSize: 12, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Número do Pedido:</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', marginTop: 2 }}>
                 #{orderId ? orderId.slice(-8).toUpperCase() : 'ALFA-78921'}
               </div>
-              <div style={{ fontSize: 12.5, color: '#CBD5E1', marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ color: '#19C25A' }}>●</span> Previsão de entrega: <b style={{ color: '#F4F6F8' }}>4 a 8 dias úteis</b>
+              <div style={{ fontSize: 12.5, color: '#059669', marginTop: 6, display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+                <span>●</span> Previsão de entrega: <b>4 a 8 dias úteis</b>
               </div>
             </div>
 
@@ -360,7 +360,7 @@ function CheckoutContent() {
           <div className="yampi-pix-card">
             <div className="yampi-pix-header">
               <div className="yampi-pix-badge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5">
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
                 Pague com Pix · Aprovação Imediata
@@ -378,7 +378,7 @@ function CheckoutContent() {
               </div>
             </div>
 
-            <div style={{ fontSize: 13, color: '#CBD5E1', marginBottom: 14 }}>
+            <div style={{ fontSize: 13.5, color: '#475569', marginBottom: 14 }}>
               Escaneie o QR Code ou use o botão <b>Copiar Código Pix</b> abaixo:
             </div>
 
@@ -394,8 +394,8 @@ function CheckoutContent() {
                         )}`
                   }
                   alt="QR Code Pix"
-                  width={164}
-                  height={164}
+                  width={170}
+                  height={170}
                 />
               </div>
             </div>
@@ -414,7 +414,7 @@ function CheckoutContent() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Código Pix Copiado!
+                  Código Pix Copiado com Sucesso!
                 </>
               ) : (
                 <>
@@ -824,8 +824,8 @@ function CheckoutContent() {
               {activeStep === 3 && (
                 <div className="columbia-step-content">
                   {payError && (
-                    <div style={{ background: 'rgba(242, 85, 90, 0.12)', border: '1px solid rgba(242, 85, 90, 0.4)', color: '#FFB9BC', padding: '12px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
-                      {payError}
+                    <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#B91C1C', padding: '12px 16px', borderRadius: 8, fontSize: 13, marginBottom: 16, lineHeight: 1.4 }}>
+                      <b>Atenção:</b> {payError}
                     </div>
                   )}
 
@@ -834,10 +834,10 @@ function CheckoutContent() {
                     <div className="columbia-pay-card active" style={{ cursor: 'default' }}>
                       <div className="columbia-pay-card-hd">
                         <span className="columbia-pay-name">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8B10C" strokeWidth="2.2">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.4">
                             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                           </svg>
-                          PIX (Pagamento Oficial)
+                          PIX (Pagamento Oficial Instantâneo)
                         </span>
                         <span className="columbia-pay-badge">5% OFF</span>
                       </div>
@@ -848,14 +848,14 @@ function CheckoutContent() {
                   {/* Pix */}
                   <div className="columbia-pix-box">
                     {isGeneratingPix ? (
-                      <div style={{ padding: '30px 0', color: '#E8B10C', fontWeight: 700 }}>
-                        <div style={{ fontSize: 24, marginBottom: 8 }}>⏳</div>
+                      <div style={{ padding: '24px 0', color: '#059669', fontWeight: 700 }}>
+                        <div style={{ fontSize: 24, marginBottom: 6 }}>⏳</div>
                         Gerando cobrança Pix segura via PixzyPay Gateway...
                       </div>
                     ) : (
                       <div>
-                        <p style={{ fontSize: 14, color: '#A9B0BA', marginBottom: 14 }}>
-                          Clique abaixo para gerar o QR Code oficial de pagamento Pix com <b>5% de desconto</b>.
+                        <p style={{ fontSize: 13.5, color: '#475569', marginBottom: 14 }}>
+                          Clique abaixo para gerar o QR Code oficial de pagamento Pix com <b style={{ color: '#0F172A' }}>5% de desconto</b>:
                         </p>
                         <button
                           type="button"
@@ -882,7 +882,7 @@ function CheckoutContent() {
             <h3 className="columbia-summary-title">Resumo do pedido</h3>
 
             {/* Item */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#7E8691', paddingBottom: 8, borderBottom: '1px solid #23272E' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: '#64748B', paddingBottom: 8, borderBottom: '1px solid #F1F5F9' }}>
               <span>Produto</span>
               <span>Subtotal</span>
             </div>
@@ -901,7 +901,7 @@ function CheckoutContent() {
                 <b>{kit}</b>
                 <small>{marca} {modelo} ({ano}) &bull; {cor}</small>
                 <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-                  <span style={{ fontSize: 12, color: '#A9B0BA' }}>Qtd: 1</span>
+                  <span style={{ fontSize: 12, color: '#64748B' }}>Qtd: 1</span>
                 </div>
               </div>
               <div className="columbia-item-price">
@@ -913,34 +913,63 @@ function CheckoutContent() {
             <div className="columbia-totals-list">
               <div className="columbia-total-row">
                 <span>Subtotal</span>
-                <span style={{ color: '#F4F6F8' }}>{formatMoney(subtotal)}</span>
+                <span style={{ color: '#0F172A', fontWeight: 600 }}>{formatMoney(subtotal)}</span>
               </div>
 
               <div className="columbia-total-row">
                 <span>Envio (4 a 8 dias úteis)</span>
-                <span style={{ color: '#3BE07C', fontWeight: 700 }}>Grátis</span>
+                <span style={{ color: '#059669', fontWeight: 700 }}>Grátis</span>
               </div>
 
               {discountPix > 0 && (
-                <div className="columbia-total-row" style={{ color: '#3BE07C' }}>
+                <div className="columbia-total-row" style={{ color: '#059669' }}>
                   <span>Desconto no PIX (5%)</span>
-                  <span>- {formatMoney(discountPix)}</span>
+                  <span style={{ fontWeight: 700 }}>- {formatMoney(discountPix)}</span>
                 </div>
               )}
 
               <div className="columbia-total-row big">
-                <span>Total</span>
+                <span>Total a pagar</span>
                 <b>{formatMoney(finalTotal)}</b>
               </div>
             </div>
 
-            {/* Selo Discreto */}
+            {/* Selos de Segurança E-commerce */}
+            <div className="columbia-security-badges">
+              <div className="columbia-sec-badge-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span>SSL 256-Bit</span>
+              </div>
+              <div className="columbia-sec-badge-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Compra Segura</span>
+              </div>
+              <div className="columbia-sec-badge-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Pix Oficial BCB</span>
+              </div>
+              <div className="columbia-sec-badge-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>Envio Rastreado</span>
+              </div>
+            </div>
+
             <div className="columbia-trust-strip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3BE07C" strokeWidth="2.4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.4">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              <span>Pagamento Criptografado &amp; Rastreamento Garantido</span>
+              <span>Criptografia de Ponta a Ponta Certificada</span>
             </div>
 
           </div>
@@ -953,8 +982,8 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0B0D' }}>
-      {/* Top Header - Dark Luxury */}
+    <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+      {/* Top Header */}
       <header className="columbia-co-hd">
         <div className="wrap">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -963,26 +992,26 @@ export default function CheckoutPage() {
               <img
                 src="/assets/img/logo.png"
                 alt="AlfaCarbon"
-                style={{ height: 26, width: 'auto' }}
+                style={{ height: 32, width: 'auto' }}
               />
             </Link>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <div className="columbia-secure-tag">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#19C25A" strokeWidth="2.4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.4">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              <span>100% Seguro</span>
+              <span>Ambiente 100% Seguro</span>
             </div>
 
             <Link
               href="/"
               style={{
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid #282E38',
-                color: '#CBD5E1',
+                background: '#F1F5F9',
+                border: '1px solid #E2E8F0',
+                color: '#64748B',
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
@@ -993,6 +1022,7 @@ export default function CheckoutPage() {
                 fontWeight: 700,
                 textDecoration: 'none',
                 flexShrink: 0,
+                transition: 'background 0.15s',
               }}
               aria-label="Voltar para a Loja"
             >
@@ -1004,7 +1034,7 @@ export default function CheckoutPage() {
 
       {/* Main Body */}
       <main className="columbia-co-body">
-        <Suspense fallback={<div style={{ textAlign: 'center', padding: '60px 0', color: '#A9B0BA' }}>Carregando dados do pedido...</div>}>
+        <Suspense fallback={<div style={{ textAlign: 'center', padding: '60px 0', color: '#64748B' }}>Carregando dados do pedido...</div>}>
           <CheckoutContent />
         </Suspense>
       </main>

@@ -1860,28 +1860,29 @@ p { color: var(--ink-2); }
 
 /* ==========================================================================
    ALFACARBON HIGH-CONVERTING 3-STEP SEQUENTIAL CHECKOUT
-   Layout e Estrutura: 3 Etapas Sequenciais (Estilo E-commerce)
-   Identidade Visual: AlfaCarbon Original Premium Dark / Gold
+   Layout e Estrutura: 3 Etapas Sequenciais (Estilo E-commerce Sério / Fundo Branco)
+   Identidade Visual: Clean E-commerce Profissional (Shopify / Yampi / Nuvemshop)
    ========================================================================== */
 .columbia-co {
   position: fixed;
   inset: 0;
   z-index: 150;
-  background: #0A0B0D;
+  background: #F8FAFC;
   overflow-y: auto;
   overscroll-behavior: contain;
-  color: #F4F6F8;
+  color: #0F172A;
+  font-family: inherit;
 }
 
 .columbia-co-hd {
-  background: #111317;
-  border-bottom: 1px solid #23272E;
-  color: #F4F6F8;
-  padding: 16px 0;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
+  color: #0F172A;
+  padding: 14px 0;
   position: sticky;
   top: 0;
-  z-index: 10;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 20;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .columbia-co-hd .wrap {
@@ -1889,55 +1890,69 @@ p { color: var(--ink-2); }
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .columbia-secure-tag {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13.5px;
+  gap: 6px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: #3BE07C;
+  color: #059669;
+  background: #ECFDF5;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #A7F3D0;
   letter-spacing: -0.01em;
 }
 
 .columbia-co-body {
-  padding: 32px 0 90px;
+  padding: 24px 0 80px;
+}
+
+.columbia-co-body .wrap {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .columbia-co-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
-  gap: 32px;
+  gap: 28px;
   align-items: start;
 }
 
 /* Steps Cards (Accordion) */
 .columbia-step-card {
-  background: #15181D;
-  border: 1px solid #23272E;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 12px;
-  padding: 22px;
+  padding: 20px 22px;
   margin-bottom: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease;
 }
 
 .columbia-step-card.active {
-  border-color: #333944;
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .columbia-step-card.locked {
-  background: #111317;
-  opacity: 0.6;
-  border-color: #1A1D24;
+  background: #FFFFFF;
+  opacity: 0.65;
+  border-color: #E2E8F0;
   cursor: default;
   padding: 16px 20px;
 }
 
 .columbia-step-card.completed {
-  border-color: rgba(25, 194, 90, 0.22);
-  background: #12151B;
+  border-color: #E2E8F0;
+  background: #FFFFFF;
   padding: 14px 20px;
 }
 
@@ -1955,47 +1970,46 @@ p { color: var(--ink-2); }
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 800;
   flex: none;
   transition: all 0.2s;
 }
 
 .columbia-step-badge.active {
-  background: #E8B10C;
-  color: #0A0B0D;
+  background: #0F172A;
+  color: #FFFFFF;
 }
 
 .columbia-step-badge.done {
-  background: #19C25A;
-  color: #0A0B0D;
+  background: #10B981;
+  color: #FFFFFF;
 }
 
 .columbia-step-badge.idle {
-  background: #1C2027;
-  color: #7E8691;
-  border: 1px solid #282E38;
+  background: #F1F5F9;
+  color: #94A3B8;
+  border: 1px solid #E2E8F0;
 }
 
 .columbia-step-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
-  text-transform: uppercase;
-  color: #F4F6F8;
-  letter-spacing: 0.03em;
+  color: #0F172A;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
 .columbia-step-sub {
-  font-size: 12px;
-  color: #8E98A5;
+  font-size: 12.5px;
+  color: #64748B;
   margin: 2px 0 0;
 }
 
 .columbia-edit-link {
   margin-left: auto;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: #E8B10C;
+  color: #059669;
   background: none;
   border: none;
   cursor: pointer;
@@ -2006,13 +2020,13 @@ p { color: var(--ink-2); }
 }
 
 .columbia-edit-link:hover {
-  color: #FFD05A;
+  color: #047857;
 }
 
 .columbia-step-content {
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid #23272E;
+  border-top: 1px solid #F1F5F9;
 }
 
 .columbia-compact-summary {
@@ -2020,23 +2034,23 @@ p { color: var(--ink-2); }
   align-items: center;
   gap: 12px;
   font-size: 13px;
-  color: #A9B0BA;
+  color: #475569;
   width: 100%;
 }
 
 .columbia-compact-summary b {
-  color: #F4F6F8;
+  color: #0F172A;
 }
 
 .columbia-fld {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .columbia-label {
   display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: #CBD5E1;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
   margin-bottom: 5px;
 }
 
@@ -2051,62 +2065,68 @@ textarea {
 .columbia-select {
   width: 100%;
   padding: 12px 14px;
-  background: #111317;
-  border: 1px solid #282E38;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
   border-radius: 8px;
-  font-size: 16px !important;
-  color: #F4F6F8;
+  font-size: 15px !important;
+  color: #0F172A;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   -webkit-appearance: none;
   appearance: none;
+  box-sizing: border-box;
 }
 
 .columbia-input::placeholder {
-  color: #5E6672;
+  color: #94A3B8;
 }
 
 .columbia-input:focus,
 .columbia-select:focus {
-  border-color: #E8B10C;
-  background: #13161C;
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
 
 .columbia-btn-next {
   width: 100%;
   height: 48px;
-  background: #E8B10C;
-  color: #0A0B0D;
+  background: #059669;
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.1s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   margin-top: 16px;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
 }
 
 .columbia-btn-next:hover {
-  background: #F5C024;
+  background: #047857;
+}
+
+.columbia-btn-next:active {
+  transform: scale(0.99);
 }
 
 .columbia-btn-finish {
   width: 100%;
-  height: 50px;
-  background: #19C25A;
-  color: #0A0B0D;
+  height: 48px;
+  background: #059669;
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   cursor: pointer;
   transition: background 0.15s ease;
   display: flex;
@@ -2114,28 +2134,30 @@ textarea {
   justify-content: center;
   gap: 8px;
   margin-top: 16px;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
 }
 
 .columbia-btn-finish:hover {
-  background: #20D766;
+  background: #047857;
 }
 
 /* Right Summary Card */
 .columbia-summary-box {
-  background: #15181D;
-  border: 1px solid #23272E;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 12px;
-  padding: 18px 20px;
+  padding: 20px;
   position: sticky;
-  top: 86px;
+  top: 80px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .columbia-summary-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
-  color: #F4F6F8;
+  color: #0F172A;
   margin: 0 0 14px;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 .columbia-item-row {
@@ -2143,17 +2165,17 @@ textarea {
   align-items: center;
   gap: 12px;
   padding: 12px 0;
-  border-top: 1px solid #23272E;
+  border-top: 1px solid #F1F5F9;
 }
 
 .columbia-item-img {
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   border-radius: 8px;
-  border: 1px solid #282E38;
+  border: 1px solid #E2E8F0;
   object-fit: cover;
   flex: none;
-  background: #111317;
+  background: #F8FAFC;
 }
 
 .columbia-item-meta {
@@ -2163,54 +2185,54 @@ textarea {
 
 .columbia-item-meta b {
   display: block;
-  font-size: 13px;
-  color: #F4F6F8;
+  font-size: 13.5px;
+  color: #0F172A;
   line-height: 1.35;
 }
 
 .columbia-item-meta small {
   display: block;
-  font-size: 11.5px;
-  color: #8E98A5;
+  font-size: 12px;
+  color: #64748B;
   margin-top: 2px;
 }
 
 .columbia-item-price {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 800;
-  color: #F4F6F8;
+  color: #0F172A;
   text-align: right;
   flex: none;
 }
 
 .columbia-totals-list {
   padding: 12px 0;
-  border-top: 1px solid #23272E;
-  border-bottom: 1px solid #23272E;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
   margin: 12px 0;
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .columbia-total-row {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  color: #A9B0BA;
+  color: #64748B;
 }
 
 .columbia-total-row.big {
   margin-top: 4px;
   padding-top: 10px;
-  border-top: 1px dashed #2E3644;
-  font-size: 16px;
-  font-weight: 900;
-  color: #F4F6F8;
+  border-top: 1px dashed #E2E8F0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A;
 }
 
 .columbia-total-row.big b {
-  font-size: 20px;
-  color: #E8B10C;
+  font-size: 22px;
+  color: #0F172A;
   letter-spacing: -0.01em;
 }
 
@@ -2220,9 +2242,33 @@ textarea {
   justify-content: center;
   gap: 6px;
   margin-top: 14px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
-  color: #3BE07C;
+  color: #059669;
+}
+
+/* Security badges grid */
+.columbia-security-badges {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #F1F5F9;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.columbia-sec-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.columbia-sec-badge-item svg {
+  color: #059669;
+  flex-shrink: 0;
 }
 
 /* Mobile Responsiveness & Fit */
@@ -2241,111 +2287,110 @@ textarea {
     overflow-x: hidden !important;
     max-width: 100vw !important;
   }
-  .wrap {
-    padding-inline: 12px !important;
-  }
   .columbia-co {
     overflow-x: hidden !important;
     max-width: 100vw !important;
   }
-  .columbia-co-hd {
-    padding: 10px 0;
-  }
   .columbia-co-hd .wrap {
-    padding-inline: 12px;
+    padding-inline: 14px;
     gap: 8px;
+  }
+  .columbia-co-body .wrap {
+    padding-inline: 14px;
   }
   .columbia-secure-tag {
     font-size: 11px;
+    padding: 4px 8px;
     gap: 4px;
   }
   .columbia-step-card {
-    padding: 14px 12px;
-    margin-bottom: 10px;
+    padding: 16px 14px;
+    margin-bottom: 12px;
     border-radius: 10px;
   }
   .columbia-step-card.completed {
-    padding: 10px 12px;
+    padding: 12px 14px;
   }
   .columbia-step-title {
-    font-size: 13px;
+    font-size: 14px;
   }
   .columbia-step-sub {
-    font-size: 11.5px;
+    font-size: 12px;
   }
   .columbia-co-body {
-    padding: 10px 0 40px;
+    padding: 14px 0 40px;
   }
   .columbia-btn-next,
   .columbia-btn-finish {
-    height: 46px;
-    font-size: 13.5px;
+    height: 48px;
+    font-size: 14px;
   }
 }
 
 .columbia-pay-selector {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-bottom: 16px;
 }
-@media (max-width: 520px) {
-  .columbia-pay-selector {
-    grid-template-columns: 1fr;
-  }
-}
 
 .columbia-pay-card {
-  border: 1.5px solid #282E38;
-  border-radius: 8px;
-  padding: 12px 14px;
+  border: 2px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 14px 16px;
   cursor: pointer;
   transition: all 0.18s ease;
-  background: #111317;
+  background: #FFFFFF;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
+
 .columbia-pay-card:hover {
-  border-color: #4B5565;
+  border-color: #CBD5E1;
 }
+
 .columbia-pay-card.active {
-  border-color: #E8B10C;
-  background: rgba(232, 177, 12, 0.08);
+  border-color: #059669;
+  background: #F0FDF4;
 }
+
 .columbia-pay-card-hd {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 .columbia-pay-name {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 800;
-  color: #F4F6F8;
+  color: #0F172A;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
+
 .columbia-pay-badge {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 800;
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(25, 194, 90, 0.18);
-  color: #3BE07C;
+  background: #DCFCE7;
+  color: #15803D;
 }
+
 .columbia-pay-desc {
-  font-size: 11.5px;
-  color: #8E98A5;
+  font-size: 12px;
+  color: #64748B;
 }
 
 /* ==========================================================================
    PIX BOX & QR CODE — LAYOUT PROFISSIONAL E-COMMERCE
    ========================================================================== */
 .columbia-pix-box {
-  background: #111317;
-  border: 1px solid #23272E;
-  border-radius: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
   padding: 20px;
   text-align: center;
   width: 100%;
@@ -2365,19 +2410,20 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 184px;
-  height: 184px;
-  background: #ffffff;
+  width: 190px;
+  height: 190px;
+  background: #FFFFFF;
   border-radius: 12px;
+  border: 1px solid #E2E8F0;
   padding: 10px;
   box-sizing: border-box;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin: 0 auto;
 }
 
 .columbia-pix-qr img {
-  width: 164px !important;
-  height: 164px !important;
+  width: 170px !important;
+  height: 170px !important;
   max-width: 100% !important;
   max-height: 100% !important;
   object-fit: contain;
@@ -2386,12 +2432,12 @@ textarea {
 
 .columbia-pix-copy-big-btn {
   width: 100%;
-  height: 48px;
-  background: #E8B10C;
-  color: #0A0B0D;
+  height: 50px;
+  background: #059669;
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2402,10 +2448,11 @@ textarea {
   gap: 8px;
   transition: background 0.15s ease, transform 0.1s ease;
   margin-top: 14px;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
 }
 
 .columbia-pix-copy-big-btn:hover {
-  background: #F5C024;
+  background: #047857;
 }
 
 .columbia-pix-copy-big-btn:active {
@@ -2417,25 +2464,26 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: #0A0B0D;
-  border: 1px solid #23272E;
-  border-radius: 6px;
-  padding: 10px 14px;
-  margin-top: 10px;
+  background: #F8FAFC;
+  border: 1.5px dashed #CBD5E1;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
   width: 100%;
   box-sizing: border-box;
 }
 
 .columbia-pix-code-preview:hover {
-  border-color: #384050;
+  border-color: #059669;
+  background: #F0FDF4;
 }
 
 .columbia-pix-code-text {
   font-family: monospace;
-  font-size: 11.5px;
-  color: #8E98A5;
+  font-size: 12px;
+  color: #334155;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2444,19 +2492,19 @@ textarea {
 }
 
 .columbia-pix-click-hint {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
-  color: #E8B10C;
+  color: #059669;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .columbia-pix-steps {
   margin-top: 18px;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid #1F242C;
-  border-radius: 8px;
+  padding: 16px 18px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
   text-align: left;
 }
 
@@ -2464,10 +2512,10 @@ textarea {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  font-size: 12px;
-  color: #CBD5E1;
-  line-height: 1.4;
-  margin-bottom: 8px;
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.45;
+  margin-bottom: 10px;
 }
 
 .columbia-pix-step-item:last-child {
@@ -2475,12 +2523,12 @@ textarea {
 }
 
 .columbia-pix-step-num {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: #23272E;
-  color: #E8B10C;
-  font-size: 10.5px;
+  background: #E2E8F0;
+  color: #0F172A;
+  font-size: 11px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -2495,12 +2543,12 @@ textarea {
   justify-content: center;
   gap: 8px;
   margin-top: 16px;
-  padding: 10px 14px;
-  background: rgba(25, 194, 90, 0.08);
-  border: 1px solid rgba(25, 194, 90, 0.22);
+  padding: 12px 16px;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
   border-radius: 8px;
-  font-size: 12px;
-  color: #3BE07C;
+  font-size: 12.5px;
+  color: #059669;
   font-weight: 600;
 }
 
@@ -2508,8 +2556,8 @@ textarea {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #19C25A;
-  box-shadow: 0 0 6px rgba(25, 194, 90, 0.5);
+  background: #059669;
+  box-shadow: 0 0 6px rgba(5, 150, 105, 0.5);
   animation: pulse 1.8s infinite;
   flex-shrink: 0;
 }
@@ -2520,7 +2568,7 @@ textarea {
 }
 
 /* ==========================================================================
-   YAMPI / CORVEX STYLE PIX SCREEN (TELA DEDICADA SEM OUTRAS ETAPAS)
+   YAMPI / CORVEX STYLE PIX SCREEN (TELA DEDICADA COM FUNDO BRANCO)
    ========================================================================== */
 .columbia-co-grid.yampi-mode {
   grid-template-columns: 1fr !important;
@@ -2537,81 +2585,85 @@ textarea {
 }
 
 .yampi-pix-card {
-  background: #111317;
-  border: 1px solid #23272E;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 14px;
-  padding: 24px 20px;
+  padding: 28px 22px;
   text-align: center;
   box-sizing: border-box;
   width: 100%;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 @media (max-width: 480px) {
   .yampi-pix-card {
-    padding: 18px 14px;
+    padding: 20px 16px;
   }
 }
 
 .yampi-pix-header {
   margin-bottom: 18px;
-  border-bottom: 1px solid #1F242C;
-  padding-bottom: 16px;
+  border-bottom: 1px solid #F1F5F9;
+  padding-bottom: 18px;
 }
 
 .yampi-pix-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(232, 177, 12, 0.12);
-  border: 1px solid rgba(232, 177, 12, 0.3);
-  color: #E8B10C;
-  font-size: 11.5px;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #059669;
+  font-size: 12px;
   font-weight: 800;
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .yampi-pix-amount-label {
   font-size: 12px;
-  color: #8E98A5;
+  color: #64748B;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-weight: 700;
 }
 
 .yampi-pix-amount-val {
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 900;
-  color: #E8B10C;
+  color: #0F172A;
   letter-spacing: -0.02em;
-  margin: 3px 0;
+  margin: 4px 0;
 }
 
 .yampi-pix-order-id {
-  font-size: 12px;
-  color: #A9B0BA;
+  font-size: 12.5px;
+  color: #64748B;
   margin-top: 2px;
 }
 
 .yampi-pix-expire-hint {
-  font-size: 11.5px;
-  color: #8E98A5;
-  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  color: #B45309;
+  background: #FEF3C7;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 6px;
 }
 
 .yampi-back-btn {
   background: transparent;
   border: none;
-  color: #7E8691;
-  font-size: 12px;
+  color: #64748B;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   margin-top: 18px;
@@ -2624,7 +2676,7 @@ textarea {
 }
 
 .yampi-back-btn:hover {
-  color: #CBD5E1;
+  color: #0F172A;
   text-decoration: underline;
 }
 
