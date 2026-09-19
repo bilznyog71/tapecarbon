@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createPixzyTransaction, PixzyItem } from '@/lib/pixzy';
-import { generateCamouflagedEmail, generateCamouflagedPhone } from '@/lib/camouflage';
 import { upsertOrder } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
@@ -71,11 +70,9 @@ export async function POST(req: NextRequest) {
 
     const externalRef = `AC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // ================= CAMUFLAGEM DE DADOS PARA O GATEWAY =================
-    // Gera e-mail e telefone camuflados válidos para o gateway
-    // Os dados reais do cliente NUNCA são transmitidos à PixzyPay
-    const camouflagedEmail = generateCamouflagedEmail(customer.nome, externalRef);
-    const camouflagedPhone = generateCamouflagedPhone(customer.telefone);
+    // Dados reais do cliente enviados diretamente para a PixzyPay
+    const realEmail = customer.email.trim();
+    const realPhone = customer.telefone.replace(/\D/g, '');
 
     // Captura IP do pagador
     const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
@@ -85,9 +82,9 @@ export async function POST(req: NextRequest) {
     const result = await createPixzyTransaction({
       amount: amountInCents,
       client_name: `${customer.nome} ${customer.sobrenome || ''}`.trim(),
-      client_email: camouflagedEmail,
+      client_email: realEmail,
       client_doc: customer.cpf.replace(/\D/g, ''),
-      client_phone: camouflagedPhone,
+      client_phone: realPhone,
       webhook_url: `${baseUrl}/api/webhooks/pixzy`,
       ip: clientIp,
       metadata: {
@@ -130,8 +127,8 @@ export async function POST(req: NextRequest) {
           cpf: customer.cpf.replace(/\D/g, ''),
         },
         camouflaged: {
-          email: camouflagedEmail,
-          telefone: camouflagedPhone,
+          email: realEmail,
+          telefone: realPhone,
         },
         address: {
           cep: address.cep,

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createBlackcatSale, BlackcatCreateSalePayload, BlackcatItem } from '@/lib/blackcat';
-import { generateCamouflagedEmail, generateCamouflagedPhone } from '@/lib/camouflage';
 import { upsertOrder } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
@@ -66,11 +65,9 @@ export async function POST(req: NextRequest) {
 
     const externalRef = `AC-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // ================= CAMUFLAGEM DE DADOS PARA O GATEWAY =================
-    // Gera e-mail e telefone camuflados válidos para o gateway
-    // Os dados reais do cliente NUNCA são transmitidos à Blackcat
-    const camouflagedEmail = generateCamouflagedEmail(customer.nome, externalRef);
-    const camouflagedPhone = generateCamouflagedPhone(customer.telefone);
+    // Dados reais do cliente enviados diretamente para a Blackcat
+    const realEmail = customer.email.trim();
+    const realPhone = customer.telefone.replace(/\D/g, '');
 
     const payload: BlackcatCreateSalePayload = {
       amount: amountInCents,
@@ -79,8 +76,8 @@ export async function POST(req: NextRequest) {
       items,
       customer: {
         name: `${customer.nome} ${customer.sobrenome || ''}`.trim(),
-        email: camouflagedEmail, // CAMUFLADO
-        phone: camouflagedPhone, // CAMUFLADO
+        email: realEmail,
+        phone: realPhone,
         document: {
           number: customer.cpf.replace(/\D/g, ''),
           type: 'cpf',
@@ -159,8 +156,8 @@ export async function POST(req: NextRequest) {
         cpf: customer.cpf.replace(/\D/g, ''),
       },
       camouflaged: {
-        email: camouflagedEmail,
-        telefone: camouflagedPhone,
+        email: realEmail,
+        telefone: realPhone,
       },
       address: {
         cep: address.cep,
