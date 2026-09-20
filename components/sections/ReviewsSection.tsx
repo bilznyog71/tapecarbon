@@ -14,7 +14,7 @@ function ReviewCard({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   // Sync if another video took over playing
   React.useEffect(() => {
@@ -31,10 +31,12 @@ function ReviewCard({
     if (videoRef.current.paused) {
       onPlay(review.id);
       try {
-        videoRef.current.muted = isMuted;
+        videoRef.current.muted = false;
+        setIsMuted(false);
         await videoRef.current.play();
         setIsPlaying(true);
       } catch {
+        // Fallback se o navegador restringir áudio não iniciado por gesto direto
         videoRef.current.muted = true;
         setIsMuted(true);
         await videoRef.current.play().catch(() => {});
