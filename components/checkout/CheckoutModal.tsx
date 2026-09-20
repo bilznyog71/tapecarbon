@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '@/hooks/useStore';
-import { CONFIG, formatMoney } from '@/data/config';
+import { CONFIG, formatMoney, getKitImageUrl } from '@/data/config';
 
 export default function CheckoutModal() {
   const { cart, isCheckoutOpen, closeCheckout, clearCart, removeFromCart } = useStore();
@@ -885,11 +885,11 @@ export default function CheckoutModal() {
                   <div key={item.id} className="columbia-item-row">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/assets/img/hero-mockup.webp"
+                      src={item.image || getKitImageUrl(item.kit, item.color)}
                       alt={item.kitName}
                       className="columbia-item-img"
                       onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
+                        e.currentTarget.src = '/assets/img/kit-interior-negro.webp';
                       }}
                     />
                     <div className="columbia-item-meta">

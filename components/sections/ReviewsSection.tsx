@@ -47,48 +47,53 @@ function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onP
   };
 
   return (
-    <article className="bg-[#171a21] border border-white/10 rounded-2xl p-5 flex flex-col justify-between shadow-xl transition-transform hover:-translate-y-1">
-      {/* Top Header */}
+    <article
+      style={{
+        background: 'var(--bg-light)',
+        border: '1px solid var(--line-light)',
+        borderRadius: 'var(--r-xl)',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
+        transition: 'transform 0.2s',
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; }}
+    >
+      {/* Top Header — sem "Cliente verificado" */}
       <div>
-        <div className="flex items-center gap-3.5 mb-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={review.avatar}
             alt={review.name}
-            className="w-12 h-12 rounded-full object-cover border border-white/15 shadow-sm"
+            style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--line-light-strong)', flexShrink: 0 }}
             loading="lazy"
           />
           <div>
-            <strong className="text-white text-base block font-bold leading-tight">{review.name}</strong>
-            <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 mt-0.5">
-              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
-                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-              </svg>
-              {review.name.includes('a') && !review.name.includes('Lucas') && !review.name.includes('Rafael') && !review.name.includes('Bruno') ? 'Cliente verificada' : 'Cliente verificado'}
-            </span>
+            <strong style={{ color: 'var(--ink-lt)', fontSize: '14px', display: 'block', fontWeight: 700 }}>{review.name}</strong>
           </div>
         </div>
 
         {/* Stars */}
-        <div className="flex items-center gap-1.5 text-amber-400 text-sm mb-2.5 font-bold">
-          <span>★★★★★</span>
-          <span className="text-white font-extrabold text-xs">5.0</span>
-        </div>
+        <div style={{ color: 'var(--gold-2)', fontSize: '14px', marginBottom: '8px', fontWeight: 700, letterSpacing: '1px' }}>★★★★★</div>
 
         {/* Text */}
-        <p className="text-gray-300 text-sm leading-relaxed mb-4">
+        <p style={{ color: 'var(--ink-lt-2)', fontSize: '13.5px', lineHeight: 1.65, marginBottom: '16px' }}>
           &ldquo;{review.text}&rdquo;
         </p>
       </div>
 
       {/* Video Container */}
       <div
-        className="relative aspect-[9/16] w-full rounded-xl overflow-hidden bg-black/50 border border-white/10 cursor-pointer group shadow-inner"
+        style={{ position: 'relative', aspectRatio: '9/16', width: '100%', borderRadius: 'var(--r-l)', overflow: 'hidden', background: '#000', border: '1px solid var(--line-light)', cursor: 'pointer' }}
         onClick={togglePlay}
       >
         <video
           ref={videoRef}
-          className="w-full h-full object-cover"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           playsInline
           preload="none"
           poster={review.poster}
@@ -98,12 +103,12 @@ function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onP
           <source src={review.video} type="video/mp4" />
         </video>
 
-        {/* Play/Pause Overlay Button */}
+        {/* Play Overlay */}
         {!isPlaying && (
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <button
               type="button"
-              className="w-14 h-14 rounded-full bg-red-600/90 text-white flex items-center justify-center text-xl pl-1 shadow-2xl hover:scale-110 transition-transform"
+              style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'var(--green)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', paddingLeft: '2px', boxShadow: '0 4px 20px rgba(24,184,84,0.4)', border: 0, cursor: 'pointer' }}
               aria-label="Reproduzir vídeo"
             >
               ▶
@@ -111,11 +116,11 @@ function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onP
           </div>
         )}
 
-        {/* Mute/Unmute Button */}
+        {/* Mute Button */}
         <button
           type="button"
           onClick={toggleMute}
-          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-xs backdrop-blur-sm transition-colors border border-white/20 z-10"
+          style={{ position: 'absolute', bottom: '10px', right: '10px', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', zIndex: 10 }}
           aria-label={isMuted ? 'Ativar áudio' : 'Desativar áudio'}
         >
           {isMuted ? '🔇' : '🔊'}
@@ -133,22 +138,22 @@ export default function ReviewsSection() {
   };
 
   return (
-    <section className="py-16 md:py-24 bg-[#0f1115] border-t border-b border-white/5" id="reviewsCarousel">
-      <div className="wrap max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20 inline-block mb-3">
-            Vídeos Reais de Clientes
-          </span>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-            Avaliações de Clientes
-          </h2>
-          <p className="text-gray-400 text-sm md:text-base mt-2">
-            Veja o resultado e a opinião de quem já instalou no carro.
+    <section
+      className="sec sec-light-soft"
+      id="reviewsCarousel"
+      style={{ borderTop: '1px solid var(--line-light)', borderBottom: '1px solid var(--line-light)' }}
+    >
+      <div className="wrap">
+        <div className="sec-head mid">
+          <span className="kicker">Clientes reais</span>
+          <h2>Quem já instalou, aprovou.</h2>
+          <p>
+            Veja os vídeos de clientes que adquiriram e testaram no carro.
           </p>
         </div>
 
         {/* Video Reviews Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
           {REVIEWS_DATA.map((r) => (
             <ReviewCard
               key={r.id}
@@ -159,18 +164,18 @@ export default function ReviewsSection() {
           ))}
         </div>
 
-        {/* Footer Score Banner */}
-        <div className="mt-14 p-6 md:p-8 rounded-2xl bg-[#171a21] border border-white/10 text-center flex flex-col items-center justify-center shadow-xl">
-          <div className="text-amber-400 text-2xl tracking-widest mb-1">★★★★★</div>
-          <div className="text-lg md:text-xl font-bold text-white mb-1.5">
-            <strong className="text-white text-2xl font-black">4,9</strong> de 5 • 1.284 avaliações
-          </div>
-          <div className="text-sm font-medium text-emerald-400 flex items-center justify-center gap-1.5">
-            <span>Mais de 5.000 clientes satisfeitos em todo o Brasil</span>
-            <span>🇧🇷</span>
-          </div>
-        </div>
+        {/* Stats banner removido — dados não confirmados */}
       </div>
+
+      <style>{`
+        @media (max-width: 1024px) {
+          #reviewsCarousel .grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          #reviewsCarousel .grid { grid-template-columns: 1fr !important; }
+          #reviewsCarousel article { aspect-ratio: auto; }
+        }
+      `}</style>
     </section>
   );
 }

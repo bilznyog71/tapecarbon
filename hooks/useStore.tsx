@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CONFIG, Kit, ColorOption, TextureOption } from '@/data/config';
+import { CONFIG, Kit, ColorOption, TextureOption, getKitImageUrl } from '@/data/config';
 
 export interface CartItem {
   id: string;
@@ -14,6 +14,7 @@ export interface CartItem {
   textureName?: string;
   price: number;
   priceOld: number;
+  image?: string;
 }
 
 interface StoreContextType {
@@ -124,6 +125,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       textureName: selectedTexture.name,
       price: selectedKit.price,
       priceOld: selectedKit.priceOld,
+      image: getKitImageUrl(selectedKit.id, selectedColor.id),
     };
 
     const newCart = [...cart, newItem];

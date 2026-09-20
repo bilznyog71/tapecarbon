@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useStore } from '@/hooks/useStore';
-import { CONFIG, formatMoney } from '@/data/config';
+import { CONFIG, formatMoney, getKitImageUrl } from '@/data/config';
 
 export default function CartDrawer() {
   const { cart, removeFromCart, isCartOpen, closeCart, openCheckout } = useStore();
@@ -49,9 +49,12 @@ export default function CartDrawer() {
                 <div className="ci" key={item.id}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`/assets/img/kit-${item.kit}-${item.color}.webp`}
+                    src={item.image || getKitImageUrl(item.kit, item.color)}
                     alt={item.kitName}
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = '/assets/img/kit-interior-negro.webp';
+                    }}
                   />
                   <div className="m">
                     <b>{item.kitName}</b>

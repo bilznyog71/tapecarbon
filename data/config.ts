@@ -116,3 +116,11 @@ export const formatInstallment = (amount: number, count: number = CONFIG.install
   const value = (amount / count).toFixed(2).replace('.', ',');
   return `${count}x de R$ ${value}`;
 };
+
+export const getKitImageUrl = (kitId?: string, colorId?: string): string => {
+  const kitType = kitId === 'carro_com' || kitId === 'full' ? 'full' : 'interior';
+  let color = 'negro';
+  if (colorId === 'cinza' || colorId === 'gris') color = 'gris';
+  else if (colorId === 'bege' || colorId === 'beige') color = 'beige';
+  return `/assets/img/kit-${kitType}-${color}.webp`;
+};

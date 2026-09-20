@@ -30,7 +30,7 @@ export default function TopProof() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className="rev-foto"
-                  src={`/assets/img/${r.photo}`}
+                  src={`/images/${r.photo}`}
                   alt={`Tapete AlfaCarbon instalado no ${r.vehicle}`}
                   loading="lazy"
                 />
