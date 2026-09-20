@@ -3,7 +3,15 @@
 import React, { useRef, useState } from 'react';
 import { REVIEWS_DATA, ReviewItem } from '@/data/reviews';
 
-function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onPlay: (id: string) => void; activeVideoId: string | null }) {
+function ReviewCard({
+  review,
+  onPlay,
+  activeVideoId,
+}: {
+  review: ReviewItem;
+  onPlay: (id: string) => void;
+  activeVideoId: string | null;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -47,55 +55,52 @@ function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onP
   };
 
   return (
-    <article
-      style={{
-        background: 'var(--bg-light)',
-        border: '1px solid var(--line-light)',
-        borderRadius: 'var(--r-xl)',
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
-        transition: 'transform 0.2s',
-      }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; }}
-    >
-      {/* Top Header — sem "Cliente verificado" */}
+    <article className="rev-video-card">
+      {/* Top Header */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+        <div className="flex items-center gap-3 mb-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={review.avatar}
             alt={review.name}
-            style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--line-light-strong)', flexShrink: 0 }}
+            className="w-11 h-11 rounded-full object-cover border border-white/15 shadow-sm flex-shrink-0"
             loading="lazy"
           />
-          <div>
-            <strong style={{ color: 'var(--ink-lt)', fontSize: '14px', display: 'block', fontWeight: 700 }}>{review.name}</strong>
+          <div className="min-w-0">
+            <strong className="text-white text-sm font-bold block leading-tight truncate">
+              {review.name}
+            </strong>
+            <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 mt-0.5">
+              <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+              </svg>
+              Cliente verificado
+            </span>
           </div>
         </div>
 
         {/* Stars */}
-        <div style={{ color: 'var(--gold-2)', fontSize: '14px', marginBottom: '8px', fontWeight: 700, letterSpacing: '1px' }}>★★★★★</div>
+        <div className="flex items-center gap-1 text-[#E8B10C] text-sm mb-2 font-bold">
+          <span>★★★★★</span>
+          <span className="text-white font-extrabold text-xs ml-1">5.0</span>
+        </div>
 
         {/* Text */}
-        <p style={{ color: 'var(--ink-lt-2)', fontSize: '13.5px', lineHeight: 1.65, marginBottom: '16px' }}>
+        <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-3">
           &ldquo;{review.text}&rdquo;
         </p>
       </div>
 
       {/* Video Container */}
       <div
-        style={{ position: 'relative', aspectRatio: '9/16', width: '100%', borderRadius: 'var(--r-l)', overflow: 'hidden', background: '#000', border: '1px solid var(--line-light)', cursor: 'pointer' }}
+        className="relative aspect-[9/16] w-full rounded-xl overflow-hidden bg-black/60 border border-white/10 cursor-pointer group shadow-inner"
         onClick={togglePlay}
       >
         <video
           ref={videoRef}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          className="w-full h-full object-cover"
           playsInline
-          preload="none"
+          preload="metadata"
           poster={review.poster}
           onEnded={() => setIsPlaying(false)}
           onPause={() => setIsPlaying(false)}
@@ -105,10 +110,10 @@ function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onP
 
         {/* Play Overlay */}
         {!isPlaying && (
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="absolute inset-0 bg-black/35 flex items-center justify-center transition-opacity">
             <button
               type="button"
-              style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'var(--green)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', paddingLeft: '2px', boxShadow: '0 4px 20px rgba(24,184,84,0.4)', border: 0, cursor: 'pointer' }}
+              className="w-13 h-13 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center text-lg pl-0.5 shadow-xl transition-transform hover:scale-110"
               aria-label="Reproduzir vídeo"
             >
               ▶
@@ -120,7 +125,7 @@ function ReviewCard({ review, onPlay, activeVideoId }: { review: ReviewItem; onP
         <button
           type="button"
           onClick={toggleMute}
-          style={{ position: 'absolute', bottom: '10px', right: '10px', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', zIndex: 10 }}
+          className="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center text-xs backdrop-blur-sm transition-colors border border-white/20 z-10"
           aria-label={isMuted ? 'Ativar áudio' : 'Desativar áudio'}
         >
           {isMuted ? '🔇' : '🔊'}
@@ -138,22 +143,22 @@ export default function ReviewsSection() {
   };
 
   return (
-    <section
-      className="sec sec-light-soft"
-      id="reviewsCarousel"
-      style={{ borderTop: '1px solid var(--line-light)', borderBottom: '1px solid var(--line-light)' }}
-    >
-      <div className="wrap">
-        <div className="sec-head mid">
-          <span className="kicker">Clientes reais</span>
-          <h2>Quem já instalou, aprovou.</h2>
-          <p>
-            Veja os vídeos de clientes que adquiriram e testaram no carro.
+    <section className="py-14 sm:py-20 bg-[#0f1115] border-t border-b border-white/5" id="reviewsCarousel">
+      <div className="wrap max-w-7xl mx-auto px-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#E8B10C] bg-[#E8B10C]/10 px-3 py-1 rounded-full border border-[#E8B10C]/20 inline-block mb-3">
+            Vídeos Reais de Clientes
+          </span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+            Quem já instalou, aprovou
+          </h2>
+          <p className="text-gray-400 text-sm sm:text-base mt-2 max-w-xl mx-auto">
+            Veja os vídeos de clientes reais que adquiriram e testaram o tapete no carro.
           </p>
         </div>
 
-        {/* Video Reviews Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+        {/* Video Reviews: Horizontal swipeable on mobile, grid on desktop */}
+        <div className="rev-videos-container">
           {REVIEWS_DATA.map((r) => (
             <ReviewCard
               key={r.id}
@@ -163,17 +168,63 @@ export default function ReviewsSection() {
             />
           ))}
         </div>
-
-        {/* Stats banner removido — dados não confirmados */}
       </div>
 
-      <style>{`
-        @media (max-width: 1024px) {
-          #reviewsCarousel .grid { grid-template-columns: repeat(2, 1fr) !important; }
+      <style jsx>{`
+        .rev-videos-container {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 20px;
         }
-        @media (max-width: 480px) {
-          #reviewsCarousel .grid { grid-template-columns: 1fr !important; }
-          #reviewsCarousel article { aspect-ratio: auto; }
+
+        :global(.rev-video-card) {
+          background: #171a21;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 18px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+          transition: transform 0.2s, border-color 0.2s;
+        }
+
+        :global(.rev-video-card:hover) {
+          transform: translateY(-2px);
+          border-color: rgba(255, 255, 255, 0.16);
+        }
+
+        @media (max-width: 1024px) {
+          .rev-videos-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .rev-videos-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 14px;
+            padding: 4px 8px 16px;
+            margin: 0 -16px;
+            padding-left: 16px;
+            padding-right: 16px;
+          }
+
+          .rev-videos-container::-webkit-scrollbar {
+            display: none;
+          }
+
+          :global(.rev-video-card) {
+            flex: 0 0 78vw;
+            max-width: 310px;
+            scroll-snap-align: center;
+            padding: 16px;
+          }
         }
       `}</style>
     </section>

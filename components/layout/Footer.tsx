@@ -8,131 +8,141 @@ export default function Footer() {
   const { openModal } = useStore();
 
   return (
-    <footer className="ftr" id="ftr">
-      <div className="wrap">
-        {/* Main grid */}
-        <div className="ftr-grid">
-          {/* Column 1: Brand */}
+    <footer className="ftr border-t border-white/10 bg-[#0c0e12] text-gray-400 text-sm">
+      <div className="wrap max-w-7xl mx-auto px-4 py-12 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+          {/* Coluna 1: Descrição (sem logo branca) */}
           <div>
-            <a className="logo" href="#top" aria-label="AlfaCarbon — início" style={{ marginBottom: '16px', display: 'inline-flex' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/assets/img/logo.png"
-                alt="AlfaCarbon"
-                width="130"
-                height="44"
-                style={{ height: '36px', width: 'auto', filter: 'brightness(0) invert(1) opacity(0.9)' }}
-              />
-            </a>
-            <p style={{ fontSize: '14px', lineHeight: 1.65, marginTop: '12px', maxWidth: '32ch' }}>
-              Tapetes automotivos 3D sob medida.
-              Proteção desenvolvida para acompanhar o formato do seu veículo.
+            <p className="text-gray-300 text-sm leading-relaxed mb-4 font-medium">
+              Especializada em tapetes automotivos sob medida tipo bandeja 3D, produzidos nas dimensões exatas do seu veículo para proteger o interior contra água, barro, poeira e desgaste.
             </p>
+            <ul className="space-y-1.5 text-xs text-gray-400">
+              <li className="flex items-center gap-1.5 text-emerald-400">✓ Sob medida para cada veículo</li>
+              <li className="flex items-center gap-1.5 text-emerald-400">✓ Envio com rastreio para todo o Brasil</li>
+              <li className="flex items-center gap-1.5 text-emerald-400">✓ Atendimento humanizado via WhatsApp</li>
+              <li className="flex items-center gap-1.5 text-emerald-400">✓ Compra 100% segura com garantia</li>
+            </ul>
+          </div>
 
-            {/* Social */}
-            <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
-              {[
-                { href: `https://instagram.com/alfacarbon`, label: 'Instagram', path: 'M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01M21 2H3a1 1 0 0 0-1 1v18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z' },
-                { href: `https://facebook.com/alfacarbon`, label: 'Facebook', path: 'M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z' },
-              ].map(s => (
+          {/* Coluna 2: Institucional */}
+          <div>
+            <h4 className="text-white font-bold text-base mb-4 uppercase tracking-wider text-xs">Institucional</h4>
+            <ul className="space-y-2.5">
+              <li><button type="button" onClick={() => openModal('empresa')} className="hover:text-white transition-colors">Quem somos</button></li>
+              <li><button type="button" onClick={() => openModal('privacidade')} className="hover:text-white transition-colors">Política de privacidade</button></li>
+              <li><button type="button" onClick={() => openModal('terminos')} className="hover:text-white transition-colors">Termos de uso</button></li>
+              <li><button type="button" onClick={() => openModal('cambios')} className="hover:text-white transition-colors">Trocas e devoluções</button></li>
+            </ul>
+          </div>
+
+          {/* Coluna 3: Ajuda e Rastreamento */}
+          <div>
+            <h4 className="text-white font-bold text-base mb-4 uppercase tracking-wider text-xs">Ajuda</h4>
+            <ul className="space-y-2.5">
+              <li><button type="button" onClick={() => openModal('envios')} className="hover:text-white transition-colors">Prazos de envio e frete</button></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">Perguntas frequentes</a></li>
+              <li>
                 <a
-                  key={s.label}
-                  href={s.href}
+                  href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá, gostaria de saber o status do meu pedido.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={s.label}
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--line-strong)',
-                    display: 'grid',
-                    placeItems: 'center',
-                    color: 'var(--ink-3)',
-                    transition: 'color 0.15s, border-color 0.15s',
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.color = 'var(--gold-2)';
-                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--gold-2)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.color = 'var(--ink-3)';
-                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--line-strong)';
-                  }}
+                  className="hover:text-white transition-colors"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d={s.path} />
-                  </svg>
+                  Rastreamento do pedido
                 </a>
-              ))}
+              </li>
+              <li><a href={`mailto:${CONFIG.email}`} className="hover:text-white transition-colors">Envie um e-mail</a></li>
+            </ul>
+          </div>
+
+          {/* Coluna 4: Contato & Atendimento (sem CNPJ nem endereço) */}
+          <div>
+            <h4 className="text-white font-bold text-base mb-4 uppercase tracking-wider text-xs">Contato & Atendimento</h4>
+            <ul className="space-y-2.5 text-xs text-gray-400 leading-relaxed">
+              <li>
+                <a
+                  href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá, tenho uma dúvida sobre a AlfaCarbon.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white font-semibold hover:text-amber-400 transition-colors block text-sm"
+                >
+                  WhatsApp: {CONFIG.whatsappLabel}
+                </a>
+              </li>
+              <li>{CONFIG.email}</li>
+              <li>{CONFIG.hours}</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* ── Bloco: Formas de Envio & Pagamento ── */}
+        <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 mb-3 text-center md:text-left">
+              Formas de Envio
+            </h4>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+              {/* Correios */}
+              <span
+                className="bg-white/10 rounded-md px-3 py-1.5 flex items-center justify-center h-8 shadow-sm"
+                title="Correios"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/correios.svg"
+                  alt="Correios"
+                  className="h-4.5 max-h-[18px] w-auto object-contain"
+                />
+              </span>
+
+              {/* SEDEX */}
+              <span
+                className="bg-white/10 rounded-md px-3 py-1.5 flex items-center justify-center h-8 shadow-sm"
+                title="SEDEX"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/sedex.svg"
+                  alt="SEDEX"
+                  className="h-4.5 max-h-[18px] w-auto object-contain"
+                />
+              </span>
+
+              {/* PAC */}
+              <span
+                className="bg-white/10 rounded-md px-3 py-1.5 flex items-center justify-center h-8 shadow-sm"
+                title="PAC"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/pac.svg"
+                  alt="PAC"
+                  className="h-4.5 max-h-[18px] w-auto object-contain"
+                />
+              </span>
             </div>
           </div>
 
-          {/* Column 2: Products */}
+          {/* Formas de Pagamento (apenas PIX, sem cartões de crédito) */}
           <div>
-            <h4>Produtos</h4>
-            <ul>
-              <li><a href="#producto">Tapetes Dianteiros</a></li>
-              <li><a href="#producto">Kit Completo</a></li>
-              <li><a href="#producto">Kit + Porta-malas</a></li>
-            </ul>
-          </div>
-
-          {/* Column 3: Help */}
-          <div>
-            <h4>Ajuda</h4>
-            <ul>
-              <li><a href="#producto">Encontrar meu carro</a></li>
-              <li><a href="#preguntas">Perguntas frequentes</a></li>
-              <li>
-                <a
-                  href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá, gostaria de rastrear meu pedido.')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Rastrear pedido
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4: Contact & Policies */}
-          <div>
-            <h4>Contato</h4>
-            <ul>
-              <li>
-                <a
-                  href={`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent('Olá, gostaria de tirar uma dúvida.')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  WhatsApp
-                </a>
-              </li>
-              <li><a href={`mailto:${CONFIG.email}`}>E-mail</a></li>
-            </ul>
-
-            <h4 style={{ marginTop: '22px' }}>Políticas</h4>
-            <ul>
-              <li><button type="button" onClick={() => openModal('terminos')}>Termos de uso</button></li>
-              <li><button type="button" onClick={() => openModal('privacidade')}>Privacidade</button></li>
-              <li><button type="button" onClick={() => openModal('cambios')}>Trocas e devoluções</button></li>
-              <li><button type="button" onClick={() => openModal('envios')}>Prazos de envio</button></li>
-            </ul>
-
-            {/* Payment methods */}
-            <div className="pays" style={{ marginTop: '18px' }}>
-              {['PIX', 'VISA', 'MASTER', 'ELO', 'BOLETO'].map(m => (
-                <span key={m}>{m}</span>
-              ))}
+            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300 mb-3 text-center md:text-right">
+              Formas de Pagamento
+            </h4>
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+              <span className="px-3 py-1 rounded bg-emerald-500/20 text-xs font-bold text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                PIX à vista (5% OFF)
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="ftr-btm">
-          <span>© {new Date().getFullYear()} AlfaCarbon Brasil. Todos os direitos reservados.</span>
-          <span>PIX · VISA · MASTER · BOLETO</span>
+        {/* Linha Final de Copyright (sem CNPJ) */}
+        <div className="pt-8 border-t border-white/10 text-xs text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <span>&copy; {new Date().getFullYear()} {CONFIG.brand} Brasil. Todos os direitos reservados.</span>
+          <span>Preços e condições exclusivos para compras no site oficial.</span>
         </div>
       </div>
     </footer>
