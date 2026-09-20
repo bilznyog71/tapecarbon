@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useStore } from '@/hooks/useStore';
-import { CONFIG, formatMoney, formatInstallment } from '@/data/config';
+import { CONFIG, formatMoney, formatInstallment, getKitImageUrl } from '@/data/config';
 import {
   VEHICLE_BRANDS,
   getModelsForBrand,
@@ -138,7 +138,7 @@ export default function ProductConfigurator() {
     contain?: boolean;
   }
 
-  const mainKitImage = `/assets/img/kit-${kitId === 'carro_com' ? 'full' : 'interior'}-${colorId === 'preto' ? 'negro' : colorId === 'cinza' ? 'gris' : 'beige'}.webp`;
+  const mainKitImage = getKitImageUrl(kitId, colorId);
   const extraShots: GalleryShot[] = [
     { src: '/assets/img/interior-instalado.webp', alt: 'Interior completo com jogo de tapetes 3D instalado' },
     { src: '/images/foto3.jpg', alt: 'Textura e acabamento de perto' },
@@ -163,7 +163,6 @@ export default function ProductConfigurator() {
           {/* Galeria */}
           <div className="gallery">
             <div className="gal-main">
-              <span className="gal-flag" id="gal-flag">-{discountPercent}% OFF</span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 id="gal-img"
@@ -198,18 +197,12 @@ export default function ProductConfigurator() {
               Encaixe perfeito para o seu modelo, acabamento premium e proteção total contra água, barro e desgaste.
             </p>
 
-            <div className="rating">
-              <span className="stars" aria-hidden="true">★★★★★</span>
-              <span>
-                <b>4,9</b> de 5 · <a href="#opiniones">1.284 avaliações</a>
-              </span>
-            </div>
+            {/* REMOVIDO: .rating com dados não verificados */}
 
             <div className="pricebox">
               <div className="price-line">
                 <span className="price-now" id="p-now">{formatMoney(selectedKit.price)}</span>
                 <s className="price-was" id="p-was">{formatMoney(selectedKit.priceOld)}</s>
-                <span className="price-off" id="p-off">-{discountPercent}% OFF</span>
               </div>
               <p className="price-note">
                 ou <b id="p-cuota">{formatInstallment(selectedKit.price)}</b> · Frete Grátis com rastreio para todo o Brasil
@@ -224,42 +217,56 @@ export default function ProductConfigurator() {
               </div>
 
               {/* Busca Rápida Autocomplete */}
-              <div className="vsearch-box mb-4 relative" ref={searchRef}>
-                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-                  Busca rápida do seu carro
+              <div style={{ marginBottom: '12px', position: 'relative' }} ref={searchRef}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: 'var(--ink-lt-3)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '6px',
+                  }}
+                >
+                  Busca rápida
                 </label>
-                <div className="relative">
+                <div style={{ position: 'relative' }}>
                   <input
                     type="text"
                     value={quickSearch}
                     onChange={(e) => setQuickSearch(e.target.value)}
                     onFocus={() => { if (quickSearch.trim()) setShowSearchList(true); }}
-                    placeholder="🔍 Digite o modelo (ex: Onix, HB20, Strada, Hilux...)"
-                    className="w-full bg-[#1e2229] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
+                    placeholder="Digite o modelo (ex: Onix, HB20, Strada, Hilux...)"
+                    className="sel-search"
+                    style={{ border: '1px solid var(--line-strong)', borderRadius: 'var(--r)', background: 'var(--bg-soft)', width: '100%', padding: '11px 13px', fontSize: '14px', outline: 0, color: 'var(--ink)' }}
                   />
                   {quickSearch && (
                     <button
                       type="button"
                       onClick={() => { setQuickSearch(''); setShowSearchList(false); }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs px-1.5 py-0.5"
+                      style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--ink-3)', background: 'none', border: 0, cursor: 'pointer', padding: '4px 8px' }}
                     >
                       Limpar
                     </button>
                   )}
                 </div>
 
-                {/* Dropdown de resultados da busca */}
+                {/* Search results dropdown */}
                 {showSearchList && (
-                  <div className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-[#1a1d24] border border-white/15 rounded-xl shadow-2xl overflow-hidden max-h-72 overflow-y-auto divide-y divide-white/5">
+                  <div className="sel-pop" style={{ display: 'block', background: 'var(--bg-card)', border: '1px solid var(--line-strong)' }}>
                     {searchResults.map((item, i) => (
                       <button
                         type="button"
                         key={i}
                         onClick={() => handleSelectQuickSearch(item)}
-                        className="w-full text-left px-4 py-3 hover:bg-white/10 flex items-center justify-between text-sm transition-colors"
+                        className="sel-list"
+                        style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '11px 14px', border: 0, background: 'none', cursor: 'pointer', fontSize: '14px', color: 'var(--ink)', borderBottom: '1px solid var(--line)', alignItems: 'center' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-soft)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'none'; }}
                       >
-                        <span className="font-bold text-white">{item.modelo}</span>
-                        <span className="text-xs text-gray-400 font-medium">{item.marca}</span>
+                        <span style={{ fontWeight: 700 }}>{item.modelo}</span>
+                        <span style={{ fontSize: '12px', color: 'var(--ink-3)' }}>{item.marca}</span>
                       </button>
                     ))}
                     <button
@@ -271,9 +278,9 @@ export default function ProductConfigurator() {
                         setBrand(quickSearch || 'Outra Marca');
                         setModel(quickSearch || 'Modelo Personalizado');
                       }}
-                      className="w-full text-left px-4 py-3 bg-red-950/30 hover:bg-red-900/40 text-xs font-semibold text-red-400 flex items-center gap-2 transition-colors"
+                      style={{ display: 'flex', width: '100%', padding: '11px 14px', border: 0, background: 'var(--bg-soft)', cursor: 'pointer', fontSize: '12px', color: 'var(--gold)', fontWeight: 700, textAlign: 'left' }}
                     >
-                      <span>🔍 Não encontrou seu modelo? Toque para digitar (fazemos sob medida ✅)</span>
+                      Modelo não encontrado? Toque para digitar manualmente
                     </button>
                   </div>
                 )}
@@ -624,11 +631,16 @@ export default function ProductConfigurator() {
               </div>
             </div>
 
-            {/* Botão de Compra */}
-            <button className="btn btn-buy btn-lg mt-4" onClick={addToCart}>
-              Montar meu kit agora
+            {/* Buy button */}
+            <button className="btn btn-buy btn-lg" style={{ marginTop: '20px' }} onClick={addToCart} id="add-to-cart-btn">
+              Adicionar ao carrinho
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" />
+              </svg>
             </button>
-            <p className="stockline">Restam apenas {CONFIG.stockUnits} unidades a este preço promocional</p>
+            {/* REMOVIDO: stockline falsa ("Restam apenas X unidades") */}
 
             <ul className="assur">
               <li>
